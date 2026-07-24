@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Alesta
  * Plugin URI:        https://www.galiance.fr/alesta
- * Description:       SEO minimaliste : editez le title et la meta description de chaque page/article, plus Open Graph pour un beau partage social.
+ * Description:       Minimalist SEO: edit the title and meta description of each page or post, plus Open Graph for a nice social share.
  * Version:           1.0.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
@@ -11,7 +11,6 @@
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       alesta
- * Domain Path:       /languages
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

@@ -32,7 +32,7 @@ class Alesta_Meta {
 		foreach ( $post_types as $post_type ) {
 			add_meta_box(
 				'alesta_seo',
-				__( 'Alesta — SEO', 'alesta' ),
+				__( 'Alesta - SEO', 'alesta' ),
 				array( __CLASS__, 'render_metabox' ),
 				$post_type,
 				'normal',
@@ -51,7 +51,7 @@ class Alesta_Meta {
 		?>
 		<p>
 			<label for="alesta_seo_title" style="display:block;font-weight:600;margin-bottom:4px;">
-				<?php esc_html_e( 'Titre SEO', 'alesta' ); ?>
+				<?php esc_html_e( 'SEO Title', 'alesta' ); ?>
 			</label>
 			<input
 				type="text"
@@ -60,15 +60,15 @@ class Alesta_Meta {
 				value="<?php echo esc_attr( $title ); ?>"
 				maxlength="70"
 				style="width:100%;"
-				placeholder="<?php esc_attr_e( 'Laisser vide pour utiliser le titre par defaut', 'alesta' ); ?>"
+				placeholder="<?php esc_attr_e( 'Leave empty to use the default title', 'alesta' ); ?>"
 			/>
 			<span style="color:#666;font-size:12px;">
-				<?php esc_html_e( 'Environ 60 caracteres recommandes.', 'alesta' ); ?>
+				<?php esc_html_e( 'About 60 characters recommended.', 'alesta' ); ?>
 			</span>
 		</p>
 		<p>
 			<label for="alesta_seo_description" style="display:block;font-weight:600;margin-bottom:4px;">
-				<?php esc_html_e( 'Meta description', 'alesta' ); ?>
+				<?php esc_html_e( 'Meta Description', 'alesta' ); ?>
 			</label>
 			<textarea
 				id="alesta_seo_description"
@@ -76,10 +76,10 @@ class Alesta_Meta {
 				rows="3"
 				maxlength="200"
 				style="width:100%;"
-				placeholder="<?php esc_attr_e( 'Resume affiche par Google sous le titre de votre page.', 'alesta' ); ?>"
+				placeholder="<?php esc_attr_e( 'Summary displayed by Google below the page title.', 'alesta' ); ?>"
 			><?php echo esc_textarea( $description ); ?></textarea>
 			<span style="color:#666;font-size:12px;">
-				<?php esc_html_e( 'Environ 155 caracteres recommandes.', 'alesta' ); ?>
+				<?php esc_html_e( 'About 155 characters recommended.', 'alesta' ); ?>
 			</span>
 		</p>
 		<?php

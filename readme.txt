@@ -1,87 +1,87 @@
 === Alesta ===
 Contributors: alestacomputer
-Tags: seo, meta description, meta tags, open graph, referencement
+Tags: seo, meta description, meta tags, open graph, twitter card
 Requires at least: 6.0
-Tested up to: 6.7
+Tested up to: 6.8
 Requires PHP: 7.4
 Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Le SEO minimaliste pour WordPress. Editez le titre SEO et la meta description de chaque page. Rien de plus. Rien d'inutile.
+The minimalist SEO plugin for WordPress. Edit SEO title and meta description for every page or post. Nothing else. Nothing unnecessary.
 
 == Description ==
 
-**Alesta** est un plugin SEO ultra minimaliste, pense pour ceux qui veulent l'essentiel sans usine a gaz.
+**Alesta** is an ultra minimalist SEO plugin, built for people who want the essentials without the bloat.
 
-Une seule fonctionnalite, faite proprement :
+One feature, done well:
 
-* **Titre SEO** editable par page/article
-* **Meta description** editable par page/article
-* **Open Graph** (og:title, og:description, og:url, og:type) automatique
-* **Twitter Card** (twitter:card) automatique
+* **SEO Title** editable per page or post
+* **Meta Description** editable per page or post
+* **Open Graph** (og:title, og:description, og:url, og:type) generated automatically
+* **Twitter Card** (twitter:card) generated automatically
 
-Pas de reglages compliques, pas d'onboarding a rallonge, pas de premium a debloquer, pas de dashboard bavard. Vous ouvrez un article, vous remplissez 2 champs, vous publiez. C'est tout.
+No complex settings, no long onboarding, no premium upsells, no chatty dashboard. Open a post, fill two fields, publish. That is all.
 
-= Pourquoi Alesta ? =
+= Why Alesta? =
 
-Les plugins SEO existants (Yoast, RankMath, All in One SEO) sont excellents mais font aussi 50 autres choses (schema, sitemap, redirections, breadcrumbs, analyse de contenu, notifications...). Si vous voulez juste editer votre title et votre meta description sans installer 3 Mo de code, Alesta fait ca.
+Existing SEO plugins (Yoast, RankMath, All in One SEO) are excellent, but they also do fifty other things (schema, sitemap, redirects, breadcrumbs, content analysis, notifications, and more). If you just want to edit your title and meta description without installing three megabytes of code, Alesta does that.
 
-= Ce qu'Alesta ne fait PAS =
+= What Alesta does NOT do =
 
-* Analyse de mots-cles
-* Sitemap XML (WordPress le fait deja depuis la version 5.5)
-* Schema.org / Rich snippets
-* Redirections
+* Keyword analysis
+* XML sitemap (WordPress has done that natively since 5.5)
+* Schema.org and rich snippets
+* Redirects
 * Breadcrumbs
-* Analyse de lisibilite
-* Notifications, badges, upsell
+* Readability analysis
+* Notifications, badges, upsell banners
 
-Si vous avez besoin de ces fonctions, utilisez Yoast ou RankMath. Alesta est fait pour ceux qui veulent juste le strict necessaire.
+If you need those features, use Yoast or RankMath. Alesta is for people who want only the strict essentials.
 
-= Compatibilite =
+= Compatibility =
 
-* Compatible avec tous les themes
-* Compatible avec Classic Editor et Block Editor (Gutenberg)
-* Zero conflit connu avec les autres plugins SEO (mais bien sur, activez-en un seul a la fois si vous voulez que les meta tags ne se dupliquent pas)
+* Works with any theme
+* Works with the Classic Editor and the Block Editor (Gutenberg)
+* No known conflict with other SEO plugins (but of course activate only one at a time to prevent duplicated meta tags)
 
-= Vie privee / RGPD =
+= Privacy and GDPR =
 
-Alesta n'envoie aucune donnee a l'exterieur. Aucune connexion externe, aucun tracking, aucune telemetrie. Le code est court, ouvert, et auditable en 5 minutes.
+Alesta sends zero data outside your site. No external connection, no tracking, no telemetry. The code is short, open, and auditable in five minutes.
 
 == Installation ==
 
-1. Uploadez le dossier `alesta` dans `/wp-content/plugins/` (ou installez via l'admin WordPress > Extensions > Ajouter).
-2. Activez le plugin dans le menu Extensions.
-3. Editez un article ou une page : une metabox **Alesta - SEO** apparait sous l'editeur. Remplissez le titre SEO et la meta description.
-4. C'est tout.
+1. Upload the `alesta` folder to `/wp-content/plugins/` (or install directly from WordPress admin: Plugins > Add New).
+2. Activate the plugin under the Plugins menu.
+3. Edit any page or post: an **Alesta - SEO** metabox appears below the editor. Fill in the SEO title and meta description.
+4. Done.
 
 == Frequently Asked Questions ==
 
-= Est-ce compatible avec Yoast SEO / RankMath ? =
+= Is it compatible with Yoast SEO or RankMath? =
 
-Techniquement oui, mais il est preferable de n'activer qu'un seul plugin SEO a la fois pour eviter que les meta tags soient dupliques dans le `<head>`.
+Technically yes, but you should activate only one SEO plugin at a time to avoid duplicated meta tags in the page `<head>`.
 
-= Pourquoi mes changements ne se voient pas ? =
+= Why are my changes not visible? =
 
-Pensez a vider le cache de votre plugin de cache (WP Rocket, W3 Total Cache, etc.). Les meta tags sont injectees dans le HTML de la page, un cache peut les figer.
+Remember to purge your cache plugin (WP Rocket, W3 Total Cache, and similar). Meta tags are injected into the page HTML, and a cache can freeze them.
 
-= Ou est le fichier de configuration ? =
+= Where is the settings page? =
 
-Il n'y en a pas. Tout se passe dans la metabox de chaque article/page. C'est volontaire : moins il y a de reglages, moins il y a de bugs.
+There is none. Everything happens inside the metabox on each page or post. This is intentional: fewer settings mean fewer bugs.
 
-= Peut-on editer les meta tags de la page d'accueil ? =
+= Can I edit meta tags for the homepage? =
 
-Si votre page d'accueil est une page WordPress (Reglages > Lecture > Page statique), oui, comme n'importe quelle page. Si c'est le fil des articles, non pour l'instant.
+If your homepage is a WordPress page (Settings > Reading > Static page), yes, like any other page. If it is the post feed, not yet.
 
 == Changelog ==
 
 = 1.0.0 =
-* Premiere version publique.
-* Meta title + meta description editables par page/article.
-* Open Graph et Twitter Card automatiques.
+* First public release.
+* Editable SEO title and meta description per page and post.
+* Automatic Open Graph and Twitter Card.
 
 == Upgrade Notice ==
 
 = 1.0.0 =
-Premiere version publique.
+First public release.
