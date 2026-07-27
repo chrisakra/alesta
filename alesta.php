@@ -1,9 +1,8 @@
 <?php
 /**
  * Plugin Name:       Alesta
- * Plugin URI:        https://www.alesta-ai.com
  * Description:       Minimalist SEO: edit the title and meta description of each page or post, plus Open Graph for a nice social share.
- * Version:           1.0.1
+ * Version:           1.0.2
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Alesta AI
@@ -17,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ALESTA_VERSION', '1.0.1' );
+define( 'ALESTA_VERSION', '1.0.2' );
 define( 'ALESTA_PLUGIN_FILE', __FILE__ );
 define( 'ALESTA_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 

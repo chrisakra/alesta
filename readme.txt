@@ -4,7 +4,7 @@ Tags: seo, meta description, meta tags, open graph, twitter card
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -76,6 +76,10 @@ If your homepage is a WordPress page (Settings > Reading > Static page), yes, li
 
 == Changelog ==
 
+= 1.0.2 =
+* Remove Plugin URI header (was identical to Author URI, which is not allowed by WordPress.org).
+* No functional changes.
+
 = 1.0.1 =
 * Update plugin metadata (Author, Author URI, Plugin URI, Contributors) for WordPress.org submission compliance.
 * No functional changes.
@@ -86,6 +90,9 @@ If your homepage is a WordPress page (Settings > Reading > Static page), yes, li
 * Automatic Open Graph and Twitter Card.
 
 == Upgrade Notice ==
+
+= 1.0.2 =
+Metadata cleanup only. Safe to update.
 
 = 1.0.1 =
 Metadata update only. Safe to update.
