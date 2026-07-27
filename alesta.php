@@ -1,13 +1,13 @@
 <?php
 /**
  * Plugin Name:       Alesta
- * Plugin URI:        https://www.galiance.fr/alesta
+ * Plugin URI:        https://www.alesta-ai.com
  * Description:       Minimalist SEO: edit the title and meta description of each page or post, plus Open Graph for a nice social share.
  * Version:           1.0.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
- * Author:            Alesta Computer
- * Author URI:        https://www.galiance.fr
+ * Author:            Alesta AI
+ * Author URI:        https://www.alesta-ai.com
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       alesta
