@@ -1,5 +1,5 @@
 === Alesta ===
-Contributors: alestacomputer
+Contributors: alestaplugin
 Tags: seo, meta description, meta tags, open graph, twitter card
 Requires at least: 6.0
 Tested up to: 7.0
