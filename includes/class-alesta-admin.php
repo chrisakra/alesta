@@ -2,9 +2,12 @@
 /**
  * Alesta — Admin menu and dashboard page.
  *
- * Minimal footprint: single "01 SEO & Référencement" section with exactly
- * two cards — SEO Meta Tags (Free, active) and Title & Meta + Audit SEO
- * (Solo promo). No other module or section appears.
+ * Sidebar layout mirrors the Alesta AI Free v1.2.7 blueprint but ships only
+ * the two first functional Free modules of that blueprint:
+ *   01 SEO           → Sitemap XML
+ *   04 Performance   → Gzip, Cache, HTTPS (.htaccess helper)
+ *
+ * Additional modules will be added block by block in future releases.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -56,8 +59,7 @@ class Alesta_Admin {
 	}
 
 	/**
-	 * Register the top-level Alesta AI menu — dashboard + one SEO section +
-	 * the single active module and the single Solo promo.
+	 * Register the top-level Alesta AI menu — dashboard, 2 sections, 2 modules.
 	 */
 	public static function register_menu() {
 		add_menu_page(
@@ -80,7 +82,7 @@ class Alesta_Admin {
 			array( __CLASS__, 'render_dashboard' )
 		);
 
-		// Section header — inert via admin-menu.css.
+		// Section header 01 SEO — inert via admin-menu.css.
 		add_submenu_page(
 			self::MENU_SLUG,
 			'SEO',
@@ -90,29 +92,41 @@ class Alesta_Admin {
 			array( __CLASS__, 'render_section_header' )
 		);
 
-		// Active module: SEO Meta Tags → native post editor.
+		// Sitemap XML — functional module.
 		add_submenu_page(
 			self::MENU_SLUG,
-			__( 'SEO Meta Tags', 'alesta' ),
-			'- SEO Meta Tags',
+			__( 'Sitemap XML', 'alesta' ),
+			'- Sitemap XML',
 			self::CAPABILITY,
-			'edit.php',
-			null
+			'alesta-ai-sitemap',
+			function () {
+				if ( class_exists( 'Alesta_Admin_Sitemap' ) ) {
+					( new Alesta_Admin_Sitemap() )->render_page();
+				}
+			}
 		);
 
-		// Solo promo: Title & Meta + Audit SEO.
+		// Section header 04 Performance — inert via admin-menu.css.
 		add_submenu_page(
 			self::MENU_SLUG,
-			'Title &amp; Meta',
-			'- Title &amp; Meta + Audit SEO <span class="alesta-pro-pill">Solo</span>',
+			'Performance',
+			'Performance &amp; Optimisation',
 			self::CAPABILITY,
-			'alesta-ai-meta',
+			'alesta-ai-perf',
+			array( __CLASS__, 'render_section_header' )
+		);
+
+		// Gzip, Cache, HTTPS (Htaccess) — functional module.
+		add_submenu_page(
+			self::MENU_SLUG,
+			__( 'Optimisation Gzip, Cache, HTTPS', 'alesta' ),
+			'- Optimisation Gzip, Cache, HTTPS',
+			self::CAPABILITY,
+			'alesta-ai-cache',
 			function () {
-				Alesta_Promo::render(
-					'Title & Meta + Audit SEO',
-					__( 'Génération en lot des titres et méta-descriptions par Claude, et audit SEO complet avec score.', 'alesta' ),
-					"\xF0\x9F\x93\x9D"
-				);
+				if ( class_exists( 'Alesta_Admin_Htaccess' ) ) {
+					( new Alesta_Admin_Htaccess() )->render_page( 'cache' );
+				}
 			}
 		);
 	}
@@ -129,7 +143,7 @@ class Alesta_Admin {
 	}
 
 	/**
-	 * Render the dashboard — cockpit header, stats, and the single SEO section.
+	 * Render the dashboard — cockpit header, stats and the 2 active sections.
 	 */
 	public static function render_dashboard() {
 		if ( ! current_user_can( self::CAPABILITY ) ) {
@@ -155,7 +169,7 @@ class Alesta_Admin {
 				<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
 					<span class="alesta-badge" style="background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;">
 						<?php
-						/* translators: %s: plugin version, e.g. 1.1.1 */
+						/* translators: %s: plugin version, e.g. 1.3.0 */
 						echo esc_html( sprintf( __( 'Alesta v%s', 'alesta' ), ALESTA_VERSION ) );
 						?>
 					</span>
@@ -179,23 +193,36 @@ class Alesta_Admin {
 				<div class="alesta-section-heading">
 					<span class="alesta-section-num">01</span>
 					<span class="alesta-section-title"><?php esc_html_e( 'SEO &amp; Référencement', 'alesta' ); ?></span>
-					<span class="alesta-section-desc"><?php esc_html_e( 'Optimisation on-page, balises, mots-clés', 'alesta' ); ?></span>
+					<span class="alesta-section-desc"><?php esc_html_e( 'Optimisation on-page, balises, sitemap, visibilité IA', 'alesta' ); ?></span>
 				</div>
 				<div class="alesta-cards">
 					<?php
 					self::card_active(
-						"\xF0\x9F\x93\x9D",
-						__( 'SEO Meta Tags', 'alesta' ),
-						__( 'Éditez le titre SEO et la méta-description de chaque page ou article. Open Graph et Twitter Card générés automatiquement.', 'alesta' ),
-						'edit.php',
-						__( 'Modifier les articles', 'alesta' )
+						"\xF0\x9F\x97\xBA", // 🗺
+						__( 'Sitemap XML', 'alesta' ),
+						__( 'Générez le sitemap.xml et notifiez Google &amp; Bing automatiquement.', 'alesta' ),
+						'alesta-ai-sitemap',
+						__( 'Ouvrir', 'alesta' )
 					);
-					self::card_promo(
-						"\xF0\x9F\x93\x9D",
-						__( 'Title &amp; Meta + Audit SEO', 'alesta' ),
-						__( 'Génération en lot par Claude et audit SEO complet avec score', 'alesta' ),
-						'alesta-ai-meta',
-						'solo'
+					?>
+				</div>
+			</div>
+
+			<!-- 04 Performance & Optimisation -->
+			<div class="alesta-section-block">
+				<div class="alesta-section-heading">
+					<span class="alesta-section-num">04</span>
+					<span class="alesta-section-title"><?php esc_html_e( 'Performance &amp; Optimisation', 'alesta' ); ?></span>
+					<span class="alesta-section-desc"><?php esc_html_e( 'Vitesse, cache, compression et HTTPS via .htaccess', 'alesta' ); ?></span>
+				</div>
+				<div class="alesta-cards">
+					<?php
+					self::card_active(
+						"\xE2\x9A\xA1", // ⚡
+						__( 'Optimisation Gzip, Cache, HTTPS', 'alesta' ),
+						__( '.htaccess : compression Gzip, cache navigateur, redirection HTTPS.', 'alesta' ),
+						'alesta-ai-cache',
+						__( 'Ouvrir', 'alesta' )
 					);
 					?>
 				</div>
@@ -206,12 +233,10 @@ class Alesta_Admin {
 	}
 
 	/**
-	 * Render an "active" module card (linked to its real page).
+	 * Render an "active" module card (linked to its admin page).
 	 */
-	private static function card_active( $icon, $name, $desc, $target, $btn_label ) {
-		$href = ( strpos( $target, '.php' ) !== false )
-			? admin_url( $target )
-			: admin_url( 'admin.php?page=' . $target );
+	private static function card_active( $icon, $name, $desc, $slug, $btn_label ) {
+		$href = admin_url( 'admin.php?page=' . $slug );
 		?>
 		<div class="alesta-module-card alesta-module-active">
 			<span class="amc-status amc-status-ok"><?php esc_html_e( '✓ Disponible', 'alesta' ); ?></span>
@@ -222,26 +247,6 @@ class Alesta_Admin {
 			</div>
 			<div class="amc-footer">
 				<a href="<?php echo esc_url( $href ); ?>" class="button button-primary"><?php echo esc_html( $btn_label ); ?></a>
-			</div>
-		</div>
-		<?php
-	}
-
-	/**
-	 * Render a "promo" module card (Solo/Pro pill + button to promo page).
-	 */
-	private static function card_promo( $icon, $name, $desc, $slug, $tier = 'solo' ) {
-		$badge = Alesta_Promo::dashboard_badge( $tier );
-		?>
-		<div class="alesta-module-card alesta-module-active">
-			<span class="amc-status amc-status-ok"><?php esc_html_e( '✓ Disponible', 'alesta' ); ?></span>
-			<div class="amc-icon"><?php echo esc_html( $icon ); ?></div>
-			<div class="amc-info">
-				<div class="amc-name"><?php echo esc_html( $name ); ?> <?php echo $badge; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
-				<div class="amc-desc"><?php echo esc_html( $desc ); ?></div>
-			</div>
-			<div class="amc-footer">
-				<a href="<?php echo esc_url( admin_url( 'admin.php?page=' . $slug ) ); ?>" class="button button-primary"><?php esc_html_e( 'Découvrir', 'alesta' ); ?></a>
 			</div>
 		</div>
 		<?php

@@ -1,97 +1,87 @@
 === Alesta ===
 Contributors: alestaplugin
-Tags: seo, meta description, open graph, twitter card, meta tags
+Tags: seo, sitemap, htaccess, cache, gzip
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-The minimalist SEO plugin for WordPress. Edit SEO title and meta description for every page or post. Nothing else. Nothing unnecessary.
+SEO and technical toolkit for WordPress: XML sitemap with Google/Bing ping, and .htaccess optimization (Gzip, cache, HTTPS).
 
 == Description ==
 
-**Alesta** is an ultra minimalist SEO plugin, built for people who want the essentials without the bloat.
+**Alesta** is a minimalist WordPress toolkit focused on SEO and technical performance. Every module does one thing and does it well.
 
-One feature, done well:
+Modules shipped in this version:
 
-* **SEO Title** editable per page or post
-* **Meta Description** editable per page or post
-* **Open Graph** (og:title, og:description, og:url, og:type) generated automatically
-* **Twitter Card** (twitter:card) generated automatically
+* **XML Sitemap** — Generates a sitemap.xml, automatically pings Google and Bing when content is updated, and lets you exclude specific post types or individual posts.
+* **Gzip, Cache, HTTPS optimization** — Clean, safe manipulation of the .htaccess file: enable Gzip compression, browser cache headers for static assets, and HTTP to HTTPS redirection. One-click backup and restore included.
 
-No complex settings, no long onboarding, no premium upsells, no chatty dashboard. Open a post, fill two fields, publish. That is all.
+Alesta is built in the same product family as the Alesta AI suite. More Free modules will be added block by block over the next releases (robots.txt, maintenance mode, health check, GDPR banner, and more).
 
-= Why Alesta? =
+= Privacy and GDPR =
 
-Existing SEO plugins (Yoast, RankMath, All in One SEO) are excellent, but they also do fifty other things (schema, sitemap, redirects, breadcrumbs, content analysis, notifications, and more). If you just want to edit your title and meta description without installing three megabytes of code, Alesta does that.
-
-= What Alesta does NOT do =
-
-* Keyword analysis
-* XML sitemap (WordPress has done that natively since 5.5)
-* Schema.org and rich snippets
-* Redirects
-* Breadcrumbs
-* Readability analysis
-* Notifications, badges, upsell banners
-
-If you need those features, use Yoast or RankMath. Alesta is for people who want only the strict essentials.
+Alesta does not send any data outside your site, except the public pings sent to Google and Bing when you regenerate your XML sitemap (standard sitemap behavior). No tracking, no telemetry, no connection to third-party servers.
 
 = Compatibility =
 
 * Works with any theme
-* Works with the Classic Editor and the Block Editor (Gutenberg)
-* No known conflict with other SEO plugins (but of course activate only one at a time to prevent duplicated meta tags)
+* Compatible with the Classic Editor and the Block Editor (Gutenberg)
+* Compatible with WooCommerce (products are included in the sitemap if the CPT is public)
 
-= Privacy and GDPR =
+= Pro version =
 
-Alesta sends zero data outside your site. No external connection, no tracking, no telemetry. The code is short, open, and auditable in five minutes.
-
-Alesta is also the foundation for future professional modules, each built with the same minimalist philosophy.
+A separate **Alesta AI Pro** extension provides additional modules (AI, security, reporting, chatbot, and more). It is distributed outside the WordPress.org repository at alesta-ai.com and is fully independent and optional.
 
 == Installation ==
 
-1. Upload the `alesta` folder to `/wp-content/plugins/` (or install directly from WordPress admin: Plugins > Add New).
-2. Activate the plugin under the Plugins menu.
-3. Edit any page or post: an **Alesta - SEO** metabox appears below the editor. Fill in the SEO title and meta description.
-4. Done.
+1. Upload the `alesta` folder to `/wp-content/plugins/` (or install it directly from the WordPress admin: Plugins &gt; Add New).
+2. Activate the plugin from the Plugins menu.
+3. Open the **Alesta AI** menu in the admin sidebar.
+4. Configure each module from its own submenu.
 
 == Frequently Asked Questions ==
 
+= How do I enable Gzip compression? =
+
+Go to **Alesta AI &rarr; Gzip, Cache, HTTPS optimization**, open the Gzip tab, and click Apply. A backup of the .htaccess is created automatically.
+
+= Does the HTTPS module replace a real SSL certificate? =
+
+No. The HTTPS redirection only works if your host already has a valid SSL certificate on your domain. The module simply adds the .htaccess rewrite rule that forces `http://` to `https://`.
+
+= Is the XML sitemap detected by Google? =
+
+Yes, the sitemap is available at `/sitemap.xml`. Alesta automatically pings Google and Bing when content is updated.
+
 = Is it compatible with Yoast SEO or RankMath? =
 
-Technically yes, but you should activate only one SEO plugin at a time to avoid duplicated meta tags in the page `<head>`.
-
-= Why are my changes not visible? =
-
-Remember to purge your cache plugin (WP Rocket, W3 Total Cache, and similar). Meta tags are injected into the page HTML, and a cache can freeze them.
-
-= Where is the settings page? =
-
-There is none. Everything happens inside the metabox on each page or post. This is intentional: fewer settings mean fewer bugs.
-
-= Can I edit meta tags for the homepage? =
-
-If your homepage is a WordPress page (Settings > Reading > Static page), yes, like any other page. If it is the post feed, not yet.
+Technically yes, but if you already use Yoast or RankMath for your XML sitemap, disable their sitemap module to avoid duplicates.
 
 == Changelog ==
 
+= 1.3.0 =
+* New functional modules ported from Alesta AI Free v1.2.7:
+  * **XML Sitemap** — generation, Google/Bing ping, per-type or per-post exclusions.
+  * **Gzip, Cache, HTTPS optimization** — .htaccess helper with backup/restore.
+* The SEO Meta Tags module (per-post title/description metabox) is removed: it is not part of the Alesta AI Free blueprint (that feature is in the Pro extension). Users who need it can stay on version 1.2.0.
+* Plugin description updated to reflect the new "SEO + technical toolkit" scope.
+
 = 1.2.0 =
 * Plugin admin UI switched to French to match the Alesta AI product family (still translation-ready via text-domain).
-* Dashboard simplified: single "01 SEO & Référencement" section with two cards — SEO Meta Tags (active) and Title & Meta + SEO Audit (Solo, informational card linking to alesta-ai.com).
+* Dashboard simplified: single "01 SEO" section with two cards.
 * Robots.txt module removed from this release — will come back in a future version as a properly finished block.
 
 = 1.1.1 =
-* Alesta AI menu now uses the Greek letter phi (ϕ) as sidebar icon, matching the Alesta AI product family.
-* Dashboard fully redesigned: cockpit header, key figures, and a full catalogue of 10 module sections. Modules included in the Pro extension (distributed outside WordPress.org) are shown as informational cards with a link to alesta-ai.com.
+* Alesta AI menu now uses the Greek letter phi as sidebar icon, matching the Alesta AI product family.
+* Dashboard redesigned: cockpit header, key figures, and a full catalogue of module sections. Modules included in the Pro extension are shown as informational cards linking to alesta-ai.com.
 * Loads a small admin.css / admin-menu.css / pro-promo.css on Alesta AI screens only.
 
 = 1.1.0 =
 * New: Robots.txt module. Edit, backup, restore and check accessibility of your robots.txt directly from the WordPress admin.
 * Alesta AI menu now includes a "Robots.txt" submenu.
-* Dashboard updated: SEO Meta Tags and Robots.txt are both listed as Active modules.
 
 = 1.0.3 =
 * New: Alesta AI admin menu with dashboard page listing active modules.
@@ -112,6 +102,9 @@ If your homepage is a WordPress page (Settings > Reading > Static page), yes, li
 * Automatic Open Graph and Twitter Card.
 
 == Upgrade Notice ==
+
+= 1.3.0 =
+Major pivot: the plugin now ships XML Sitemap and .htaccess optimization (Gzip / cache / HTTPS), aligning with the Alesta AI Free blueprint. The previous per-post SEO metabox is removed. If you rely on it, stay on 1.2.0 or export your data first.
 
 = 1.2.0 =
 Admin UI translated to French. Dashboard reduced to one SEO section. Safe to update.
