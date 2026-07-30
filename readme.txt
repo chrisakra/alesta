@@ -1,10 +1,10 @@
 === Alesta ===
 Contributors: alestaplugin
-Tags: seo, meta description, meta tags, open graph, twitter card
+Tags: seo, meta description, robots, robots.txt, open graph
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.2
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -49,6 +49,8 @@ If you need those features, use Yoast or RankMath. Alesta is for people who want
 
 Alesta sends zero data outside your site. No external connection, no tracking, no telemetry. The code is short, open, and auditable in five minutes.
 
+Alesta is also the foundation for future professional modules, each built with the same minimalist philosophy.
+
 == Installation ==
 
 1. Upload the `alesta` folder to `/wp-content/plugins/` (or install directly from WordPress admin: Plugins > Add New).
@@ -76,6 +78,16 @@ If your homepage is a WordPress page (Settings > Reading > Static page), yes, li
 
 == Changelog ==
 
+= 1.1.0 =
+* New: Robots.txt module. Edit, backup, restore and check accessibility of your robots.txt directly from the WordPress admin.
+* Alesta AI menu now includes a "Robots.txt" submenu.
+* Dashboard updated: SEO Meta Tags and Robots.txt are both listed as Active modules.
+
+= 1.0.3 =
+* New: Alesta AI admin menu with dashboard page listing active modules.
+* SEO Meta Tags module remains fully functional and accessible via the same metabox.
+* Foundation added for future modules.
+
 = 1.0.2 =
 * Remove Plugin URI header (was identical to Author URI, which is not allowed by WordPress.org).
 * No functional changes.
@@ -90,6 +102,12 @@ If your homepage is a WordPress page (Settings > Reading > Static page), yes, li
 * Automatic Open Graph and Twitter Card.
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+Adds a Robots.txt editor module. Safe to update.
+
+= 1.0.3 =
+Adds admin menu and dashboard. No breaking changes.
 
 = 1.0.2 =
 Metadata cleanup only. Safe to update.
