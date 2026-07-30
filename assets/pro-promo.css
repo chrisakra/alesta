@@ -1,0 +1,109 @@
+/* Alesta — "Available in Alesta AI Pro" promo page (ported from Free v1.2.7) */
+
+.alesta-pro-promo-wrap {
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+	padding: 40px 20px;
+	min-height: 60vh;
+}
+
+.alesta-pro-promo-card {
+	background: #fff;
+	border: 1px solid #e5e7eb;
+	border-radius: 16px;
+	padding: 40px 44px;
+	max-width: 560px;
+	width: 100%;
+	text-align: center;
+	box-shadow: 0 8px 32px rgba(0,0,0,.08);
+	position: relative;
+}
+
+.alesta-pro-promo-badge {
+	display: inline-block;
+	background: #1e3a5f;
+	color: #fff;
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: .6px;
+	padding: 5px 14px;
+	border-radius: 20px;
+	margin-bottom: 20px;
+}
+
+.alesta-pro-promo-icon {
+	font-size: 48px;
+	margin-bottom: 16px;
+	line-height: 1;
+}
+
+.alesta-pro-promo-title {
+	font-size: 24px;
+	font-weight: 800;
+	color: #111827;
+	margin: 0 0 10px;
+}
+
+.alesta-pro-promo-desc {
+	font-size: 14px;
+	color: #6b7280;
+	margin: 0 0 20px;
+	line-height: 1.6;
+}
+
+.alesta-pro-promo-info {
+	font-size: 13px;
+	color: #4b5563;
+	background: #f9fafb;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+	padding: 12px 16px;
+	margin: 0 0 24px;
+	line-height: 1.55;
+}
+
+.alesta-pro-promo-btn {
+	display: inline-block;
+	background: #e8890c;
+	color: #fff !important;
+	font-size: 15px;
+	font-weight: 700;
+	padding: 12px 24px;
+	border-radius: 8px;
+	text-decoration: none !important;
+	transition: opacity .15s, transform .15s;
+}
+.alesta-pro-promo-btn:hover {
+	opacity: .92;
+	transform: translateY(-1px);
+}
+
+.alesta-pro-promo-note {
+	font-size: 11px;
+	color: #9ca3af;
+	margin: 14px 0 0;
+}
+
+/* Small pill next to feature names on the main dashboard */
+.alesta-pro-badge {
+	display: inline-block;
+	font-size: 9px;
+	font-weight: 700;
+	padding: 1px 6px;
+	border-radius: 4px;
+	margin-left: 5px;
+	vertical-align: middle;
+	letter-spacing: .3px;
+	line-height: 1.6;
+	white-space: nowrap;
+	text-transform: uppercase;
+	background: #fff3e0;
+	border: 1px solid #e8890c;
+	color: #7c3d00;
+}
+.alesta-pro-badge--pro {
+	background: #e8890c;
+	border-color: #e8890c;
+	color: #fff;
+}

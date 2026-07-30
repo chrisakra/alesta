@@ -1,0 +1,66 @@
+/* Alesta — Sidebar admin menu pills & upgrade CTA (ported from Free v1.2.7) */
+
+/* "Solo" / "Pro" pill next to paid feature submenu names */
+#adminmenu .alesta-pro-pill {
+	display: inline-block;
+	font-size: 9px;
+	font-weight: 700;
+	padding: 1px 6px;
+	margin-left: 6px;
+	border-radius: 4px;
+	vertical-align: middle;
+	line-height: 1.5;
+	letter-spacing: .3px;
+	background: #fff3e0;
+	color: #7c3d00;
+	border: 1px solid #e8890c;
+	text-transform: uppercase;
+}
+#adminmenu .alesta-pro-pill--pro {
+	background: #e8890c;
+	color: #fff;
+	border-color: #e8890c;
+}
+
+/* "Upgrade to Pro" button at the bottom of the submenu */
+#adminmenu li.toplevel_page_alesta-ai a[href*="alesta-ai.com/tarifs"] {
+	padding: 0 !important;
+}
+#adminmenu .alesta-menu-upgrade {
+	display: inline-block;
+	background: #e8890c;
+	color: #fff !important;
+	font-weight: 700;
+	font-size: 12px;
+	padding: 6px 12px;
+	margin: 4px 0 4px -6px;
+	border-radius: 4px;
+	line-height: 1.3;
+	box-shadow: 0 1px 2px rgba(0,0,0,.2);
+}
+#adminmenu .alesta-menu-upgrade:hover {
+	background: #c4700a;
+}
+
+/* Menu sections (non-clickable headers) styled as small caps grey labels */
+#adminmenu .toplevel_page_alesta-ai .wp-submenu a[href$="=alesta-ai-seo"],
+#adminmenu .toplevel_page_alesta-ai .wp-submenu a[href$="=alesta-ai-content"],
+#adminmenu .toplevel_page_alesta-ai .wp-submenu a[href$="=alesta-ai-media"],
+#adminmenu .toplevel_page_alesta-ai .wp-submenu a[href$="=alesta-ai-perf"],
+#adminmenu .toplevel_page_alesta-ai .wp-submenu a[href$="=alesta-ai-automation"],
+#adminmenu .toplevel_page_alesta-ai .wp-submenu a[href$="=alesta-ai-security-section"],
+#adminmenu .toplevel_page_alesta-ai .wp-submenu a[href$="=alesta-ai-reports"],
+#adminmenu .toplevel_page_alesta-ai .wp-submenu a[href$="=alesta-ai-reviews-section"],
+#adminmenu .toplevel_page_alesta-ai .wp-submenu a[href$="=alesta-ai-communication-section"],
+#adminmenu .toplevel_page_alesta-ai .wp-submenu a[href$="=alesta-ai-settings-section"] {
+	font-size: 10px !important;
+	font-weight: 700 !important;
+	letter-spacing: .05em !important;
+	color: #a0aec0 !important;
+	padding-top: 12px !important;
+	pointer-events: none !important;
+	cursor: default !important;
+	border-top: 1px solid rgba(255,255,255,.07) !important;
+	margin-top: 4px !important;
+	text-transform: uppercase !important;
+}

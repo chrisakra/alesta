@@ -4,7 +4,7 @@ Tags: seo, meta description, robots, robots.txt, open graph
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -78,6 +78,11 @@ If your homepage is a WordPress page (Settings > Reading > Static page), yes, li
 
 == Changelog ==
 
+= 1.1.1 =
+* Alesta AI menu now uses the Greek letter phi (ϕ) as sidebar icon, matching the Alesta AI product family.
+* Dashboard fully redesigned: cockpit header, key figures, and a full catalogue of 10 module sections. Modules included in the Pro extension (distributed outside WordPress.org) are shown as informational cards with a link to alesta-ai.com.
+* Loads a small admin.css / admin-menu.css / pro-promo.css on Alesta AI screens only.
+
 = 1.1.0 =
 * New: Robots.txt module. Edit, backup, restore and check accessibility of your robots.txt directly from the WordPress admin.
 * Alesta AI menu now includes a "Robots.txt" submenu.
@@ -102,6 +107,9 @@ If your homepage is a WordPress page (Settings > Reading > Static page), yes, li
 * Automatic Open Graph and Twitter Card.
 
 == Upgrade Notice ==
+
+= 1.1.1 =
+Full dashboard redesign matching the Alesta AI product family. Safe to update.
 
 = 1.1.0 =
 Adds a Robots.txt editor module. Safe to update.
