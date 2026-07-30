@@ -1,10 +1,10 @@
 === Alesta ===
 Contributors: alestaplugin
-Tags: seo, meta description, robots, robots.txt, open graph
+Tags: seo, meta description, open graph, twitter card, meta tags
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.1.1
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -78,6 +78,11 @@ If your homepage is a WordPress page (Settings > Reading > Static page), yes, li
 
 == Changelog ==
 
+= 1.2.0 =
+* Plugin admin UI switched to French to match the Alesta AI product family (still translation-ready via text-domain).
+* Dashboard simplified: single "01 SEO & Référencement" section with two cards — SEO Meta Tags (active) and Title & Meta + SEO Audit (Solo, informational card linking to alesta-ai.com).
+* Robots.txt module removed from this release — will come back in a future version as a properly finished block.
+
 = 1.1.1 =
 * Alesta AI menu now uses the Greek letter phi (ϕ) as sidebar icon, matching the Alesta AI product family.
 * Dashboard fully redesigned: cockpit header, key figures, and a full catalogue of 10 module sections. Modules included in the Pro extension (distributed outside WordPress.org) are shown as informational cards with a link to alesta-ai.com.
@@ -107,6 +112,9 @@ If your homepage is a WordPress page (Settings > Reading > Static page), yes, li
 * Automatic Open Graph and Twitter Card.
 
 == Upgrade Notice ==
+
+= 1.2.0 =
+Admin UI translated to French. Dashboard reduced to one SEO section. Safe to update.
 
 = 1.1.1 =
 Full dashboard redesign matching the Alesta AI product family. Safe to update.

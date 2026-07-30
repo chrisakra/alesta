@@ -36,13 +36,13 @@ class Alesta_Promo {
 					<p class="alesta-pro-promo-desc"><?php echo esc_html( $feature_desc ); ?></p>
 					<?php endif; ?>
 					<p class="alesta-pro-promo-info">
-						<?php esc_html_e( 'This feature is part of Alesta AI Pro, a separate extension distributed outside the WordPress.org repository.', 'alesta' ); ?>
+						<?php esc_html_e( 'Cette fonctionnalité fait partie d\'Alesta AI Pro, une extension distincte distribuée en dehors du dépôt WordPress.org.', 'alesta' ); ?>
 					</p>
 					<a href="<?php echo esc_url( self::PRO_URL ); ?>" class="alesta-pro-promo-btn" target="_blank" rel="noopener noreferrer">
-						<?php esc_html_e( 'Discover Alesta AI Pro', 'alesta' ); ?> &rarr;
+						<?php esc_html_e( 'Découvrir Alesta AI Pro', 'alesta' ); ?> &rarr;
 					</a>
 					<p class="alesta-pro-promo-note">
-						<?php esc_html_e( 'You will be redirected to alesta-ai.com.', 'alesta' ); ?>
+						<?php esc_html_e( 'Vous serez redirigé vers alesta-ai.com.', 'alesta' ); ?>
 					</p>
 				</div>
 			</div>
