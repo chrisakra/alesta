@@ -1,14 +1,14 @@
 === Alesta ===
 Contributors: alestaplugin
-Tags: seo, sitemap, htaccess, cache, gzip
+Tags: seo, sitemap, htaccess, robots, broken links
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.3.0
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-SEO and technical toolkit for WordPress: XML sitemap with Google/Bing ping, and .htaccess optimization (Gzip, cache, HTTPS).
+SEO and technical toolkit for WordPress: XML sitemap, .htaccess optimization (Gzip/cache/HTTPS), robots.txt editor, broken links scanner.
 
 == Description ==
 
@@ -18,8 +18,10 @@ Modules shipped in this version:
 
 * **XML Sitemap** — Generates a sitemap.xml, automatically pings Google and Bing when content is updated, and lets you exclude specific post types or individual posts.
 * **Gzip, Cache, HTTPS optimization** — Clean, safe manipulation of the .htaccess file: enable Gzip compression, browser cache headers for static assets, and HTTP to HTTPS redirection. One-click backup and restore included.
+* **Robots.txt editor** — Edit, backup, restore and check the accessibility of your robots.txt directly from the WordPress admin.
+* **Broken links scanner (4xx / 5xx)** — Scheduled scan of your internal links to detect 404, 500 and other HTTP errors, with a sortable results table.
 
-Alesta is built in the same product family as the Alesta AI suite. More Free modules will be added block by block over the next releases (robots.txt, maintenance mode, health check, GDPR banner, and more).
+Alesta is built in the same product family as the Alesta AI suite. More Free modules will be added block by block over the next releases (maintenance mode, health check, GDPR banner, and more).
 
 = Privacy and GDPR =
 
@@ -62,6 +64,13 @@ Technically yes, but if you already use Yoast or RankMath for your XML sitemap, 
 
 == Changelog ==
 
+= 1.4.0 =
+* New functional modules ported from Alesta AI Free v1.2.7:
+  * **Robots.txt editor** — edit, backup, restore, accessibility check.
+  * **Broken links scanner (4xx / 5xx)** — scheduled scan of internal links with results table.
+* Section "04 Performance & Optimisation" of the dashboard now lists 3 active modules.
+* Plugin description updated to reflect the new modules.
+
 = 1.3.0 =
 * New functional modules ported from Alesta AI Free v1.2.7:
   * **XML Sitemap** — generation, Google/Bing ping, per-type or per-post exclusions.
@@ -102,6 +111,9 @@ Technically yes, but if you already use Yoast or RankMath for your XML sitemap, 
 * Automatic Open Graph and Twitter Card.
 
 == Upgrade Notice ==
+
+= 1.4.0 =
+Adds two new functional modules: Robots.txt editor and Broken links scanner (4xx / 5xx). Safe to update — no removals from 1.3.0.
 
 = 1.3.0 =
 Major pivot: the plugin now ships XML Sitemap and .htaccess optimization (Gzip / cache / HTTPS), aligning with the Alesta AI Free blueprint. The previous per-post SEO metabox is removed. If you rely on it, stay on 1.2.0 or export your data first.

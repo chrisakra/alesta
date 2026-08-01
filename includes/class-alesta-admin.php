@@ -2,10 +2,12 @@
 /**
  * Alesta — Admin menu and dashboard page.
  *
- * Sidebar layout mirrors the Alesta AI Free v1.2.7 blueprint but ships only
- * the two first functional Free modules of that blueprint:
+ * Sidebar layout mirrors the Alesta AI Free v1.2.7 blueprint. Functional
+ * Free modules shipped in this release:
  *   01 SEO           → Sitemap XML
  *   04 Performance   → Gzip, Cache, HTTPS (.htaccess helper)
+ *                    → Robots.txt editor
+ *                    → Broken links scanner (4xx / 5xx)
  *
  * Additional modules will be added block by block in future releases.
  */
@@ -129,6 +131,34 @@ class Alesta_Admin {
 				}
 			}
 		);
+
+		// Robots.txt — functional module.
+		add_submenu_page(
+			self::MENU_SLUG,
+			__( 'Robots.txt', 'alesta' ),
+			'- Robots.txt',
+			self::CAPABILITY,
+			'alesta-ai-robots',
+			function () {
+				if ( class_exists( 'Alesta_Admin_Robots' ) ) {
+					( new Alesta_Admin_Robots() )->render_page();
+				}
+			}
+		);
+
+		// Broken links 4xx / 5xx — functional module.
+		add_submenu_page(
+			self::MENU_SLUG,
+			__( 'Erreurs 4xx / 5xx', 'alesta' ),
+			'- Erreurs 4xx / 5xx',
+			self::CAPABILITY,
+			'alesta-ai-links',
+			function () {
+				if ( class_exists( 'Alesta_Admin_Errors' ) ) {
+					( new Alesta_Admin_Errors() )->render_page();
+				}
+			}
+		);
 	}
 
 	/**
@@ -222,6 +252,20 @@ class Alesta_Admin {
 						__( 'Optimisation Gzip, Cache, HTTPS', 'alesta' ),
 						__( '.htaccess : compression Gzip, cache navigateur, redirection HTTPS.', 'alesta' ),
 						'alesta-ai-cache',
+						__( 'Ouvrir', 'alesta' )
+					);
+					self::card_active(
+						"\xF0\x9F\xA4\x96", // 🤖
+						__( 'Robots.txt', 'alesta' ),
+						__( 'Éditez, sauvegardez et restaurez robots.txt directement depuis WordPress.', 'alesta' ),
+						'alesta-ai-robots',
+						__( 'Ouvrir', 'alesta' )
+					);
+					self::card_active(
+						"\xE2\x9A\xA0", // ⚠
+						__( 'Erreurs 4xx / 5xx', 'alesta' ),
+						__( 'Scanner de liens internes cassés (404, 500, redirections en boucle).', 'alesta' ),
+						'alesta-ai-links',
 						__( 'Ouvrir', 'alesta' )
 					);
 					?>
