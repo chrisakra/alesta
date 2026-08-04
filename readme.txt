@@ -1,14 +1,14 @@
 === Alesta ===
 Contributors: alestaplugin
-Tags: seo, sitemap, htaccess, robots, broken links
+Tags: seo, sitemap, htaccess, robots, database cleaner
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.4.0
+Stable tag: 1.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-SEO and technical toolkit for WordPress: XML sitemap, .htaccess optimization (Gzip/cache/HTTPS), robots.txt editor, broken links scanner.
+SEO and technical toolkit for WordPress: XML sitemap, .htaccess (Gzip/cache/HTTPS), robots.txt, broken links, DB cleaner, GDPR-safe Google Fonts.
 
 == Description ==
 
@@ -20,6 +20,8 @@ Modules shipped in this version:
 * **Gzip, Cache, HTTPS optimization** — Clean, safe manipulation of the .htaccess file: enable Gzip compression, browser cache headers for static assets, and HTTP to HTTPS redirection. One-click backup and restore included.
 * **Robots.txt editor** — Edit, backup, restore and check the accessibility of your robots.txt directly from the WordPress admin.
 * **Broken links scanner (4xx / 5xx)** — Scheduled scan of your internal links to detect 404, 500 and other HTTP errors, with a sortable results table.
+* **Scheduled database cleaner** — Removes revisions, auto-drafts, orphan meta, expired transients, spam and trash comments on a WP Cron schedule. One-click manual cleanup and detailed report.
+* **Google Fonts GDPR self-hosting** — Detects Google Fonts loaded by your theme/plugins, downloads them locally, and rewrites the URLs so no requests hit Google servers (GDPR compliance).
 
 Alesta is built in the same product family as the Alesta AI suite. More Free modules will be added block by block over the next releases (maintenance mode, health check, GDPR banner, and more).
 
@@ -63,6 +65,13 @@ Yes, the sitemap is available at `/sitemap.xml`. Alesta automatically pings Goog
 Technically yes, but if you already use Yoast or RankMath for your XML sitemap, disable their sitemap module to avoid duplicates.
 
 == Changelog ==
+
+= 1.5.0 =
+* New functional modules ported from Alesta AI Free v1.2.7:
+  * **Scheduled DB Cleaner** — WP Cron cleanup for revisions, transients, spam.
+  * **Google Fonts GDPR** — self-hosts Google Fonts detected on your site.
+* Section "04 Performance & Optimisation" of the dashboard now lists 5 active modules.
+* Plugin description updated to include the two new modules.
 
 = 1.4.0 =
 * New functional modules ported from Alesta AI Free v1.2.7:
@@ -111,6 +120,9 @@ Technically yes, but if you already use Yoast or RankMath for your XML sitemap, 
 * Automatic Open Graph and Twitter Card.
 
 == Upgrade Notice ==
+
+= 1.5.0 =
+Adds two new modules: scheduled DB cleaner and GDPR-safe Google Fonts self-hosting. Safe to update.
 
 = 1.4.0 =
 Adds two new functional modules: Robots.txt editor and Broken links scanner (4xx / 5xx). Safe to update — no removals from 1.3.0.

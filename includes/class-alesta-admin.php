@@ -8,6 +8,8 @@
  *   04 Performance   → Gzip, Cache, HTTPS (.htaccess helper)
  *                    → Robots.txt editor
  *                    → Broken links scanner (4xx / 5xx)
+ *                    → Scheduled DB Cleaner
+ *                    → Google Fonts (GDPR self-hosting)
  *
  * Additional modules will be added block by block in future releases.
  */
@@ -159,6 +161,34 @@ class Alesta_Admin {
 				}
 			}
 		);
+
+		// DB Cleaner — functional module.
+		add_submenu_page(
+			self::MENU_SLUG,
+			__( 'Nettoyeur BDD', 'alesta' ),
+			'- Nettoyeur BDD planifié',
+			self::CAPABILITY,
+			'alesta-ai-db-cleaner',
+			function () {
+				if ( class_exists( 'Alesta_Admin_DB_Cleaner' ) ) {
+					( new Alesta_Admin_DB_Cleaner() )->render_page();
+				}
+			}
+		);
+
+		// Google Fonts RGPD — functional module.
+		add_submenu_page(
+			self::MENU_SLUG,
+			__( 'Google Fonts RGPD', 'alesta' ),
+			'- Optimiseur Google Fonts RGPD',
+			self::CAPABILITY,
+			'alesta-ai-fonts',
+			function () {
+				if ( class_exists( 'Alesta_Admin_Fonts' ) ) {
+					( new Alesta_Admin_Fonts() )->render_page();
+				}
+			}
+		);
 	}
 
 	/**
@@ -266,6 +296,20 @@ class Alesta_Admin {
 						__( 'Erreurs 4xx / 5xx', 'alesta' ),
 						__( 'Scanner de liens internes cassés (404, 500, redirections en boucle).', 'alesta' ),
 						'alesta-ai-links',
+						__( 'Ouvrir', 'alesta' )
+					);
+					self::card_active(
+						"\xF0\x9F\x97\x91", // 🗑
+						__( 'Nettoyeur BDD planifié', 'alesta' ),
+						__( 'Nettoyage automatique : révisions, transients, spam, tables orphelines.', 'alesta' ),
+						'alesta-ai-db-cleaner',
+						__( 'Ouvrir', 'alesta' )
+					);
+					self::card_active(
+						"\xF0\x9F\x87\xAA", // 🇪
+						__( 'Google Fonts RGPD', 'alesta' ),
+						__( 'Auto-hébergement des polices Google pour la conformité RGPD.', 'alesta' ),
+						'alesta-ai-fonts',
 						__( 'Ouvrir', 'alesta' )
 					);
 					?>
