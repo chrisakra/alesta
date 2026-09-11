@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Alesta
  * Description:       SEO and technical toolkit: XML sitemap, .htaccess (Gzip/cache/HTTPS), robots.txt, broken links, DB cleaner, GDPR fonts + banner, maintenance mode, floating contact widget, health check, debug manager, budget tracker. Same product family as Alesta AI.
- * Version:           1.7.1
+ * Version:           1.8.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Alesta AI
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ALESTA_VERSION', '1.7.1' );
+define( 'ALESTA_VERSION', '1.8.0' );
 define( 'ALESTA_PLUGIN_FILE', __FILE__ );
 define( 'ALESTA_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 
@@ -43,9 +43,27 @@ require_once ALESTA_PLUGIN_DIR . 'includes/modules/communication/class-admin-tal
 require_once ALESTA_PLUGIN_DIR . 'includes/modules/performance/class-admin-health.php';
 require_once ALESTA_PLUGIN_DIR . 'includes/modules/performance/class-admin-debug.php';
 require_once ALESTA_PLUGIN_DIR . 'includes/modules/settings/class-admin-budget.php';
+require_once ALESTA_PLUGIN_DIR . 'includes/modules/performance/class-minify-module.php';
+require_once ALESTA_PLUGIN_DIR . 'includes/modules/performance/class-admin-minify.php';
+
+// "Get Alesta AI Pro" link on the WP Plugins page, next to Deactivate — same
+// pattern as Elementor's "Get Elementor Pro". Redirects to the pricing table
+// anchor on alesta-ai.com in a new tab.
+add_filter(
+	'plugin_action_links_' . plugin_basename( ALESTA_PLUGIN_FILE ),
+	function ( $links ) {
+		$links[] = sprintf(
+			'<a href="%s" target="_blank" rel="noopener noreferrer" style="color:#d97706;font-weight:700;">%s</a>',
+			esc_url( 'https://www.alesta-ai.com/tarifs.html#tarifs' ),
+			esc_html__( 'Get Alesta AI Pro', 'alesta' )
+		);
+		return $links;
+	}
+);
 
 add_action( 'plugins_loaded', array( 'Alesta_Admin', 'init' ) );
 add_action( 'plugins_loaded', array( 'Alesta_RGPD_Module', 'init' ) );
+add_action( 'plugins_loaded', array( 'Alesta_Minify_Module', 'init' ) );
 add_action( 'plugins_loaded', function () {
 	new Alesta_Sitemap_Module();
 	new Alesta_Admin_Sitemap();
@@ -67,4 +85,5 @@ add_action( 'plugins_loaded', function () {
 	new Alesta_Admin_Health();
 	new Alesta_Admin_Debug();
 	new Alesta_Admin_Budget();
+	new Alesta_Admin_Minify();
 } );

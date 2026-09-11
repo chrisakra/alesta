@@ -392,6 +392,12 @@ class Alesta_Admin_Debug {
                 . "--- CONTENU DU DEBUG.LOG (dernières 100 lignes) ---\n"
                 . $log_text;
 
+        // Direct call to Anthropic API is required here: the user has explicitly
+        // opted in by entering their own Anthropic API key in the Configuration
+        // module (BYOK), and requested an on-demand analysis of their debug.log.
+        // Using WordPress AI Client would require a system-wide provider setup
+        // not appropriate for a per-user, per-key call.
+        // phpcs:ignore PluginCheck.CodeAnalysis.AIProvider.DirectIntegration
         $response = wp_remote_post('https://api.anthropic.com/v1/messages', [
             'timeout' => 60,
             'headers' => [

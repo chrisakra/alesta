@@ -146,3 +146,58 @@
     background: #f3f4f6;
     color: #6b7280;
 }
+
+/* === Pro / Solo module cards (locked, opens internal teaser then external site) === */
+.alesta-module-card.alesta-module-pro {
+    background: #fffbf0;
+    border-left: 3px solid #f59e0b;
+}
+/* Solo tier — status pill (light amber background, thin border) */
+.amc-status-solo {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #f59e0b;
+    letter-spacing: 0.3px;
+}
+/* Pro tier — status pill (solid amber, white text) */
+.amc-status-pro {
+    background: #e8890c;
+    color: #ffffff;
+    border: 1px solid #e8890c;
+    letter-spacing: 0.3px;
+}
+/* Small pill next to the module name — Solo style (outlined) is the default. */
+.alesta-pro-badge {
+    display: inline-block;
+    font-size: 9.5px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+    letter-spacing: 0.4px;
+    line-height: 1.6;
+    white-space: nowrap;
+    background: #fff3e0;
+    color: #7c3d00;
+    border: 1px solid #e8890c;
+    text-transform: uppercase;
+}
+/* Pro modifier — filled amber background, white text. */
+.alesta-pro-badge--pro {
+    background: #e8890c;
+    border-color: #e8890c;
+    color: #ffffff;
+}
+.alesta-btn-pro {
+    background: #ffffff !important;
+    border-color: #f59e0b !important;
+    color: #92400e !important;
+    text-shadow: none !important;
+    font-weight: 600 !important;
+}
+.alesta-btn-pro:hover, .alesta-btn-pro:focus {
+    background: #fef3c7 !important;
+    color: #78350f !important;
+    border-color: #d97706 !important;
+}
