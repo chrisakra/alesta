@@ -1,0 +1,431 @@
+/* Alesta AI — Page admin Talk to Me */
+
+.alesta-ttm-wrap { max-width: 1100px; }
+
+/* ── Header ───────────────────────────────────────────────────────── */
+
+.alesta-ttm-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: linear-gradient(135deg, #1e3a5f 0%, #0f2440 100%);
+    color: #fff;
+    border-radius: 12px;
+    padding: 22px 28px;
+    margin: 1rem 0 1.5rem;
+}
+.alesta-ttm-header-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, .12);
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+}
+.alesta-ttm-header h1 { margin: 0; font-size: 22px; color: #fff; line-height: 1.2; }
+.alesta-ttm-header p  { margin: 4px 0 0; font-size: 13px; color: #94a3b8; flex: 1; }
+
+/* Toggle ON/OFF */
+.alesta-ttm-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+}
+.alesta-ttm-toggle input { display: none; }
+.alesta-ttm-toggle-slider {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: rgba(255, 255, 255, .25);
+    border-radius: 999px;
+    transition: background .2s;
+    flex-shrink: 0;
+}
+.alesta-ttm-toggle-slider::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform .2s;
+}
+.alesta-ttm-toggle input:checked + .alesta-ttm-toggle-slider {
+    background: #22c55e;
+}
+.alesta-ttm-toggle input:checked + .alesta-ttm-toggle-slider::before {
+    transform: translateX(20px);
+}
+.alesta-ttm-toggle--small .alesta-ttm-toggle-slider {
+    width: 36px;
+    height: 20px;
+    /* On a white card background, the default light-white slider would be
+       invisible. Use a visible neutral gray instead. */
+    background: #d1d5db;
+    box-shadow: inset 0 0 0 1px #b5bcc6;
+}
+.alesta-ttm-toggle--small .alesta-ttm-toggle-slider::before {
+    width: 16px;
+    height: 16px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .15);
+}
+.alesta-ttm-toggle--small input:checked + .alesta-ttm-toggle-slider {
+    background: #22c55e;
+    box-shadow: none;
+}
+.alesta-ttm-toggle--small input:checked + .alesta-ttm-toggle-slider::before {
+    transform: translateX(16px);
+}
+
+/* ── Onglets ──────────────────────────────────────────────────────── */
+
+.alesta-ttm-tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 1.25rem;
+}
+.alesta-ttm-tab {
+    background: transparent;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #6b7280;
+    cursor: pointer;
+    margin-bottom: -2px;
+    transition: color .15s, border-color .15s;
+}
+.alesta-ttm-tab:hover { color: #e8890c; }
+.alesta-ttm-tab.is-active {
+    color: #e8890c;
+    border-bottom-color: #e8890c;
+}
+
+.alesta-ttm-panel { display: none; }
+.alesta-ttm-panel.is-active { display: block; }
+
+/* ── Cards ────────────────────────────────────────────────────────── */
+
+.alesta-ttm-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .03);
+}
+.alesta-ttm-card h3 {
+    margin: 0 0 .85rem;
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+    padding-bottom: .55rem;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.alesta-ttm-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+@media (max-width: 800px) {
+    .alesta-ttm-grid-2 { grid-template-columns: 1fr; }
+}
+.alesta-ttm-grid-2 .alesta-ttm-card { margin-bottom: 0; }
+
+/* Champs génériques */
+.alesta-ttm-field { margin-bottom: 1rem; }
+.alesta-ttm-field:last-child { margin-bottom: 0; }
+.alesta-ttm-field label {
+    display: block;
+    font-weight: 600;
+    font-size: 13px;
+    color: #374151;
+    margin-bottom: .35rem;
+}
+.alesta-ttm-field input[type="text"],
+.alesta-ttm-field input[type="number"],
+.alesta-ttm-field input[type="time"],
+.alesta-ttm-field select,
+.alesta-ttm-field textarea {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 13px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #fff;
+    box-sizing: border-box;
+}
+.alesta-ttm-field textarea { resize: vertical; min-height: 60px; font-family: inherit; }
+.alesta-ttm-field input:focus,
+.alesta-ttm-field select:focus,
+.alesta-ttm-field textarea:focus {
+    outline: 0;
+    border-color: #e8890c;
+    box-shadow: 0 0 0 3px rgba(232, 137, 12, .15);
+}
+
+.alesta-ttm-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 13px;
+    color: #374151;
+    cursor: pointer;
+}
+
+/* ── Onglet 1 : Canaux ────────────────────────────────────────────── */
+
+.alesta-ttm-channels-admin {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: .65rem;
+}
+
+.alesta-ttm-channel-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px 16px;
+    transition: box-shadow .15s, border-color .15s;
+}
+.alesta-ttm-channel-row.ui-sortable-helper {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .12);
+    border-color: #e8890c;
+}
+.alesta-ttm-handle {
+    cursor: grab;
+    color: #9ca3af;
+    padding-top: 8px;
+    flex-shrink: 0;
+}
+.alesta-ttm-handle:active { cursor: grabbing; }
+
+.alesta-ttm-channel-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 4px;
+}
+.alesta-ttm-channel-icon svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+.alesta-ttm-channel-body { flex: 1; min-width: 0; }
+.alesta-ttm-channel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+.alesta-ttm-channel-head strong {
+    font-size: 14px;
+    color: #111827;
+}
+.alesta-ttm-channel-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+.alesta-ttm-channel-fields > input:first-child:last-child,
+.alesta-ttm-channel-fields > input.ttm-ch-value:nth-last-child(1) {
+    grid-column: 1 / -1;
+}
+.alesta-ttm-channel-fields input {
+    padding: 6px 10px;
+    font-size: 13px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+}
+
+/* ── Onglet 2 : Apparence — sélecteurs visuels ────────────────────── */
+
+.alesta-ttm-mode-grid,
+.alesta-ttm-position-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.alesta-ttm-mode,
+.alesta-ttm-pos {
+    background: #fff;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color .15s, box-shadow .15s;
+    position: relative;
+    user-select: none;
+}
+.alesta-ttm-mode:hover,
+.alesta-ttm-pos:hover { border-color: #fcd9a8; }
+.alesta-ttm-mode.is-active,
+.alesta-ttm-pos.is-active {
+    border-color: #e8890c;
+    background: #fff8f0;
+    box-shadow: 0 2px 8px rgba(232, 137, 12, .2);
+}
+.alesta-ttm-mode input,
+.alesta-ttm-pos input { position: absolute; opacity: 0; pointer-events: none; }
+
+.alesta-ttm-mode-name,
+.alesta-ttm-pos > span:not(.alesta-ttm-pos-thumb) {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+.alesta-ttm-mode small {
+    display: block;
+    margin-top: 2px;
+    color: #9ca3af;
+    font-size: 11px;
+}
+
+.alesta-ttm-mode-thumb,
+.alesta-ttm-pos-thumb {
+    display: block;
+    width: 100%;
+    height: 60px;
+    background: #f3f4f6;
+    border-radius: 6px;
+    position: relative;
+}
+
+/* Thumb mode menu : un bouton + un panneau au-dessus */
+.alesta-ttm-mode-thumb--menu {
+    background:
+        linear-gradient(#fff, #fff)        78% 4px / 16px 18px no-repeat,
+        linear-gradient(#fff, #fff)        78% 24px / 16px 18px no-repeat,
+        linear-gradient(#fff, #fff)        78% 44px / 16px 18px no-repeat,
+        linear-gradient(#d1d5db, #d1d5db)  82% 48px / 14px 14px no-repeat,
+        #1e3a5f;
+}
+.alesta-ttm-mode.is-active .alesta-ttm-mode-thumb--menu {
+    background:
+        linear-gradient(#fff, #fff)        78% 4px / 16px 18px no-repeat,
+        linear-gradient(#fff, #fff)        78% 24px / 16px 18px no-repeat,
+        linear-gradient(#fff, #fff)        78% 44px / 16px 18px no-repeat,
+        linear-gradient(#fff, #fff)        82% 48px / 14px 14px no-repeat,
+        #e8890c;
+}
+
+/* Thumb mode stack : 3 cercles empilés */
+.alesta-ttm-mode-thumb--stack {
+    background:
+        radial-gradient(circle, #d1d5db 5px, transparent 6px) 80% 8px / 14px 14px no-repeat,
+        radial-gradient(circle, #d1d5db 5px, transparent 6px) 80% 26px / 14px 14px no-repeat,
+        radial-gradient(circle, #d1d5db 5px, transparent 6px) 80% 44px / 14px 14px no-repeat,
+        #f3f4f6;
+}
+.alesta-ttm-mode.is-active .alesta-ttm-mode-thumb--stack {
+    background:
+        radial-gradient(circle, #e8890c 5px, transparent 6px) 80% 8px / 14px 14px no-repeat,
+        radial-gradient(circle, #e8890c 5px, transparent 6px) 80% 26px / 14px 14px no-repeat,
+        radial-gradient(circle, #e8890c 5px, transparent 6px) 80% 44px / 14px 14px no-repeat,
+        #fff8f0;
+}
+
+/* Position thumbs */
+.alesta-ttm-pos-thumb--bl {
+    background:
+        radial-gradient(circle, #d1d5db 6px, transparent 7px) 8% 70% / 18px 18px no-repeat,
+        #f3f4f6;
+}
+.alesta-ttm-pos-thumb--br {
+    background:
+        radial-gradient(circle, #d1d5db 6px, transparent 7px) 92% 70% / 18px 18px no-repeat,
+        #f3f4f6;
+}
+.alesta-ttm-pos.is-active .alesta-ttm-pos-thumb--bl {
+    background:
+        radial-gradient(circle, #e8890c 6px, transparent 7px) 8% 70% / 18px 18px no-repeat,
+        #fff8f0;
+}
+.alesta-ttm-pos.is-active .alesta-ttm-pos-thumb--br {
+    background:
+        radial-gradient(circle, #e8890c 6px, transparent 7px) 92% 70% / 18px 18px no-repeat,
+        #fff8f0;
+}
+
+/* ── Onglet 3 : Heures ────────────────────────────────────────────── */
+
+.alesta-ttm-hours {
+    width: 100%;
+    margin-top: 1rem;
+    border-collapse: collapse;
+}
+.alesta-ttm-hours td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #f3f4f6;
+}
+.alesta-ttm-hours td:first-child { width: 35%; }
+.alesta-ttm-hours input[type="time"] {
+    padding: 6px 10px;
+    font-size: 13px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    width: 110px;
+}
+
+/* ── Bottom action bar ────────────────────────────────────────────── */
+
+.alesta-ttm-actions {
+    margin-top: 1.5rem;
+    padding: 14px 22px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    bottom: 12px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .06);
+}
+.alesta-ttm-actions .button-primary {
+    background: #e8890c !important;
+    border-color: #e8890c !important;
+    color: #fff !important;
+    text-shadow: none !important;
+    box-shadow: 0 1px 0 #c4700a !important;
+}
+.alesta-ttm-actions .button-primary:hover {
+    background: #c4700a !important;
+    border-color: #c4700a !important;
+}
+.alesta-ttm-feedback { font-size: 13px; }
+.alesta-ttm-feedback.is-ok    { color: #166534; }
+.alesta-ttm-feedback.is-error { color: #991b1b; }
+
+/* ── WP color picker fix (compact) ────────────────────────────────── */
+
+.alesta-ttm-wrap .wp-picker-container { display: inline-block; }

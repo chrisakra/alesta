@@ -1,0 +1,193 @@
+/* Health Check Dashboard — Alesta */
+
+#alesta-health-wrap { max-width: 1060px; }
+
+/* ── En-tête ── */
+.alesta-health-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 28px;
+    background: linear-gradient(135deg, #1e3a5f, #0f2440);
+    border-radius: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+.alesta-health-header h1 {
+    margin: 0 0 4px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+}
+.alesta-health-subtitle {
+    margin: 0;
+    font-size: 13px;
+    color: rgba(255,255,255,.6);
+}
+
+/* Score circulaire */
+.alesta-health-score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    border: 4px solid rgba(255,255,255,.2);
+    flex-shrink: 0;
+}
+.alesta-health-score.score-good { border-color: #4ade80; background: rgba(74,222,128,.12); }
+.alesta-health-score.score-warn { border-color: #fbbf24; background: rgba(251,191,36,.12); }
+.alesta-health-score.score-bad  { border-color: #f87171; background: rgba(248,113,113,.12); }
+
+.score-number {
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+}
+.score-percent { font-size: 14px; color: rgba(255,255,255,.7); line-height: 1; }
+.score-label   { font-size: 10px; font-weight: 700; letter-spacing: .5px; color: rgba(255,255,255,.65); margin-top: 2px; text-transform: uppercase; }
+
+/* ── Bandeau stats ── */
+.alesta-health-statbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px 18px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+.hstat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+.hstat-ok    { background: #f0fdf4; }
+.hstat-warn  { background: #fffbeb; }
+.hstat-error { background: #fef2f2; }
+.hstat-total { background: #f0f9ff; }
+
+.hstat-num  { font-size: 18px; font-weight: 700; color: #111827; }
+.hstat-lbl  { font-size: 12px; color: #6b7280; font-weight: 500; }
+.hstat-ok   .hstat-num { color: #166534; }
+.hstat-warn .hstat-num { color: #92400e; }
+.hstat-error .hstat-num { color: #991b1b; }
+.hstat-total .hstat-num { color: #1e3a5f; }
+
+.hstat-refresh {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.hstat-date { font-size: 11px; color: #9ca3af; }
+
+/* ── Grille de cartes ── */
+.alesta-health-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+@media (max-width: 1100px) {
+    .alesta-health-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 700px) {
+    .alesta-health-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Carte ── */
+.alesta-health-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+.health-card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: #f9fafb;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 13px;
+    font-weight: 700;
+    color: #111827;
+}
+.health-card-icon { font-size: 16px; }
+.health-card-badge {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+.health-card-body { padding: 8px 0; }
+
+/* ── Item de vérification ── */
+.health-check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 16px;
+    border-bottom: 1px solid #f9fafb;
+    transition: background .1s;
+}
+.health-check-item:last-child { border-bottom: none; }
+.health-check-item:hover { background: #f9fafb; }
+
+/* Point de statut */
+.health-check-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+}
+.health-check-ok    .health-check-dot { background: #22c55e; }
+.health-check-warn  .health-check-dot { background: #f59e0b; }
+.health-check-error .health-check-dot { background: #ef4444; }
+
+.health-check-content { flex: 1; min-width: 0; }
+.health-check-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.health-check-label {
+    font-size: 12px;
+    color: #374151;
+    font-weight: 500;
+}
+.health-check-value {
+    font-size: 12px;
+    color: #111827;
+    font-weight: 600;
+    text-align: right;
+    white-space: nowrap;
+}
+.health-check-ok    .health-check-value { color: #166534; }
+.health-check-warn  .health-check-value { color: #92400e; }
+.health-check-error .health-check-value { color: #991b1b; }
+
+.health-check-note {
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 2px;
+    font-style: italic;
+    line-height: 1.4;
+}
+.health-check-warn  .health-check-note { color: #b45309; }
+.health-check-error .health-check-note { color: #b91c1c; }

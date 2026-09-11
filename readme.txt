@@ -1,14 +1,14 @@
 === Alesta ===
 Contributors: alestaplugin
-Tags: seo, sitemap, htaccess, robots, database cleaner
+Tags: seo, sitemap, htaccess, gdpr, maintenance mode
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.5.0
+Stable tag: 1.7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-SEO and technical toolkit for WordPress: XML sitemap, .htaccess (Gzip/cache/HTTPS), robots.txt, broken links, DB cleaner, GDPR-safe Google Fonts.
+SEO + technical WordPress toolkit: sitemap, .htaccess, robots, DB cleaner, GDPR, maintenance, contact widget, health, debug and more.
 
 == Description ==
 
@@ -22,8 +22,14 @@ Modules shipped in this version:
 * **Broken links scanner (4xx / 5xx)** — Scheduled scan of your internal links to detect 404, 500 and other HTTP errors, with a sortable results table.
 * **Scheduled database cleaner** — Removes revisions, auto-drafts, orphan meta, expired transients, spam and trash comments on a WP Cron schedule. One-click manual cleanup and detailed report.
 * **Google Fonts GDPR self-hosting** — Detects Google Fonts loaded by your theme/plugins, downloads them locally, and rewrites the URLs so no requests hit Google servers (GDPR compliance).
+* **Maintenance mode** — One-click maintenance / coming-soon page with configurable logo, headline, message, background, countdown and whitelist for admins. Sends a 503 status to search engines.
+* **GDPR cookies banner** — Customizable consent banner (Accept / Refuse / Configure) rendered site-wide, with per-category storage of the visitor's choice.
+* **Talk to Me — floating contact widget** — Multi-channel contact button (WhatsApp, Messenger, phone, email, SMS, Telegram, Instagram DM, custom link) with configurable opening hours per day. No AI, no external API.
+* **Health Check** — Site health dashboard: PHP version, SSL, disk usage, active plugins count, MySQL version, uploads folder size, key file/permission checks.
+* **Debug Manager** — One-click toggle for WP_DEBUG (writes to wp-config.php with automatic backup), live viewer for debug.log with size/rotation info, one-click clear.
+* **Budget tracker** — Monthly / daily token consumption dashboard (empty by default; populated when you install the optional Alesta AI Pro plugin for AI features).
 
-Alesta is built in the same product family as the Alesta AI suite. More Free modules will be added block by block over the next releases (maintenance mode, health check, GDPR banner, and more).
+Alesta is built in the same product family as the Alesta AI suite. This release covers all 12 Free modules from the Alesta AI Free v1.2.7 blueprint.
 
 = Privacy and GDPR =
 
@@ -65,6 +71,22 @@ Yes, the sitemap is available at `/sitemap.xml`. Alesta automatically pings Goog
 Technically yes, but if you already use Yoast or RankMath for your XML sitemap, disable their sitemap module to avoid duplicates.
 
 == Changelog ==
+
+= 1.7.0 =
+* New functional modules ported from Alesta AI Free v1.2.7 (completes the Free blueprint):
+  * **Health Check** — Site health dashboard (PHP, SSL, disk, plugins, MySQL, uploads).
+  * **Debug Manager** — Toggle WP_DEBUG + view / analyze debug.log with automatic wp-config.php backup.
+  * **Budget tracker** — Monthly / daily token usage dashboard (empty in Free, populated by the optional Pro plugin).
+* New admin dashboard section: "07 Réglages & Diagnostic".
+* Plugin now covers 12/12 Free modules of the Alesta AI Free blueprint.
+
+= 1.6.0 =
+* New functional modules ported from Alesta AI Free v1.2.7:
+  * **Maintenance mode** — 503 maintenance / coming-soon page with logo, headline, message, background, optional countdown and admin whitelist.
+  * **GDPR cookies banner** — Site-wide consent banner (Accept / Refuse / Configure) with per-category preference storage.
+  * **Talk to Me** — Floating multi-channel contact widget (WhatsApp, Messenger, phone, email, SMS, Telegram, Instagram, custom) with opening hours per day. Zero AI, zero external API.
+* Two new admin dashboard sections: "05 Sécurité & RGPD" and "06 Communication & Contact".
+* Plugin description updated to reflect the three new modules.
 
 = 1.5.0 =
 * New functional modules ported from Alesta AI Free v1.2.7:
@@ -120,6 +142,12 @@ Technically yes, but if you already use Yoast or RankMath for your XML sitemap, 
 * Automatic Open Graph and Twitter Card.
 
 == Upgrade Notice ==
+
+= 1.7.0 =
+Adds three new modules to complete the Free blueprint: Health Check, Debug Manager, Budget tracker. Safe to update.
+
+= 1.6.0 =
+Adds three new modules: maintenance mode (503 page), GDPR cookies banner, and floating multi-channel contact widget (Talk to Me). Safe to update.
 
 = 1.5.0 =
 Adds two new modules: scheduled DB cleaner and GDPR-safe Google Fonts self-hosting. Safe to update.

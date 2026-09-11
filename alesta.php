@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name:       Alesta
- * Description:       SEO and technical toolkit: XML sitemap with Google/Bing ping, .htaccess optimization (Gzip, browser cache, HTTPS), robots.txt editor, broken links scanner, scheduled database cleaner, and Google Fonts self-hosting (GDPR). Same product family as Alesta AI.
- * Version:           1.5.0
+ * Description:       SEO and technical toolkit: XML sitemap, .htaccess (Gzip/cache/HTTPS), robots.txt, broken links, DB cleaner, GDPR fonts + banner, maintenance mode, floating contact widget, health check, debug manager, budget tracker. Same product family as Alesta AI.
+ * Version:           1.7.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Alesta AI
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ALESTA_VERSION', '1.5.0' );
+define( 'ALESTA_VERSION', '1.7.0' );
 define( 'ALESTA_PLUGIN_FILE', __FILE__ );
 define( 'ALESTA_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 
@@ -34,8 +34,18 @@ require_once ALESTA_PLUGIN_DIR . 'includes/modules/performance/class-db-cleaner-
 require_once ALESTA_PLUGIN_DIR . 'includes/modules/performance/class-admin-db-cleaner.php';
 require_once ALESTA_PLUGIN_DIR . 'includes/modules/performance/class-fonts-module.php';
 require_once ALESTA_PLUGIN_DIR . 'includes/modules/performance/class-admin-fonts.php';
+require_once ALESTA_PLUGIN_DIR . 'includes/modules/performance/class-maintenance-module.php';
+require_once ALESTA_PLUGIN_DIR . 'includes/modules/performance/class-admin-maintenance.php';
+require_once ALESTA_PLUGIN_DIR . 'includes/modules/security/class-rgpd-module.php';
+require_once ALESTA_PLUGIN_DIR . 'includes/modules/security/class-admin-rgpd.php';
+require_once ALESTA_PLUGIN_DIR . 'includes/modules/communication/class-talk-to-me-module.php';
+require_once ALESTA_PLUGIN_DIR . 'includes/modules/communication/class-admin-talk-to-me.php';
+require_once ALESTA_PLUGIN_DIR . 'includes/modules/performance/class-admin-health.php';
+require_once ALESTA_PLUGIN_DIR . 'includes/modules/performance/class-admin-debug.php';
+require_once ALESTA_PLUGIN_DIR . 'includes/modules/settings/class-admin-budget.php';
 
 add_action( 'plugins_loaded', array( 'Alesta_Admin', 'init' ) );
+add_action( 'plugins_loaded', array( 'Alesta_RGPD_Module', 'init' ) );
 add_action( 'plugins_loaded', function () {
 	new Alesta_Sitemap_Module();
 	new Alesta_Admin_Sitemap();
@@ -49,4 +59,12 @@ add_action( 'plugins_loaded', function () {
 	new Alesta_Admin_DB_Cleaner();
 	new Alesta_Fonts_Module();
 	new Alesta_Admin_Fonts();
+	new Alesta_Maintenance_Module();
+	new Alesta_Admin_Maintenance();
+	new Alesta_Admin_RGPD();
+	new Alesta_TalkToMe_Module();
+	new Alesta_Admin_TalkToMe();
+	new Alesta_Admin_Health();
+	new Alesta_Admin_Debug();
+	new Alesta_Admin_Budget();
 } );

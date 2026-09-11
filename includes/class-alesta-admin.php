@@ -189,6 +189,120 @@ class Alesta_Admin {
 				}
 			}
 		);
+
+		// Mode maintenance — functional module.
+		add_submenu_page(
+			self::MENU_SLUG,
+			__( 'Mode maintenance', 'alesta' ),
+			'- Mode maintenance',
+			self::CAPABILITY,
+			'alesta-ai-maintenance',
+			function () {
+				if ( class_exists( 'Alesta_Admin_Maintenance' ) ) {
+					( new Alesta_Admin_Maintenance() )->render_page();
+				}
+			}
+		);
+
+		// Health Check — functional module.
+		add_submenu_page(
+			self::MENU_SLUG,
+			__( 'Santé du site', 'alesta' ),
+			'- Santé du site',
+			self::CAPABILITY,
+			'alesta-ai-health',
+			function () {
+				if ( class_exists( 'Alesta_Admin_Health' ) ) {
+					( new Alesta_Admin_Health() )->render_page();
+				}
+			}
+		);
+
+		// Debug Manager — functional module.
+		add_submenu_page(
+			self::MENU_SLUG,
+			__( 'Gestionnaire debug', 'alesta' ),
+			'- Gestionnaire debug',
+			self::CAPABILITY,
+			'alesta-ai-debug',
+			function () {
+				if ( class_exists( 'Alesta_Admin_Debug' ) ) {
+					( new Alesta_Admin_Debug() )->render_page();
+				}
+			}
+		);
+
+		// Section header 05 Sécurité — inert via admin-menu.css.
+		add_submenu_page(
+			self::MENU_SLUG,
+			'Sécurité',
+			'S&eacute;curit&eacute; &amp; RGPD',
+			self::CAPABILITY,
+			'alesta-ai-security-section',
+			array( __CLASS__, 'render_section_header' )
+		);
+
+		// Bannière RGPD — functional module.
+		add_submenu_page(
+			self::MENU_SLUG,
+			__( 'Bannière RGPD', 'alesta' ),
+			'- Bannière RGPD (cookies)',
+			self::CAPABILITY,
+			'alesta-ai-rgpd',
+			function () {
+				if ( class_exists( 'Alesta_Admin_RGPD' ) ) {
+					( new Alesta_Admin_RGPD() )->render_page();
+				}
+			}
+		);
+
+		// Section header 06 Communication — inert via admin-menu.css.
+		add_submenu_page(
+			self::MENU_SLUG,
+			'Communication',
+			'Communication &amp; Contact',
+			self::CAPABILITY,
+			'alesta-ai-communication-section',
+			array( __CLASS__, 'render_section_header' )
+		);
+
+		// Talk to Me — functional module (contact widget).
+		add_submenu_page(
+			self::MENU_SLUG,
+			__( 'Talk to Me', 'alesta' ),
+			'- Talk to Me',
+			self::CAPABILITY,
+			'alesta-ai-talk-to-me',
+			function () {
+				if ( class_exists( 'Alesta_Admin_TalkToMe' ) ) {
+					( new Alesta_Admin_TalkToMe() )->render_page();
+				}
+			}
+		);
+
+		// Section header 07 Réglages & Diagnostic — inert via admin-menu.css.
+		add_submenu_page(
+			self::MENU_SLUG,
+			'Réglages',
+			'R&eacute;glages &amp; Diagnostic',
+			self::CAPABILITY,
+			'alesta-ai-settings-section',
+			array( __CLASS__, 'render_section_header' )
+		);
+
+		// Budget tracker — functional module.
+		add_submenu_page(
+			self::MENU_SLUG,
+			__( 'Suivi consommation', 'alesta' ),
+			'- Budget',
+			self::CAPABILITY,
+			'alesta-ai-budget',
+			function () {
+				if ( class_exists( 'Alesta_Admin_Budget' ) ) {
+					( new Alesta_Admin_Budget() )->render_page();
+				}
+			}
+		);
 	}
 
 	/**
@@ -310,6 +424,87 @@ class Alesta_Admin {
 						__( 'Google Fonts RGPD', 'alesta' ),
 						__( 'Auto-hébergement des polices Google pour la conformité RGPD.', 'alesta' ),
 						'alesta-ai-fonts',
+						__( 'Ouvrir', 'alesta' )
+					);
+					self::card_active(
+						"\xF0\x9F\x9A\xA7", // 🚧
+						__( 'Mode maintenance', 'alesta' ),
+						__( 'Page maintenance / coming-soon avec logo, bouton et compte à rebours.', 'alesta' ),
+						'alesta-ai-maintenance',
+						__( 'Ouvrir', 'alesta' )
+					);
+					self::card_active(
+						"\xF0\x9F\xA9\xBA", // 🩺
+						__( 'Santé du site', 'alesta' ),
+						__( 'Tableau de bord santé WP : PHP, SSL, disque, plugins, MySQL.', 'alesta' ),
+						'alesta-ai-health',
+						__( 'Ouvrir', 'alesta' )
+					);
+					self::card_active(
+						"\xF0\x9F\x90\x9E", // 🐞
+						__( 'Gestionnaire debug', 'alesta' ),
+						__( 'Toggle WP_DEBUG + lecture / analyse du debug.log en un clic.', 'alesta' ),
+						'alesta-ai-debug',
+						__( 'Ouvrir', 'alesta' )
+					);
+					?>
+				</div>
+			</div>
+
+			<!-- 05 Sécurité & RGPD -->
+			<div class="alesta-section-block">
+				<div class="alesta-section-heading">
+					<span class="alesta-section-num">05</span>
+					<span class="alesta-section-title"><?php esc_html_e( 'Sécurité &amp; RGPD', 'alesta' ); ?></span>
+					<span class="alesta-section-desc"><?php esc_html_e( 'Conformité cookies, consentement visiteurs, protection des données', 'alesta' ); ?></span>
+				</div>
+				<div class="alesta-cards">
+					<?php
+					self::card_active(
+						"\xF0\x9F\x8D\xAA", // 🍪
+						__( 'Bannière RGPD', 'alesta' ),
+						__( 'Bannière de consentement cookies personnalisable (Accepter / Refuser / Configurer).', 'alesta' ),
+						'alesta-ai-rgpd',
+						__( 'Ouvrir', 'alesta' )
+					);
+					?>
+				</div>
+			</div>
+
+			<!-- 06 Communication & Contact -->
+			<div class="alesta-section-block">
+				<div class="alesta-section-heading">
+					<span class="alesta-section-num">06</span>
+					<span class="alesta-section-title"><?php esc_html_e( 'Communication &amp; Contact', 'alesta' ); ?></span>
+					<span class="alesta-section-desc"><?php esc_html_e( 'Widget contact multi-canaux : WhatsApp, Messenger, téléphone, email, SMS, Telegram, Instagram', 'alesta' ); ?></span>
+				</div>
+				<div class="alesta-cards">
+					<?php
+					self::card_active(
+						"\xF0\x9F\x92\xAC", // 💬
+						__( 'Talk to Me', 'alesta' ),
+						__( 'Widget flottant contact multi-canaux avec horaires d\'ouverture par jour.', 'alesta' ),
+						'alesta-ai-talk-to-me',
+						__( 'Ouvrir', 'alesta' )
+					);
+					?>
+				</div>
+			</div>
+
+			<!-- 07 Réglages & Diagnostic -->
+			<div class="alesta-section-block">
+				<div class="alesta-section-heading">
+					<span class="alesta-section-num">07</span>
+					<span class="alesta-section-title"><?php esc_html_e( 'Réglages &amp; Diagnostic', 'alesta' ); ?></span>
+					<span class="alesta-section-desc"><?php esc_html_e( 'Suivi de la consommation et paramètres transverses', 'alesta' ); ?></span>
+				</div>
+				<div class="alesta-cards">
+					<?php
+					self::card_active(
+						"\xF0\x9F\x92\xB0", // 💰
+						__( 'Suivi consommation', 'alesta' ),
+						__( 'Tableau de suivi mensuel / quotidien des tokens (utilisé par les modules IA du Pro).', 'alesta' ),
+						'alesta-ai-budget',
 						__( 'Ouvrir', 'alesta' )
 					);
 					?>

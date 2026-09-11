@@ -1,0 +1,272 @@
+/* ── Bannière RGPD — Alesta AI (frontend) ── */
+
+:root {
+    --rgpd-bg:       #ffffff;
+    --rgpd-text:     #1f2937;
+    --rgpd-accent:   #1e3a5f;
+    --rgpd-acc-txt:  #ffffff;
+    --rgpd-sec:      #f3f4f6;
+    --rgpd-sec-txt:  #374151;
+    --rgpd-border:   #e5e7eb;
+    --rgpd-radius:   10px;
+    --rgpd-shadow:   0 4px 32px rgba(0,0,0,.14);
+    --rgpd-z:        99999;
+    --rgpd-anim:     .35s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── Base ── */
+.alesta-rgpd {
+    position: fixed;
+    z-index: var(--rgpd-z);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--rgpd-text);
+    box-sizing: border-box;
+}
+.alesta-rgpd *, .alesta-rgpd *::before, .alesta-rgpd *::after {
+    box-sizing: inherit;
+}
+
+/* ── Visibilité (animation entrée) ── */
+.alesta-rgpd { opacity: 0; pointer-events: none; }
+.alesta-rgpd--visible { opacity: 1; pointer-events: auto; }
+.alesta-rgpd--hiding  { opacity: 0; pointer-events: none; }
+
+/* ── Overlay (popup only) ── */
+.alesta-rgpd__overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity var(--rgpd-anim);
+}
+.alesta-rgpd--visible .alesta-rgpd__overlay { opacity: 1; }
+
+/* ── Box ── */
+.alesta-rgpd__box {
+    background: var(--rgpd-bg);
+    border: 1px solid var(--rgpd-border);
+    border-radius: var(--rgpd-radius);
+    box-shadow: var(--rgpd-shadow);
+    padding: 20px 22px 16px;
+    position: relative;
+    transition: transform var(--rgpd-anim);
+    max-width: 100%;
+}
+
+/* ══ Layouts ══════════════════════════════════════════════════════════════ */
+
+/* --- BAR (bande pleine largeur) --- */
+.alesta-rgpd--bar.alesta-rgpd--bottom { left: 0; right: 0; bottom: 0; }
+.alesta-rgpd--bar.alesta-rgpd--top    { left: 0; right: 0; top: 0; }
+.alesta-rgpd--bar .alesta-rgpd__box {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px 24px;
+}
+.alesta-rgpd--bar .alesta-rgpd__header { flex-shrink: 0; }
+.alesta-rgpd--bar .alesta-rgpd__body   { flex: 1; min-width: 200px; }
+.alesta-rgpd--bar .alesta-rgpd__footer { flex-shrink: 0; margin-left: auto; }
+.alesta-rgpd--bar .alesta-rgpd__panel  { width: 100%; order: 10; border-top: 1px solid var(--rgpd-border); padding-top: 14px; margin-top: 8px; }
+.alesta-rgpd--bar.alesta-rgpd--bottom .alesta-rgpd__box { border-bottom: none; border-radius: 0; }
+.alesta-rgpd--bar.alesta-rgpd--top    .alesta-rgpd__box { border-top: none; border-radius: 0; }
+
+/* Animation bar */
+.alesta-rgpd--bar.alesta-rgpd--bottom { transform: translateY(100%); transition: transform var(--rgpd-anim), opacity var(--rgpd-anim); }
+.alesta-rgpd--bar.alesta-rgpd--top    { transform: translateY(-100%); transition: transform var(--rgpd-anim), opacity var(--rgpd-anim); }
+.alesta-rgpd--bar.alesta-rgpd--visible { transform: translateY(0); }
+
+/* --- POPUP (fenêtre centrée) --- */
+.alesta-rgpd--popup {
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    transition: opacity var(--rgpd-anim);
+}
+.alesta-rgpd--popup .alesta-rgpd__box {
+    max-width: 520px;
+    width: 100%;
+    border-radius: 14px;
+    transform: scale(.96);
+    transition: transform var(--rgpd-anim);
+}
+.alesta-rgpd--popup.alesta-rgpd--visible .alesta-rgpd__box { transform: scale(1); }
+
+/* --- CORNER (carte flottante) --- */
+.alesta-rgpd--corner.alesta-rgpd--bottom-left  { bottom: 20px; left: 20px; max-width: 340px; }
+.alesta-rgpd--corner.alesta-rgpd--bottom-right { bottom: 20px; right: 20px; max-width: 340px; }
+.alesta-rgpd--corner.alesta-rgpd--bottom       { bottom: 20px; left: 20px; max-width: 340px; }
+.alesta-rgpd--corner.alesta-rgpd--top          { top: 20px; left: 20px; max-width: 340px; }
+.alesta-rgpd--corner { transition: opacity var(--rgpd-anim), transform var(--rgpd-anim); transform: translateY(20px); }
+.alesta-rgpd--corner.alesta-rgpd--visible { transform: translateY(0); }
+
+/* ══ Éléments internes ════════════════════════════════════════════════════ */
+
+.alesta-rgpd__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.alesta-rgpd__icon { font-size: 18px; flex-shrink: 0; }
+.alesta-rgpd__title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--rgpd-text);
+}
+.alesta-rgpd__desc {
+    margin: 0 0 6px;
+    font-size: 13px;
+    color: var(--rgpd-text);
+    opacity: .8;
+}
+.alesta-rgpd__link {
+    font-size: 12px;
+    color: var(--rgpd-accent);
+    text-decoration: underline;
+}
+.alesta-rgpd__link:hover { opacity: .8; }
+
+/* ── Footer boutons ── */
+.alesta-rgpd__footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+}
+.alesta-rgpd__actions { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+
+/* ── Boutons ── */
+.alesta-rgpd__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    transition: opacity .15s, transform .1s;
+    font-family: inherit;
+}
+.alesta-rgpd__btn:hover  { opacity: .88; }
+.alesta-rgpd__btn:active { transform: scale(.97); }
+
+.alesta-rgpd__btn--primary {
+    background: var(--rgpd-accent);
+    color: var(--rgpd-acc-txt);
+    border-color: var(--rgpd-accent);
+}
+.alesta-rgpd__btn--secondary {
+    background: var(--rgpd-sec);
+    color: var(--rgpd-sec-txt);
+    border-color: var(--rgpd-border);
+}
+.alesta-rgpd__btn--link {
+    background: transparent;
+    color: var(--rgpd-text);
+    border-color: transparent;
+    padding-left: 4px;
+    padding-right: 4px;
+    font-weight: 400;
+    text-decoration: underline;
+    opacity: .7;
+    font-size: 12px;
+}
+.alesta-rgpd__btn--link:hover { opacity: 1; }
+
+/* ── Panneau personnalisation ── */
+.alesta-rgpd__panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .35s ease, padding .2s;
+}
+.alesta-rgpd__panel--open {
+    max-height: 600px;
+    border-top: 1px solid var(--rgpd-border);
+    padding-top: 14px;
+    margin-top: 10px;
+}
+.alesta-rgpd__cat {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rgpd-border);
+}
+.alesta-rgpd__cat:last-child { border-bottom: none; }
+.alesta-rgpd__cat-info { flex: 1; }
+.alesta-rgpd__cat-name {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--rgpd-text);
+    margin-bottom: 2px;
+}
+.alesta-rgpd__cat-desc {
+    display: block;
+    font-size: 11px;
+    color: var(--rgpd-text);
+    opacity: .65;
+}
+
+/* Toggle switch */
+.alesta-rgpd__toggle {
+    width: 40px;
+    height: 22px;
+    border-radius: 11px;
+    background: var(--rgpd-border);
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    transition: background .2s;
+    outline: none;
+    margin-top: 2px;
+    display: inline-block;
+}
+.alesta-rgpd__toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(0,0,0,.2);
+    transition: transform .2s;
+}
+.alesta-rgpd__toggle--on {
+    background: var(--rgpd-accent);
+}
+.alesta-rgpd__toggle--on::after { transform: translateX(18px); }
+.alesta-rgpd__toggle--locked { cursor: default; opacity: .7; }
+
+.alesta-rgpd__panel-footer {
+    padding-top: 12px;
+    text-align: right;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+    .alesta-rgpd--bar .alesta-rgpd__box { flex-direction: column; align-items: flex-start; }
+    .alesta-rgpd--bar .alesta-rgpd__footer { margin-left: 0; width: 100%; }
+    .alesta-rgpd--bar .alesta-rgpd__actions { margin-left: 0; }
+    .alesta-rgpd--corner { max-width: calc(100vw - 32px) !important; }
+    .alesta-rgpd__btn { padding: 8px 12px; font-size: 12px; }
+}
