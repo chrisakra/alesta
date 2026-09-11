@@ -2,9 +2,9 @@
 Contributors: alestaplugin
 Tags: seo, sitemap, htaccess, gdpr, maintenance mode
 Requires at least: 6.0
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.7.0
+Stable tag: 1.7.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,10 @@ Yes, the sitemap is available at `/sitemap.xml`. Alesta automatically pings Goog
 Technically yes, but if you already use Yoast or RankMath for your XML sitemap, disable their sitemap module to avoid duplicates.
 
 == Changelog ==
+
+= 1.7.1 =
+* Compatibility confirmed with WordPress 7.1.
+* No code changes — bump metadata only ("Tested up to").
 
 = 1.7.0 =
 * New functional modules ported from Alesta AI Free v1.2.7 (completes the Free blueprint):
@@ -142,6 +146,9 @@ Technically yes, but if you already use Yoast or RankMath for your XML sitemap, 
 * Automatic Open Graph and Twitter Card.
 
 == Upgrade Notice ==
+
+= 1.7.1 =
+Compatibility bump for WordPress 7.1. No code change, safe to update.
 
 = 1.7.0 =
 Adds three new modules to complete the Free blueprint: Health Check, Debug Manager, Budget tracker. Safe to update.
