@@ -4,7 +4,7 @@ Tags: seo, sitemap, htaccess, gdpr, maintenance mode
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.8.0
+Stable tag: 1.8.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,9 @@ Yes, the sitemap is available at `/sitemap.xml`. Alesta automatically pings Goog
 Technically yes, but if you already use Yoast or RankMath for your XML sitemap, disable their sitemap module to avoid duplicates.
 
 == Changelog ==
+
+= 1.8.1 =
+* Cleanup: removed orphan file includes/class-alesta-meta.php (never loaded).
 
 = 1.8.0 =
 * New functional module ported from Alesta AI Free v1.2.7 (completes the Free blueprint 12/12):
@@ -150,6 +153,9 @@ Technically yes, but if you already use Yoast or RankMath for your XML sitemap, 
 * Automatic Open Graph and Twitter Card.
 
 == Upgrade Notice ==
+
+= 1.8.1 =
+Maintenance release, no functional change.
 
 = 1.8.0 =
 Adds the Minify HTML/CSS/JS module (with automatic page-builder bypass), completing the Free blueprint 12/12. Safe to update — new module is OFF by default; enable each toggle one by one and test.
