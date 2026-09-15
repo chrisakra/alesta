@@ -43,6 +43,7 @@
 }
 
 /* Menu sections (non-clickable headers) styled as small caps grey labels */
+#adminmenu .toplevel_page_alesta-ai .wp-submenu li.alesta-menu-section a,
 #adminmenu .toplevel_page_alesta-ai .wp-submenu a[href$="=alesta-ai-seo"],
 #adminmenu .toplevel_page_alesta-ai .wp-submenu a[href$="=alesta-ai-content"],
 #adminmenu .toplevel_page_alesta-ai .wp-submenu a[href$="=alesta-ai-media"],

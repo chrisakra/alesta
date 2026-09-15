@@ -25,6 +25,7 @@ class Alesta_Admin {
 
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'register_menu' ) );
+		add_action( 'admin_menu', array( __CLASS__, 'tag_section_headers' ), 900 );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_assets' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_global_menu_assets' ) );
 	}
@@ -354,7 +355,7 @@ class Alesta_Admin {
 		// 01 SEO
 		self::register_pro_submenu( 'alesta-ai-pro-meta',         __( 'Title & Meta IA', 'alesta' ),           __( 'Génération en masse des titres SEO et meta-descriptions par Claude, avec audit score par page.', 'alesta' ),         "\xF0\x9F\x93\x9D", 'solo' );
 		self::register_pro_submenu( 'alesta-ai-pro-faq',          __( 'FAQ Schema', 'alesta' ),                __( 'Génération de rich snippets Google FAQ via JSON-LD, alimentée par Claude.', 'alesta' ),                              "\xE2\x9D\x93",     'solo' );
-		self::register_pro_submenu( 'alesta-ai-pro-schema',       __( 'Données structurées', 'alesta' ),       __( 'Article, Product, Organization, LocalBusiness… Claude détecte le type par page.', 'alesta' ),                        "\xF0\x9F\x8F\x97", 'pro' );
+		self::register_pro_submenu( 'alesta-ai-pro-schema',       __( 'Données structurées', 'alesta' ),       __( 'Article, Product, Organization, LocalBusiness… Claude détecte le type par page.', 'alesta' ),                        "\xF0\x9F\x8F\x97", 'solo' );
 		self::register_pro_submenu( 'alesta-ai-pro-keywords',     __( 'Mots-clés', 'alesta' ),                 __( 'Densité, synonymes LSI, analyse Claude.', 'alesta' ),                                                                "\xF0\x9F\x94\x91", 'solo' );
 		self::register_pro_submenu( 'alesta-ai-pro-llms',         __( 'LLMs.txt pour IA', 'alesta' ),          __( 'Fichier de découverte pour ChatGPT, Claude, Gemini, Perplexity.', 'alesta' ),                                        "\xF0\x9F\xA4\x96", 'solo' );
 		self::register_pro_submenu( 'alesta-ai-pro-ai-metadata',  __( 'AI Metadata Generator', 'alesta' ),     __( 'Balises meta spécifiques aux crawlers IA.', 'alesta' ),                                                              "\xF0\x9F\xA7\xA0", 'solo' );
@@ -362,7 +363,7 @@ class Alesta_Admin {
 
 		// 02 Contenu & Rédaction
 		self::register_pro_submenu( 'alesta-ai-pro-chatbot',      __( 'Chatbot IA', 'alesta' ),                __( 'Widget conversationnel connecté à Claude Haiku : personnalisable (ton, périmètre, mémoire).', 'alesta' ),           "\xF0\x9F\x92\xAC", 'pro' );
-		self::register_pro_submenu( 'alesta-ai-pro-translate',    __( 'Traduction 20 langues', 'alesta' ),     __( 'Traduit articles et pages en 20 langues avec préservation du HTML, via Claude Opus.', 'alesta' ),                    "\xF0\x9F\x8C\x90", 'pro' );
+		self::register_pro_submenu( 'alesta-ai-pro-translate',    __( 'Traduction IA', 'alesta' ),     __( 'Traduit articles et pages avec préservation du HTML, via Claude Opus — 5 langues en Solo, 20 langues dès Pro.', 'alesta' ),                    "\xF0\x9F\x8C\x90", 'solo' );
 		self::register_pro_submenu( 'alesta-ai-pro-improve',      __( 'Amélioration texte', 'alesta' ),        __( 'Reformuler, simplifier, enrichir vos contenus existants par Claude.', 'alesta' ),                                    "\xE2\x9C\xA8",     'solo' );
 		self::register_pro_submenu( 'alesta-ai-pro-summaries',    __( 'Résumés automatiques', 'alesta' ),      __( 'Extraits 2-3 phrases pour tous les articles et pages.', 'alesta' ),                                                  "\xF0\x9F\x93\x83", 'solo' );
 		self::register_pro_submenu( 'alesta-ai-pro-editorial',    __( 'Plan éditorial', 'alesta' ),            __( 'Calendrier d\'articles sur 1 à 3 mois via Claude.', 'alesta' ),                                                      "\xF0\x9F\x93\x85", 'solo' );
@@ -382,11 +383,7 @@ class Alesta_Admin {
 		self::register_pro_submenu( 'alesta-ai-pro-activity',     __( 'Journal d\'activité', 'alesta' ),       __( 'Log des actions admin (posts, login, plugins) avec alertes suspectes.', 'alesta' ),                                  "\xF0\x9F\x93\x93", 'solo' );
 		self::register_pro_submenu( 'alesta-ai-pro-updates',      __( 'Mises à jour planifiées', 'alesta' ),   __( 'Auto-update WP + plugins selon fenêtre horaire choisie.', 'alesta' ),                                                "\xF0\x9F\x94\x84", 'pro' );
 		self::register_pro_submenu( 'alesta-ai-pro-roles',        __( 'Rôles avancés', 'alesta' ),             __( 'Contrôle fin des permissions par rôle et par module.', 'alesta' ),                                                   "\xF0\x9F\x91\xA4", 'pro' );
-		self::register_pro_submenu( 'alesta-ai-pro-bruteforce',   __( 'Brute Force', 'alesta' ),               __( 'Protection connexion : rate limiting + blocage IP après N tentatives.', 'alesta' ),                                  "\xF0\x9F\x9B\x91", 'pro' );
-		self::register_pro_submenu( 'alesta-ai-pro-files-scan',   __( 'Scan fichiers sensibles', 'alesta' ),   __( 'Détection permissions dangereuses, backdoors, fichiers hors-place.', 'alesta' ),                                     "\xF0\x9F\x94\x8E", 'pro' );
-
-		// 06 Communication & Contact
-		self::register_pro_submenu( 'alesta-ai-pro-email',        __( 'Email transactionnel', 'alesta' ),      __( 'Templates personnalisables + envoi via SMTP ou API (Resend, Postmark, SendGrid).', 'alesta' ),                       "\xE2\x9C\x89",     'solo' );
+		self::register_pro_submenu( 'alesta-ai-pro-bruteforce',   __( 'Brute Force', 'alesta' ),               __( 'Protection connexion : rate limiting + blocage IP après N tentatives.', 'alesta' ),                                  "\xF0\x9F\x9B\x91", 'solo' );
 
 		// 08 Rapports client
 		self::register_pro_submenu( 'alesta-ai-pro-pdf',          __( 'Rapport PDF SEO', 'alesta' ),           __( 'Génération A4 paysage : score global, meta manquants, breakdown par page — pour envoi client.', 'alesta' ),          "\xF0\x9F\x93\x84", 'pro' );
@@ -420,6 +417,26 @@ class Alesta_Admin {
 				}
 			}
 		);
+	}
+
+	/**
+	 * Tags every section-header submenu with a CSS class (5th slot of the
+	 * $submenu entry, rendered by WP as the <li> class) so admin-menu.css can
+	 * target them by class instead of by href suffix. Runs late (priority
+	 * 900) so the Pro addon's own headers (registered at 20) are tagged too.
+	 */
+	public static function tag_section_headers() {
+		global $submenu;
+		if ( empty( $submenu[ self::MENU_SLUG ] ) ) {
+			return;
+		}
+		$known = array( 'alesta-ai-seo', 'alesta-ai-content', 'alesta-ai-media', 'alesta-ai-perf', 'alesta-ai-automation', 'alesta-ai-reports' );
+		foreach ( $submenu[ self::MENU_SLUG ] as $i => $item ) {
+			$slug = isset( $item[2] ) ? $item[2] : '';
+			if ( substr( $slug, -8 ) === '-section' || in_array( $slug, $known, true ) ) {
+				$submenu[ self::MENU_SLUG ][ $i ][4] = 'alesta-menu-section';
+			}
+		}
 	}
 
 	/**
@@ -514,7 +531,7 @@ class Alesta_Admin {
 						__( 'Données structurées', 'alesta' ),
 						__( 'Article, Product, Organization, LocalBusiness… Claude détecte le type par page.', 'alesta' ),
 						'alesta-ai-pro-schema',
-						'pro'
+						'solo'
 					);
 					self::card_pro(
 						"\xF0\x9F\x94\x91", // 🔑
@@ -566,10 +583,10 @@ class Alesta_Admin {
 					);
 					self::card_pro(
 						"\xF0\x9F\x8C\x90", // 🌐
-						__( 'Traduction 20 langues', 'alesta' ),
-						__( 'Traduit articles et pages en 20 langues avec préservation du HTML, via Claude Opus.', 'alesta' ),
+						__( 'Traduction IA', 'alesta' ),
+						__( 'Traduit articles et pages avec préservation du HTML, via Claude Opus — 5 langues en Solo, 20 langues dès Pro.', 'alesta' ),
 						'alesta-ai-pro-translate',
-						'pro'
+						'solo'
 					);
 					self::card_pro(
 						"\xE2\x9C\xA8", // ✨
@@ -762,14 +779,7 @@ class Alesta_Admin {
 						__( 'Brute Force', 'alesta' ),
 						__( 'Protection connexion : rate limiting + blocage IP après N tentatives.', 'alesta' ),
 						'alesta-ai-pro-bruteforce',
-						'pro'
-					);
-					self::card_pro(
-						"\xF0\x9F\x94\x8E", // 🔎
-						__( 'Scan fichiers sensibles', 'alesta' ),
-						__( 'Détection permissions dangereuses, backdoors, fichiers hors-place.', 'alesta' ),
-						'alesta-ai-pro-files-scan',
-						'pro'
+						'solo'
 					);
 					?>
 				</div>
@@ -790,13 +800,6 @@ class Alesta_Admin {
 						__( 'Widget flottant contact multi-canaux avec horaires d\'ouverture par jour.', 'alesta' ),
 						'alesta-ai-talk-to-me',
 						__( 'Ouvrir', 'alesta' )
-					);
-					self::card_pro(
-						"\xE2\x9C\x89", // ✉
-						__( 'Email transactionnel', 'alesta' ),
-						__( 'Templates personnalisables + envoi via SMTP ou API (Resend, Postmark, SendGrid).', 'alesta' ),
-						'alesta-ai-pro-email',
-						'solo'
 					);
 					?>
 				</div>
@@ -928,8 +931,32 @@ class Alesta_Admin {
 		$has_real_pro = $pro_active && self::submenu_page_exists( $target_slug );
 		$href         = admin_url( 'admin.php?page=' . $target_slug );
 
+		if ( $has_real_pro && ! self::pro_plan_covers( $tier ) ) {
+			// Pro actif mais la licence ne couvre pas ce module (ex : Solo sur
+			// un module Pro) : carte verrouillée qui ouvre la vraie page Pro
+			// (elle affiche l'upsell avec le bon lien d'upgrade).
+			$is_pro = ( $tier === 'pro' );
+			?>
+			<div class="alesta-module-card alesta-module-pro">
+				<span class="<?php echo $is_pro ? 'amc-status amc-status-pro' : 'amc-status amc-status-solo'; ?>"><?php echo esc_html( $is_pro ? "ð Pro" : "ð Solo" ); ?></span>
+				<div class="amc-icon"><?php echo esc_html( $icon ); ?></div>
+				<div class="amc-info">
+					<div class="amc-name">
+						<?php echo esc_html( $name ); ?>
+						<span class="<?php echo $is_pro ? 'alesta-pro-badge alesta-pro-badge--pro' : 'alesta-pro-badge'; ?>"><?php echo esc_html( $is_pro ? 'Pro' : 'Solo' ); ?></span>
+					</div>
+					<div class="amc-desc"><?php echo esc_html( $desc ); ?></div>
+				</div>
+				<div class="amc-footer">
+					<a href="<?php echo esc_url( $href ); ?>" class="button alesta-btn-pro"><?php esc_html_e( 'Débloquer', 'alesta' ); ?></a>
+				</div>
+			</div>
+			<?php
+			return;
+		}
+
 		if ( $has_real_pro ) {
-			// Pro actif ET la vraie page existe : rendu carte verte "Actif"
+			// Pro actif ET la vraie page existe ET plan couvert : carte verte "Actif"
 			?>
 			<div class="alesta-module-card alesta-module-active">
 				<span class="amc-status amc-status-ok"><?php esc_html_e( '✓ Actif Pro', 'alesta' ); ?></span>
@@ -985,12 +1012,33 @@ class Alesta_Admin {
 	}
 
 	/**
+	 * Asks the Pro addon whether the current licence plan covers a tier
+	 * ('solo' or 'pro'). Alesta_AI_License::can() exists in both Pro
+	 * variants (Freemius + Galiance Open) ; if it is missing we assume
+	 * everything is covered (legacy behaviour).
+	 */
+	private static function pro_plan_covers( $tier ) {
+		if ( ! class_exists( 'Alesta_AI_License', false ) || ! method_exists( 'Alesta_AI_License', 'can' ) ) {
+			return true;
+		}
+		try {
+			return (bool) Alesta_AI_License::can( $tier === 'pro' ? 'pro' : 'solo' );
+		} catch ( Throwable $e ) {
+			return true;
+		}
+	}
+
+	/**
 	 * Maps a teaser slug (alesta-ai-pro-XXX) to the real Pro page slug
 	 * (alesta-ai-XXX). Handles a few naming exceptions from the Pro plugin.
 	 */
 	private static function pro_target_slug( $teaser_slug ) {
 		$exceptions = array(
-			'alesta-ai-pro-moderation' => 'alesta-ai-comments',
+			'alesta-ai-pro-moderation'     => 'alesta-ai-comments',
+			'alesta-ai-pro-security'       => 'alesta-ai-security-audit',
+			'alesta-ai-pro-bruteforce'     => 'alesta-ai-brute-force',
+			'alesta-ai-pro-google-reviews' => 'alesta-ai-reviews',
+			'alesta-ai-pro-trustpilot'     => 'alesta-ai-reviews-trustpilot',
 		);
 		if ( isset( $exceptions[ $teaser_slug ] ) ) {
 			return $exceptions[ $teaser_slug ];

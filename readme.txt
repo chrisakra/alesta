@@ -4,7 +4,7 @@ Tags: seo, sitemap, htaccess, gdpr, maintenance mode
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.8.1
+Stable tag: 1.8.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,13 @@ Yes, the sitemap is available at `/sitemap.xml`. Alesta automatically pings Goog
 Technically yes, but if you already use Yoast or RankMath for your XML sitemap, disable their sitemap module to avoid duplicates.
 
 == Changelog ==
+
+= 1.8.2 =
+* Dashboard: when Alesta AI Pro is active, module cards now reflect the actual licence plan — modules not covered by the current plan (e.g. Pro modules on a Solo licence) show a locked "Débloquer" card instead of "Actif Pro".
+* Dashboard: "Données structurées", "Traduction IA" and "Brute Force" are now flagged Solo (aligned with alesta-ai.com/tarifs).
+* Dashboard: removed the "Email transactionnel" and "Scan fichiers sensibles" teaser cards (no matching Pro module).
+* Fix: "Ouvrir" buttons for Audit sécurité, Brute Force, Avis Google and Avis Trustpilot now open the correct Pro page.
+* Sidebar: section headers are tagged with a CSS class (more robust styling when the Pro addon reorders the menu).
 
 = 1.8.1 =
 * Cleanup: removed orphan file includes/class-alesta-meta.php (never loaded).
@@ -153,6 +160,9 @@ Technically yes, but if you already use Yoast or RankMath for your XML sitemap, 
 * Automatic Open Graph and Twitter Card.
 
 == Upgrade Notice ==
+
+= 1.8.2 =
+Dashboard now shows the real licence coverage when Alesta AI Pro is active. Safe to update.
 
 = 1.8.1 =
 Maintenance release, no functional change.
