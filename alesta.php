@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Alesta
  * Description:       SEO and technical toolkit: XML sitemap, .htaccess (Gzip/cache/HTTPS), robots.txt, broken links, DB cleaner, GDPR fonts + banner, maintenance mode, floating contact widget, health check, debug manager, budget tracker. Same product family as Alesta AI.
- * Version:           1.8.2
+ * Version:           1.8.3
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Alesta AI
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ALESTA_VERSION', '1.8.2' );
+define( 'ALESTA_VERSION', '1.8.3' );
 define( 'ALESTA_PLUGIN_FILE', __FILE__ );
 define( 'ALESTA_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 

@@ -938,7 +938,7 @@ class Alesta_Admin {
 			$is_pro = ( $tier === 'pro' );
 			?>
 			<div class="alesta-module-card alesta-module-pro">
-				<span class="<?php echo $is_pro ? 'amc-status amc-status-pro' : 'amc-status amc-status-solo'; ?>"><?php echo esc_html( $is_pro ? "ð Pro" : "ð Solo" ); ?></span>
+				<span class="<?php echo $is_pro ? 'amc-status amc-status-pro' : 'amc-status amc-status-solo'; ?>"><?php echo esc_html( $is_pro ? "🔒 Pro" : "🔒 Solo" ); ?></span>
 				<div class="amc-icon"><?php echo esc_html( $icon ); ?></div>
 				<div class="amc-info">
 					<div class="amc-name">
