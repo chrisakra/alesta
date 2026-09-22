@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Alesta
  * Description:       SEO and technical toolkit: XML sitemap, .htaccess (Gzip/cache/HTTPS), robots.txt, broken links, DB cleaner, GDPR fonts + banner, maintenance mode, floating contact widget, health check, debug manager, budget tracker. Same product family as Alesta AI.
- * Version:           1.8.4
+ * Version:           1.8.5
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Alesta AI
@@ -16,12 +16,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ALESTA_VERSION', '1.8.4' );
+define( 'ALESTA_VERSION', '1.8.5' );
 define( 'ALESTA_PLUGIN_FILE', __FILE__ );
 define( 'ALESTA_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 
 require_once ALESTA_PLUGIN_DIR . 'includes/class-alesta-promo.php';
 require_once ALESTA_PLUGIN_DIR . 'includes/class-alesta-admin.php';
+require_once ALESTA_PLUGIN_DIR . 'includes/class-alesta-review-prompt.php';
 require_once ALESTA_PLUGIN_DIR . 'includes/modules/seo/class-sitemap-module.php';
 require_once ALESTA_PLUGIN_DIR . 'includes/modules/seo/class-admin-sitemap.php';
 require_once ALESTA_PLUGIN_DIR . 'includes/modules/performance/class-htaccess-module.php';
@@ -60,6 +61,10 @@ add_filter(
 		return $links;
 	}
 );
+
+register_activation_hook( ALESTA_PLUGIN_FILE, array( 'Alesta_Review_Prompt', 'on_activation' ) );
+add_action( 'admin_init', array( 'Alesta_Review_Prompt', 'handle_fallback' ) );
+add_action( 'plugins_loaded', function () { new Alesta_Review_Prompt(); } );
 
 add_action( 'plugins_loaded', array( 'Alesta_Admin', 'init' ) );
 add_action( 'plugins_loaded', array( 'Alesta_RGPD_Module', 'init' ) );

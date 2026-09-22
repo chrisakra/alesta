@@ -465,6 +465,12 @@ class Alesta_Admin {
 		?>
 		<div class="wrap alesta-wrap">
 
+			<?php
+			if ( class_exists( 'Alesta_Review_Prompt' ) ) {
+				Alesta_Review_Prompt::render();
+			}
+			?>
+
 			<!-- Header cockpit -->
 			<div style="display:flex;align-items:center;justify-content:space-between;padding:20px 26px;background:linear-gradient(135deg,#1e3a5f 0%,#0f2440 100%);border-radius:10px;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
 				<div style="display:flex;align-items:center;gap:14px;">
