@@ -959,7 +959,7 @@ class Alesta_Admin {
 			// Pro actif ET la vraie page existe ET plan couvert : carte verte "Actif"
 			?>
 			<div class="alesta-module-card alesta-module-active">
-				<span class="amc-status amc-status-ok"><?php esc_html_e( '✓ Actif Pro', 'alesta' ); ?></span>
+				<span class="amc-status amc-status-ok"><?php echo esc_html( self::active_badge_label() ); ?></span>
 				<div class="amc-icon"><?php echo esc_html( $icon ); ?></div>
 				<div class="amc-info">
 					<div class="amc-name"><?php echo esc_html( $name ); ?></div>
@@ -1017,6 +1017,32 @@ class Alesta_Admin {
 	 * variants (Freemius + Galiance Open) ; if it is missing we assume
 	 * everything is covered (legacy behaviour).
 	 */
+	/**
+	 * Libellé de la pastille verte d'un module premium débloqué : on nomme le
+	 * plan réellement actif (« Actif Solo », « Actif Pro »…) au lieu de
+	 * « Actif Pro » en dur, qui laissait croire à un client Solo que son plan
+	 * était Pro.
+	 */
+	private static function active_badge_label() {
+		$labels = array(
+			'solo'     => __( '✓ Actif Solo', 'alesta' ),
+			'pro'      => __( '✓ Actif Pro', 'alesta' ),
+			'agency'   => __( '✓ Actif Agency', 'alesta' ),
+			'founders' => __( '✓ Actif Founders', 'alesta' ),
+		);
+		if ( class_exists( 'Alesta_AI_License', false ) && method_exists( 'Alesta_AI_License', 'current_plan' ) ) {
+			try {
+				$plan = (string) Alesta_AI_License::current_plan();
+				if ( isset( $labels[ $plan ] ) ) {
+					return $labels[ $plan ];
+				}
+			} catch ( Throwable $e ) {
+				// Plan indisponible : libellé neutre.
+			}
+		}
+		return __( '✓ Actif', 'alesta' );
+	}
+
 	private static function pro_plan_covers( $tier ) {
 		if ( ! class_exists( 'Alesta_AI_License', false ) || ! method_exists( 'Alesta_AI_License', 'can' ) ) {
 			return true;
