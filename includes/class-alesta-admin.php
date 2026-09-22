@@ -5,13 +5,20 @@
  * Sidebar layout mirrors the Alesta AI Free v1.2.7 blueprint. Functional
  * Free modules shipped in this release:
  *   01 SEO           → Sitemap XML
+ *                    → Title & Meta IA + Audit SEO (BYOK Anthropic)
+ *                    → FAQ Schema (BYOK Anthropic)
  *   04 Performance   → Gzip, Cache, HTTPS (.htaccess helper)
  *                    → Robots.txt editor
  *                    → Broken links scanner (4xx / 5xx)
  *                    → Scheduled DB Cleaner
  *                    → Google Fonts (GDPR self-hosting)
+ *   05 Sécurité      → Protection Brute Force
+ *   07 Réglages      → Configuration (clé API), Budget
  *
- * Additional modules will be added block by block in future releases.
+ * Cohabitation avec l'addon Alesta AI Pro : la Pro enregistre les MÊMES
+ * slugs (alesta-ai-meta, alesta-ai-faq, alesta-ai-brute-force,
+ * alesta-ai-settings) à admin_menu priorité 20. Le Free (priorité 10) ne
+ * les enregistre donc que si la Pro est absente (is_pro_active()).
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -67,6 +74,10 @@ class Alesta_Admin {
 	 * Register the top-level Alesta AI menu — dashboard, 2 sections, 2 modules.
 	 */
 	public static function register_menu() {
+		// Pro addon present ? It registers its own Title & Meta, FAQ, Brute Force
+		// and Configuration pages under the same slugs (admin_menu priority 20).
+		$pro_active = self::is_pro_active();
+
 		add_menu_page(
 			'Alesta AI',
 			'Alesta AI',
@@ -110,6 +121,37 @@ class Alesta_Admin {
 				}
 			}
 		);
+
+		// Title & Meta IA + Audit SEO — functional module (v1.9.0). Same slug
+		// as the Pro page: registered only when the Pro addon is absent.
+		if ( ! $pro_active ) {
+			add_submenu_page(
+				self::MENU_SLUG,
+				__( 'Title & Meta + Audit SEO', 'alesta' ),
+				'- Title &amp; Meta + Audit SEO',
+				self::CAPABILITY,
+				'alesta-ai-meta',
+				function () {
+					if ( class_exists( 'Alesta_Admin_Meta' ) ) {
+						( new Alesta_Admin_Meta() )->render_page();
+					}
+				}
+			);
+
+			// FAQ Schema — functional module (v1.9.0).
+			add_submenu_page(
+				self::MENU_SLUG,
+				__( 'FAQ Schema', 'alesta' ),
+				'- FAQ Schema',
+				self::CAPABILITY,
+				'alesta-ai-faq',
+				function () {
+					if ( class_exists( 'Alesta_Admin_FAQ' ) ) {
+						( new Alesta_Admin_FAQ() )->render_page();
+					}
+				}
+			);
+		}
 
 		// Section header 04 Performance — inert via admin-menu.css.
 		add_submenu_page(
@@ -271,6 +313,22 @@ class Alesta_Admin {
 			}
 		);
 
+		// Protection Brute Force — functional module (v1.9.0).
+		if ( ! $pro_active ) {
+			add_submenu_page(
+				self::MENU_SLUG,
+				__( 'Protection Brute Force', 'alesta' ),
+				'- Protection Brute Force',
+				self::CAPABILITY,
+				'alesta-ai-brute-force',
+				function () {
+					if ( class_exists( 'Alesta_Admin_Brute_Force' ) ) {
+						( new Alesta_Admin_Brute_Force() )->render_page();
+					}
+				}
+			);
+		}
+
 		// Section header 06 Communication — inert via admin-menu.css.
 		add_submenu_page(
 			self::MENU_SLUG,
@@ -304,6 +362,22 @@ class Alesta_Admin {
 			'alesta-ai-settings-section',
 			array( __CLASS__, 'render_section_header' )
 		);
+
+		// Configuration (clé API Anthropic + modèle) — functional module (v1.9.0).
+		if ( ! $pro_active ) {
+			add_submenu_page(
+				self::MENU_SLUG,
+				__( 'Configuration', 'alesta' ),
+				'- Configuration',
+				self::CAPABILITY,
+				'alesta-ai-settings',
+				function () {
+					if ( class_exists( 'Alesta_Admin_Settings' ) ) {
+						( new Alesta_Admin_Settings() )->render_page();
+					}
+				}
+			);
+		}
 
 		// Budget tracker — functional module.
 		add_submenu_page(
@@ -353,8 +427,6 @@ class Alesta_Admin {
 		// ══════════════════════════════════════════════════════════════════════
 
 		// 01 SEO
-		self::register_pro_submenu( 'alesta-ai-pro-meta',         __( 'Title & Meta IA', 'alesta' ),           __( 'Génération en masse des titres SEO et meta-descriptions par Claude, avec audit score par page.', 'alesta' ),         "\xF0\x9F\x93\x9D", 'solo' );
-		self::register_pro_submenu( 'alesta-ai-pro-faq',          __( 'FAQ Schema', 'alesta' ),                __( 'Génération de rich snippets Google FAQ via JSON-LD, alimentée par Claude.', 'alesta' ),                              "\xE2\x9D\x93",     'solo' );
 		self::register_pro_submenu( 'alesta-ai-pro-schema',       __( 'Données structurées', 'alesta' ),       __( 'Article, Product, Organization, LocalBusiness… Claude détecte le type par page.', 'alesta' ),                        "\xF0\x9F\x8F\x97", 'solo' );
 		self::register_pro_submenu( 'alesta-ai-pro-keywords',     __( 'Mots-clés', 'alesta' ),                 __( 'Densité, synonymes LSI, analyse Claude.', 'alesta' ),                                                                "\xF0\x9F\x94\x91", 'solo' );
 		self::register_pro_submenu( 'alesta-ai-pro-llms',         __( 'LLMs.txt pour IA', 'alesta' ),          __( 'Fichier de découverte pour ChatGPT, Claude, Gemini, Perplexity.', 'alesta' ),                                        "\xF0\x9F\xA4\x96", 'solo' );
@@ -383,7 +455,6 @@ class Alesta_Admin {
 		self::register_pro_submenu( 'alesta-ai-pro-activity',     __( 'Journal d\'activité', 'alesta' ),       __( 'Log des actions admin (posts, login, plugins) avec alertes suspectes.', 'alesta' ),                                  "\xF0\x9F\x93\x93", 'solo' );
 		self::register_pro_submenu( 'alesta-ai-pro-updates',      __( 'Mises à jour planifiées', 'alesta' ),   __( 'Auto-update WP + plugins selon fenêtre horaire choisie.', 'alesta' ),                                                "\xF0\x9F\x94\x84", 'pro' );
 		self::register_pro_submenu( 'alesta-ai-pro-roles',        __( 'Rôles avancés', 'alesta' ),             __( 'Contrôle fin des permissions par rôle et par module.', 'alesta' ),                                                   "\xF0\x9F\x91\xA4", 'pro' );
-		self::register_pro_submenu( 'alesta-ai-pro-bruteforce',   __( 'Brute Force', 'alesta' ),               __( 'Protection connexion : rate limiting + blocage IP après N tentatives.', 'alesta' ),                                  "\xF0\x9F\x9B\x91", 'solo' );
 
 		// 08 Rapports client
 		self::register_pro_submenu( 'alesta-ai-pro-pdf',          __( 'Rapport PDF SEO', 'alesta' ),           __( 'Génération A4 paysage : score global, meta manquants, breakdown par page — pour envoi client.', 'alesta' ),          "\xF0\x9F\x93\x84", 'pro' );
@@ -518,19 +589,19 @@ class Alesta_Admin {
 						'alesta-ai-sitemap',
 						__( 'Ouvrir', 'alesta' )
 					);
-					self::card_pro(
+					self::card_active(
 						"\xF0\x9F\x93\x9D", // 📝
-						__( 'Title & Meta IA', 'alesta' ),
-						__( 'Génération en masse des titres SEO et meta-descriptions par Claude, avec audit score.', 'alesta' ),
-						'alesta-ai-pro-meta',
-						'solo'
+						__( 'Title & Meta IA + Audit SEO', 'alesta' ),
+						__( 'Génération des titres SEO et meta-descriptions par Claude (votre clé API), audit score par page.', 'alesta' ),
+						'alesta-ai-meta',
+						__( 'Ouvrir', 'alesta' )
 					);
-					self::card_pro(
+					self::card_active(
 						"\xE2\x9D\x93", // ❓
 						__( 'FAQ Schema', 'alesta' ),
-						__( 'Rich snippets Google FAQ via JSON-LD, alimentés par Claude.', 'alesta' ),
-						'alesta-ai-pro-faq',
-						'solo'
+						__( 'Rich snippets Google FAQ via JSON-LD, générés par Claude (votre clé API).', 'alesta' ),
+						'alesta-ai-faq',
+						__( 'Ouvrir', 'alesta' )
 					);
 					self::card_pro(
 						"\xF0\x9F\x8F\x97", // 🏗
@@ -752,6 +823,13 @@ class Alesta_Admin {
 						'alesta-ai-health',
 						__( 'Ouvrir', 'alesta' )
 					);
+					self::card_active(
+						"\xF0\x9F\x9B\x91", // 🛑
+						__( 'Brute Force', 'alesta' ),
+						__( 'Protection connexion : rate limiting + blocage IP après N tentatives.', 'alesta' ),
+						'alesta-ai-brute-force',
+						__( 'Ouvrir', 'alesta' )
+					);
 					self::card_pro(
 						"\xF0\x9F\x9B\xA1", // 🛡
 						__( 'Audit sécurité IA', 'alesta' ),
@@ -779,13 +857,6 @@ class Alesta_Admin {
 						__( 'Contrôle fin des permissions par rôle et par module.', 'alesta' ),
 						'alesta-ai-pro-roles',
 						'pro'
-					);
-					self::card_pro(
-						"\xF0\x9F\x9B\x91", // 🛑
-						__( 'Brute Force', 'alesta' ),
-						__( 'Protection connexion : rate limiting + blocage IP après N tentatives.', 'alesta' ),
-						'alesta-ai-pro-bruteforce',
-						'solo'
 					);
 					?>
 				</div>
@@ -834,10 +905,19 @@ class Alesta_Admin {
 						'alesta-ai-debug',
 						__( 'Ouvrir', 'alesta' )
 					);
+					if ( ! self::is_pro_active() ) {
+						self::card_active(
+							"\xF0\x9F\x94\x91", // 🔑
+							__( 'Configuration', 'alesta' ),
+							__( 'Votre fournisseur IA (Anthropic ou OpenAI), sa clé API et le modèle utilisés par les modules IA.', 'alesta' ),
+							'alesta-ai-settings',
+							__( 'Ouvrir', 'alesta' )
+						);
+					}
 					self::card_active(
 						"\xF0\x9F\x92\xB0", // 💰
 						__( 'Suivi consommation', 'alesta' ),
-						__( 'Tableau de suivi mensuel / quotidien des tokens (utilisé par les modules IA du Pro).', 'alesta' ),
+						__( 'Tableau de suivi mensuel / quotidien des tokens consommés par les modules IA.', 'alesta' ),
 						'alesta-ai-budget',
 						__( 'Ouvrir', 'alesta' )
 					);
@@ -1024,10 +1104,10 @@ class Alesta_Admin {
 	 * everything is covered (legacy behaviour).
 	 */
 	/**
-	 * Libellé de la pastille verte d'un module premium débloqué : on nomme le
-	 * plan réellement actif (« Actif Solo », « Actif Pro »…) au lieu de
+	 * Libellé de la pastille verte d'un module premium débloqué. On nomme le
+	 * plan réellement actif (« Actif Solo », « Actif Pro »…) plutôt que
 	 * « Actif Pro » en dur, qui laissait croire à un client Solo que son plan
-	 * était Pro.
+	 * était Pro. Sans addon (ou plan inconnu) : « Actif ».
 	 */
 	private static function active_badge_label() {
 		$labels = array(
@@ -1043,7 +1123,7 @@ class Alesta_Admin {
 					return $labels[ $plan ];
 				}
 			} catch ( Throwable $e ) {
-				// Plan indisponible : libellé neutre.
+				// Plan indisponible : on retombe sur le libellé neutre.
 			}
 		}
 		return __( '✓ Actif', 'alesta' );
@@ -1068,7 +1148,6 @@ class Alesta_Admin {
 		$exceptions = array(
 			'alesta-ai-pro-moderation'     => 'alesta-ai-comments',
 			'alesta-ai-pro-security'       => 'alesta-ai-security-audit',
-			'alesta-ai-pro-bruteforce'     => 'alesta-ai-brute-force',
 			'alesta-ai-pro-google-reviews' => 'alesta-ai-reviews',
 			'alesta-ai-pro-trustpilot'     => 'alesta-ai-reviews-trustpilot',
 		);

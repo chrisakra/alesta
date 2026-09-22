@@ -1,0 +1,51 @@
+/* Alesta — Audit SEO CSS (porté depuis Alesta AI Pro audit.css). Handle : alesta-audit */
+
+.audit-tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 0;
+}
+.audit-tab {
+    padding: 8px 18px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    background: transparent;
+    color: #6b7280;
+}
+.audit-tab.active {
+    background: #fff;
+    border-color: #e5e7eb;
+    color: #111827;
+    font-weight: 500;
+    position: relative;
+    top: 1px;
+}
+.audit-tab-content {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 0 0 1rem;
+    min-height: 120px;
+}
+
+/* Issues badges */
+.audit-issue {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin: 2px 2px 2px 0;
+}
+.audit-error   { background: #fee2e2; color: #991b1b; }
+.audit-warning { background: #fef9c3; color: #713f12; }
+.audit-info    { background: #e0f2fe; color: #075985; }
+.audit-ok      { background: #d1fae5; color: #065f46; }
+
+/* Table tweaks */
+.audit-tab-content .widefat th { padding: 10px 12px; }
+.audit-tab-content .widefat td { padding: 10px 12px; vertical-align: top; }

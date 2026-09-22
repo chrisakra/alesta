@@ -7,10 +7,10 @@ defined('ABSPATH') || exit;
  * Suivi de consommation Claude (Anthropic) : jauge mensuelle, historique,
  * graphique quotidien, réglages d'alerte, export CSV.
  *
- * Fonctionne sans Pro : lit les stats depuis Alesta_AI_API si disponible
- * (fournie par le plugin Pro qui fait le tracking effectif), sinon renvoie
- * zéro. Les réglages de budget (limite, seuil, email) sont eux stockés en
- * option WP standard et exploitables par Pro à l'activation.
+ * Délègue à Alesta_AI_API quand la Pro est active (elle fait le tracking
+ * effectif dans ses propres options), sinon à Alesta_API (client Claude du
+ * Free depuis 1.9.0, qui écrit dans alesta_token_usage* / alesta_budget_settings).
+ * Les lectures directes d'options restent en dernier recours.
  */
 class Alesta_Admin_Budget {
 
@@ -43,12 +43,20 @@ class Alesta_Admin_Budget {
     }
 
     // =========================================================================
-    // FALLBACK DELEGATES — utilisent Alesta_AI_API si dispo (Pro), sinon zéros.
+    // FALLBACK DELEGATES — Alesta_AI_API (Pro) > Alesta_API (Free) > options.
     // =========================================================================
 
+    /**
+     * Classe cliente API à interroger : celle de la Pro si elle est chargée
+     * (WordPress inclut l'addon avant le Free), sinon celle du Free (1.9.0).
+     */
+    private function api_class(): string {
+        return class_exists( 'Alesta_AI_API', false ) ? 'Alesta_AI_API' : 'Alesta_API';
+    }
+
     private function get_budget_settings(): array {
-        if ( is_callable(['Alesta_AI_API', 'get_budget_settings']) ) {
-            $s = call_user_func(['Alesta_AI_API', 'get_budget_settings']);
+        if ( is_callable([$this->api_class(), 'get_budget_settings']) ) {
+            $s = call_user_func([$this->api_class(), 'get_budget_settings']);
             if ( is_array($s) ) return array_merge($this->default_budget_settings(), $s);
         }
         $s = get_option(self::OPT_BUDGET_SETTINGS, []);
@@ -65,8 +73,8 @@ class Alesta_Admin_Budget {
     }
 
     private function save_budget_settings_delegate( array $data ): void {
-        if ( is_callable(['Alesta_AI_API', 'save_budget_settings']) ) {
-            call_user_func(['Alesta_AI_API', 'save_budget_settings'], $data);
+        if ( is_callable([$this->api_class(), 'save_budget_settings']) ) {
+            call_user_func([$this->api_class(), 'save_budget_settings'], $data);
             return;
         }
         $clean = [
@@ -79,8 +87,8 @@ class Alesta_Admin_Budget {
     }
 
     private function get_usage_stats(): array {
-        if ( is_callable(['Alesta_AI_API', 'get_usage_stats']) ) {
-            $u = call_user_func(['Alesta_AI_API', 'get_usage_stats']);
+        if ( is_callable([$this->api_class(), 'get_usage_stats']) ) {
+            $u = call_user_func([$this->api_class(), 'get_usage_stats']);
             if ( is_array($u) ) return array_merge($this->default_usage_stats(), $u);
         }
         $u = get_option(self::OPT_USAGE_STATS, []);
@@ -99,8 +107,8 @@ class Alesta_Admin_Budget {
     }
 
     private function get_monthly_stats(): array {
-        if ( is_callable(['Alesta_AI_API', 'get_monthly_stats']) ) {
-            $m = call_user_func(['Alesta_AI_API', 'get_monthly_stats']);
+        if ( is_callable([$this->api_class(), 'get_monthly_stats']) ) {
+            $m = call_user_func([$this->api_class(), 'get_monthly_stats']);
             if ( is_array($m) ) return $m;
         }
         $m = get_option(self::OPT_MONTHLY_STATS, []);
@@ -108,8 +116,8 @@ class Alesta_Admin_Budget {
     }
 
     private function get_daily_stats( int $days = 30 ): array {
-        if ( is_callable(['Alesta_AI_API', 'get_daily_stats']) ) {
-            $d = call_user_func(['Alesta_AI_API', 'get_daily_stats'], $days);
+        if ( is_callable([$this->api_class(), 'get_daily_stats']) ) {
+            $d = call_user_func([$this->api_class(), 'get_daily_stats'], $days);
             if ( is_array($d) ) return $d;
         }
         $d = get_option(self::OPT_DAILY_STATS, []);
@@ -121,8 +129,8 @@ class Alesta_Admin_Budget {
     }
 
     private function reset_monthly_delegate(): void {
-        if ( is_callable(['Alesta_AI_API', 'reset_monthly']) ) {
-            call_user_func(['Alesta_AI_API', 'reset_monthly']);
+        if ( is_callable([$this->api_class(), 'reset_monthly']) ) {
+            call_user_func([$this->api_class(), 'reset_monthly']);
             return;
         }
         $month   = gmdate('Y-m');
@@ -143,8 +151,8 @@ class Alesta_Admin_Budget {
     }
 
     private function reset_all_delegate(): void {
-        if ( is_callable(['Alesta_AI_API', 'reset_all']) ) {
-            call_user_func(['Alesta_AI_API', 'reset_all']);
+        if ( is_callable([$this->api_class(), 'reset_all']) ) {
+            call_user_func([$this->api_class(), 'reset_all']);
             return;
         }
         delete_option(self::OPT_USAGE_STATS);
@@ -246,7 +254,7 @@ class Alesta_Admin_Budget {
                     <span class="dashicons dashicons-chart-area bgt-header-icon"></span>
                     <div>
                         <h1>Budget API</h1>
-                        <p>Suivi de consommation et limites mensuelles Claude (Anthropic)</p>
+                        <p>Suivi de consommation et limites mensuelles de votre fournisseur IA</p>
                     </div>
                 </div>
                 <div class="bgt-header-right">
@@ -262,6 +270,11 @@ class Alesta_Admin_Budget {
                     <?php endif; ?>
                 </div>
             </div>
+
+            <!-- ── Note d'estimation des coûts ── -->
+            <p style="margin:0 0 16px;font-size:12px;color:#6b7280;">
+                <?php esc_html_e('Les tokens sont comptés pour tous les modèles. Le coût n\'est estimé que pour les modèles dont le tarif est connu du plugin : pour les autres (OpenAI, nouveaux modèles Claude) il reste à 0 — « non estimé ». Le filtre alesta_ai_model_pricing permet de fournir vos propres tarifs.', 'alesta'); ?>
+            </p>
 
             <!-- ── Stats du mois ── -->
             <div class="bgt-section-title">📅 <?php echo esc_html(date_i18n('F Y')); ?></div>

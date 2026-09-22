@@ -97,7 +97,13 @@ jQuery(function ($) {
 
     $('#btn-analyze-log').on('click', function () {
         if (!AlestaDebug.has_api) {
-            alert('Clé API Anthropic non configurée.\nRendez-vous dans Alesta → Réglages → Configuration.');
+            var noKey = { data: { code: 'no_api_key', settings_url: AlestaDebug.settings_url } };
+            var noKeyMsg = 'Aucune clé API IA configurée. Saisissez-la dans Alesta AI → Configuration.';
+            if (window.AlestaKeyNotice) {
+                window.AlestaKeyNotice.notify(noKey, noKeyMsg);
+            } else {
+                alert(noKeyMsg);
+            }
             return;
         }
 
@@ -124,12 +130,14 @@ jQuery(function ($) {
                 $content.html(
                     formatAnalysis(d.analysis) +
                     '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af;">' +
-                    '📊 ' + d.lines_analyzed + ' lignes analysées · ' +
-                    (d.input_tokens + d.output_tokens) + ' tokens utilisés' +
+                    '📊 ' + d.lines_analyzed + ' lignes analysées' +
                     '</div>'
                 );
             } else {
-                $content.html('<div style="color:#dc2626;">❌ ' + (res.data ? res.data.message : 'Erreur inconnue') + '</div>');
+                $content.text('❌ ' + (res.data && res.data.message ? res.data.message : 'Erreur inconnue')).css('color', '#dc2626');
+                if (window.AlestaKeyNotice) {
+                    window.AlestaKeyNotice.appendTo($content, res);
+                }
             }
         })
         .fail(function () {

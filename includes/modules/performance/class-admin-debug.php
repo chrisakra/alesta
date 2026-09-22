@@ -90,13 +90,17 @@ class Alesta_Admin_Debug {
         if (strpos($hook, 'alesta-ai-debug') === false) return;
 
         $ver = ALESTA_VERSION . '.' . time();
+        if ( class_exists('Alesta_API') ) {
+            Alesta_API::enqueue_key_notice();
+        }
         wp_enqueue_script('alesta-debug', plugin_dir_url( ALESTA_PLUGIN_FILE ) . 'assets/debug-admin.js',  ['jquery'], $ver, true);
         wp_enqueue_style('alesta-debug',  plugin_dir_url( ALESTA_PLUGIN_FILE ) . 'assets/debug-admin.css', [], $ver);
         wp_localize_script('alesta-debug', 'AlestaDebug', [
             'ajax_url'  => admin_url('admin-ajax.php'),
             'nonce'     => wp_create_nonce('alesta_debug_nonce'),
             'debug_on'  => defined('WP_DEBUG') && WP_DEBUG,
-            'has_api'   => !empty(get_option('alesta_api_key')),
+            'has_api'   => class_exists('Alesta_API') && Alesta_API::has_stored_key(),
+            'settings_url' => admin_url('admin.php?page=alesta-ai-settings'),
         ]);
     }
 
@@ -349,9 +353,13 @@ class Alesta_Admin_Debug {
         check_ajax_referer('alesta_debug_nonce', 'nonce');
         if (!current_user_can('manage_options')) wp_send_json_error(['message' => 'Accès refusé.'], 403);
 
-        $api_key = get_option('alesta_api_key', '');
-        if (empty($api_key)) {
-            wp_send_json_error(['message' => 'Clé API Anthropic non configurée. Rendez-vous dans Réglages → Configuration.']);
+        if (!class_exists('Alesta_API')) {
+            wp_send_json_error(['message' => __('Client API Alesta indisponible.', 'alesta')]);
+        }
+
+        $api = new Alesta_API();
+        if (!$api->has_key()) {
+            wp_send_json_error(Alesta_API::error_payload(Alesta_API::missing_key_error()));
         }
 
         // Read log
@@ -392,45 +400,23 @@ class Alesta_Admin_Debug {
                 . "--- CONTENU DU DEBUG.LOG (dernières 100 lignes) ---\n"
                 . $log_text;
 
-        // Direct call to Anthropic API is required here: the user has explicitly
-        // opted in by entering their own Anthropic API key in the Configuration
-        // module (BYOK), and requested an on-demand analysis of their debug.log.
-        // Using WordPress AI Client would require a system-wide provider setup
-        // not appropriate for a per-user, per-key call.
-        // phpcs:ignore PluginCheck.CodeAnalysis.AIProvider.DirectIntegration
-        $response = wp_remote_post('https://api.anthropic.com/v1/messages', [
-            'timeout' => 60,
-            'headers' => [
-                'x-api-key'         => $api_key,
-                'anthropic-version' => '2023-06-01',
-                'content-type'      => 'application/json',
-            ],
-            'body' => wp_json_encode([
-                'model'      => 'claude-opus-4-5',
-                'max_tokens' => 2048,
-                'messages'   => [['role' => 'user', 'content' => $prompt]],
-            ]),
-        ]);
+        // L'appel passe par le client commun Alesta_API : il route vers le
+        // fournisseur choisi par l'administrateur (Anthropic ou OpenAI), avec
+        // SA propre clé (BYOK), et comptabilise les tokens dans le Budget API.
+        $response = $api->ask($prompt, 2048);
 
         if (is_wp_error($response)) {
-            wp_send_json_error(['message' => 'Erreur API : ' . $response->get_error_message()]);
+            wp_send_json_error(Alesta_API::error_payload($response));
         }
 
-        $body = json_decode(wp_remote_retrieve_body($response), true);
-        if (!empty($body['error'])) {
-            wp_send_json_error(['message' => 'Claude : ' . sanitize_text_field($body['error']['message'] ?? 'Erreur inconnue')]);
-        }
-
-        $analysis = sanitize_textarea_field($body['content'][0]['text'] ?? '');
+        $analysis = sanitize_textarea_field((string) $response);
         if (!$analysis) {
-            wp_send_json_error(['message' => 'Réponse vide de Claude.']);
+            wp_send_json_error(['message' => __('Réponse vide du fournisseur IA.', 'alesta')]);
         }
 
         wp_send_json_success([
-            'analysis'      => $analysis,
-            'lines_analyzed'=> count($last),
-            'input_tokens'  => $body['usage']['input_tokens']  ?? 0,
-            'output_tokens' => $body['usage']['output_tokens'] ?? 0,
+            'analysis'       => $analysis,
+            'lines_analyzed' => count($last),
         ]);
     }
 
