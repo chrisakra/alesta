@@ -236,12 +236,12 @@ class Alesta_Maintenance_Module {
     }
 
     private function get_client_ip(): string {
-        foreach (['HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'REMOTE_ADDR'] as $key) {
-            if ( ! empty($_SERVER[$key]) ) {
-                $ip = trim(explode(',', sanitize_text_field( wp_unslash( $_SERVER[$key] ) ))[0]);
-                if ( filter_var($ip, FILTER_VALIDATE_IP) ) return $ip;
-            }
+        // En-têtes de transfert non fiables hors proxy de confiance (ALESTA-06).
+        if ( class_exists( 'Alesta_Net' ) ) {
+            return Alesta_Net::client_ip();
         }
-        return '';
+        return isset( $_SERVER['REMOTE_ADDR'] )
+            ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) )
+            : '';
     }
 }

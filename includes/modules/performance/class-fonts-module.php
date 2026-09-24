@@ -248,7 +248,6 @@ class Alesta_Fonts_Module {
         $response = wp_remote_get(home_url('/'), [
             'timeout'    => 15,
             'user-agent' => self::UA_CHROME,
-            'sslverify'  => false,
         ]);
 
         if ( is_wp_error($response) ) return $found;
@@ -331,7 +330,6 @@ class Alesta_Fonts_Module {
         $css_response = wp_remote_get($url, [
             'timeout'    => 20,
             'user-agent' => self::UA_CHROME,
-            'sslverify'  => false,
         ]);
 
         if ( is_wp_error($css_response) ) {
@@ -352,19 +350,26 @@ class Alesta_Fonts_Module {
         )) {
             foreach ( array_unique($matches[1]) as $font_url ) {
                 $font_filename = self::font_filename_from_url($font_url);
+                // Extension hors liste blanche de polices : on refuse (ALESTA-08).
+                if ( '' === $font_filename ) continue;
                 $font_path     = $dir . $font_filename;
                 $font_url_local = self::fonts_url() . $font_filename;
 
                 if ( ! file_exists($font_path) ) {
                     $font_response = wp_remote_get($font_url, [
                         'timeout'   => 30,
-                        'sslverify' => false,
                     ]);
 
                     if ( is_wp_error($font_response) ) continue;
 
                     $font_data = wp_remote_retrieve_body($font_response);
                     if ( empty($font_data) ) continue;
+
+                    // Ne jamais écrire un contenu qui n'est pas une police : sur un
+                    // canal sortant sans TLS vérifié, un MITM déposerait un fichier
+                    // arbitraire sur le disque (ALESTA-08).
+                    $ctype = wp_remote_retrieve_header($font_response, 'content-type');
+                    if ( ! self::looks_like_font($font_data, is_string($ctype) ? $ctype : '') ) continue;
 
                     file_put_contents($font_path, $font_data); // phpcs:ignore WordPress.WP.AlternativeFunctions
                 }
@@ -482,6 +487,18 @@ class Alesta_Fonts_Module {
         if ( ! file_exists($index) ) {
             file_put_contents($index, '<?php // Silence is golden.'); // phpcs:ignore WordPress.WP.AlternativeFunctions
         }
+        // Refuser l'exécution de scripts dans le dossier des polices — les
+        // fichiers de police restent servis, seuls les .php sont interdits
+        // (défense en profondeur, ALESTA-08 ; sans effet sous nginx).
+        $htaccess = $dir . '.htaccess';
+        if ( ! file_exists($htaccess) ) {
+            $rules  = "# Alesta AI — interdit l'exécution de scripts (ALESTA-08)\n";
+            $rules .= "<FilesMatch \"\\.(?:php|phtml|pht|php[0-9])$\">\n";
+            $rules .= "  <IfModule mod_authz_core.c>\n    Require all denied\n  </IfModule>\n";
+            $rules .= "  <IfModule !mod_authz_core.c>\n    Order allow,deny\n    Deny from all\n  </IfModule>\n";
+            $rules .= "</FilesMatch>\n";
+            file_put_contents($htaccess, $rules); // phpcs:ignore WordPress.WP.AlternativeFunctions
+        }
         return is_dir($dir) && wp_is_writable($dir);
     }
 
@@ -490,7 +507,27 @@ class Alesta_Fonts_Module {
         $name = basename($path ?? 'font.woff2');
         // Assainir le nom
         $name = preg_replace('/[^a-zA-Z0-9._-]/', '-', $name);
+        // Liste blanche d'extensions : refuser tout ce qui n'est pas une police
+        // (en particulier .php et .htaccess) — ALESTA-08.
+        $ext = strtolower( pathinfo($name, PATHINFO_EXTENSION) );
+        if ( ! in_array($ext, ['woff2', 'woff', 'ttf', 'otf', 'eot'], true) ) {
+            return '';
+        }
         return $name;
+    }
+
+    /**
+     * Le contenu téléchargé ressemble-t-il vraiment à une police ?
+     * Octets magiques d'abord, Content-Type en repli (EOT n'a pas de
+     * signature fiable en tête).
+     */
+    private static function looks_like_font( string $data, string $content_type ): bool {
+        $sig   = substr($data, 0, 4);
+        $magic = ['wOF2', 'wOFF', 'OTTO', 'true', 'ttcf', "\x00\x01\x00\x00"];
+        if ( in_array($sig, $magic, true) ) {
+            return true;
+        }
+        return ( '' !== $content_type && stripos($content_type, 'font') !== false );
     }
 
     /**

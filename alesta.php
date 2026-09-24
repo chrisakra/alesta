@@ -20,6 +20,7 @@ define( 'ALESTA_VERSION', '1.9.0' );
 define( 'ALESTA_PLUGIN_FILE', __FILE__ );
 define( 'ALESTA_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 
+require_once ALESTA_PLUGIN_DIR . 'includes/class-alesta-net.php';
 require_once ALESTA_PLUGIN_DIR . 'includes/class-alesta-promo.php';
 require_once ALESTA_PLUGIN_DIR . 'includes/class-alesta-admin.php';
 require_once ALESTA_PLUGIN_DIR . 'includes/class-alesta-review-prompt.php';

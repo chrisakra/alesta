@@ -364,14 +364,15 @@ class Alesta_Brute_Force_Module {
      * (= le client originel, pas le dernier proxy).
      */
     public static function client_ip(): string {
-        $candidates = [ 'HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'REMOTE_ADDR' ];
-        foreach ( $candidates as $k ) {
-            if ( empty( $_SERVER[$k] ) ) continue;
-            $raw = sanitize_text_field( wp_unslash( $_SERVER[$k] ) );
-            // X-Forwarded-For peut être "client, proxy1, proxy2".
-            $first = trim( explode( ',', $raw )[0] );
-            if ( filter_var( $first, FILTER_VALIDATE_IP ) ) return $first;
+        // IP non usurpable : REMOTE_ADDR par défaut, en-têtes de transfert
+        // (X-Forwarded-For, CF-Connecting-IP…) uniquement derrière un proxy
+        // déclaré de confiance. Sinon un anonyme contourne l'anti-force-brute,
+        // se met en liste blanche, ou bannit l'administrateur (ALESTA-06).
+        if ( class_exists( 'Alesta_Net' ) ) {
+            return Alesta_Net::client_ip();
         }
-        return '';
+        return isset( $_SERVER['REMOTE_ADDR'] )
+            ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) )
+            : '';
     }
 }

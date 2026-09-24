@@ -29,7 +29,7 @@ Modules shipped in this version (16 free modules):
 * **GDPR cookies banner** — Customizable consent banner (Accept / Refuse / Configure) rendered site-wide, with per-category storage of the visitor's choice.
 * **Talk to Me — floating contact widget** — Multi-channel contact button (WhatsApp, Messenger, phone, email, SMS, Telegram, Instagram DM, custom link) with configurable opening hours per day. No AI, no external API.
 * **Health Check** — Site health dashboard: PHP version, SSL, disk usage, active plugins count, MySQL version, uploads folder size, key file/permission checks.
-* **Debug Manager** — One-click toggle for WP_DEBUG (writes to wp-config.php with automatic backup), live viewer for debug.log with size/rotation info, one-click clear.
+* **Debug Manager** — One-click toggle for WP_DEBUG (writes the WP_DEBUG constants to wp-config.php), live viewer for debug.log with size/rotation info, one-click clear.
 * **Configuration** — Lets you choose your AI provider (Anthropic Claude or OpenAI), stores its API key (encrypted with your site's AUTH_KEY salt) and lets you pick the model used by the AI modules. Both keys can be stored side by side so you can switch provider without retyping them. Test and delete a key at any time.
 * **Budget tracker** — Monthly / daily token consumption and estimated cost of the AI modules, with an optional monthly limit, alert threshold and e-mail notification.
 
@@ -48,9 +48,15 @@ The **Title & Meta AI + SEO Audit** and **FAQ Schema** modules, the "Generate wi
 * OpenAI terms of use: https://openai.com/policies/row-terms-of-use
 * OpenAI privacy policy: https://openai.com/policies/row-privacy-policy
 
+Some optional modules contact the following additional services, always as a result of an administrator action and never because a visitor browses your site:
+
+* **Google Fonts** (Google LLC): the "Local Google Fonts" performance module downloads font stylesheets and font files from `https://fonts.googleapis.com` and `https://fonts.gstatic.com` so they can be served from your own server. It runs only when an administrator scans the site or localises a font, and sends only the font request — no visitor data. Terms: https://policies.google.com/terms — Privacy: https://policies.google.com/privacy
+* **Vimeo oEmbed** (Vimeo.com, Inc.): when the XML sitemap module builds a video sitemap, it queries `https://vimeo.com/api/oembed.json` for the public metadata (thumbnail, duration) of Vimeo videos you have embedded. Triggered only on sitemap generation. Terms: https://vimeo.com/terms — Privacy: https://vimeo.com/privacy
+* **Link checker**: the SEO Audit and broken-link modules send an HTTP request to the external URLs found in your own published content, to verify they still resolve (User-Agent `Alesta-LinkChecker`). Triggered only when an administrator runs the audit; the destinations are the domains you yourself linked to.
+
 = Privacy and GDPR =
 
-Apart from the AI provider API calls described above (triggered only by an administrator), Alesta does not send any data outside your site, except the public pings sent to Google and Bing when you regenerate your XML sitemap (standard sitemap behavior). No tracking, no telemetry.
+Apart from the external services described above — each triggered only by an explicit administrator action, never by visitor traffic — Alesta does not send any data outside your site, except the public pings sent to Google and Bing when you regenerate your XML sitemap (standard sitemap behavior). No tracking, no telemetry.
 
 = Compatibility =
 
@@ -140,7 +146,7 @@ The key is encrypted (AES-256-GCM) with a key derived from your site's `AUTH_KEY
 = 1.7.0 =
 * New functional modules ported from Alesta AI Free v1.2.7 (completes the Free blueprint):
   * **Health Check** — Site health dashboard (PHP, SSL, disk, plugins, MySQL, uploads).
-  * **Debug Manager** — Toggle WP_DEBUG + view / analyze debug.log with automatic wp-config.php backup.
+  * **Debug Manager** — Toggle WP_DEBUG + view / analyze debug.log.
   * **Budget tracker** — Monthly / daily token usage dashboard (empty in Free, populated by the optional Pro plugin).
 * New admin dashboard section: "07 Réglages & Diagnostic".
 * Plugin now covers 12/12 Free modules of the Alesta AI Free blueprint.
