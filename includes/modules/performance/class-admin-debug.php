@@ -463,17 +463,88 @@ class Alesta_Admin_Debug {
         if ($content === false) {
             return new WP_Error('read_error', 'Lecture de wp-config.php impossible.');
         }
+        $original = $content;
 
         $bool    = $enable ? 'true' : 'false';
         $content = $this->upsert_constant($content, 'WP_DEBUG',         $bool);
         $content = $this->upsert_constant($content, 'WP_DEBUG_LOG',     $bool);
         $content = $this->upsert_constant($content, 'WP_DEBUG_DISPLAY', 'false');
 
+        // ALESTA-17 : ne jamais committer un wp-config.php syntaxiquement cassé
+        // (écran blanc sur tout le site). On valide le contenu produit…
+        if ( ! $this->is_valid_php($content) ) {
+            return new WP_Error('invalid_config', 'La modification produirait un wp-config.php invalide — écriture annulée.');
+        }
+        // …et on garde une copie de secours restaurable avant d'écrire.
+        $this->backup_config($config_path, $original);
+
         if (!$wp_filesystem->put_contents($config_path, $content, FS_CHMOD_FILE)) {
             return new WP_Error('write_error', 'Écriture de wp-config.php impossible.');
         }
 
+        // Le journal par défaut (wp-content/debug.log) est téléchargeable :
+        // on pose une protection Apache si aucune n'existe (ALESTA-17).
+        if ($enable) {
+            $this->protect_debug_log();
+        }
+
         return true;
+    }
+
+    /**
+     * Le code produit est-il du PHP valide ? Empêche d'écrire un wp-config.php
+     * cassé. Si token_get_all n'est pas disponible, on ne bloque pas.
+     */
+    private function is_valid_php(string $code): bool {
+        if ( ! function_exists('token_get_all') || ! defined('TOKEN_PARSE') ) {
+            return true;
+        }
+        try {
+            token_get_all($code, TOKEN_PARSE);
+            return true;
+        } catch (\ParseError $e) {
+            return false;
+        } catch (\Throwable $e) {
+            return true;
+        }
+    }
+
+    /**
+     * Copie de secours de wp-config.php. Le fichier porte l'extension .php : s'il
+     * est demandé par le web il est EXÉCUTÉ (donc n'affiche rien), jamais servi
+     * en clair — même protection que wp-config.php lui-même. (ALESTA-17)
+     */
+    private function backup_config(string $config_path, string $original): void {
+        global $wp_filesystem;
+        if ( ! is_string($original) || '' === $original ) {
+            return;
+        }
+        $backup = dirname($config_path) . '/wp-config-alesta-backup.php';
+        $stamp  = gmdate('Y-m-d H:i:s');
+        $header = "<?php /* Sauvegarde Alesta AI de wp-config.php — " . $stamp . " UTC. "
+            . "Pour restaurer : renommer ce fichier en wp-config.php. */ ?>\n";
+        $wp_filesystem->put_contents($backup, $header . $original, FS_CHMOD_FILE);
+    }
+
+    /**
+     * Interdit l'accès web à wp-content/debug.log si aucune règle n'existe déjà.
+     * Sans effet sous nginx (qui ignore .htaccess) — défense en profondeur Apache.
+     */
+    private function protect_debug_log(): void {
+        global $wp_filesystem;
+        if ( ! defined('WP_CONTENT_DIR') ) {
+            return;
+        }
+        $ht = WP_CONTENT_DIR . '/.htaccess';
+        if ( $wp_filesystem->exists($ht) ) {
+            return; // ne pas écraser une configuration existante.
+        }
+        $rules = "# Alesta AI (ALESTA-17) : interdit l'accès web au journal de debug\n"
+            . "<FilesMatch \"^debug\\.log$\">\n"
+            . "  <IfModule mod_authz_core.c>\n    Require all denied\n  </IfModule>\n"
+            . "  <IfModule !mod_authz_core.c>\n    Order allow,deny\n    Deny from all\n  </IfModule>\n"
+            . "</FilesMatch>\n";
+        $wp_filesystem->put_contents($ht, $rules, FS_CHMOD_FILE);
     }
 
     private function upsert_constant(string $content, string $name, string $value): string {

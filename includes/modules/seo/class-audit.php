@@ -241,10 +241,17 @@ class Alesta_Audit {
                 $url = home_url($url);
             }
 
+            // Ne pas suivre un lien qui viserait le réseau interne (SSRF) : un
+            // auteur peut placer http://169.254.169.254/… dans un article
+            // (ALESTA-10). Ces liens sont ignorés silencieusement.
+            if ( class_exists('Alesta_Net') && ! Alesta_Net::is_safe_remote_url($url) ) {
+                continue;
+            }
+
             $response = wp_remote_head($url, [
                 'timeout'     => self::LINK_CHECK_TIMEOUT,
-                'sslverify'   => false,
-                'redirection' => 5,
+                'sslverify'   => true,
+                'redirection' => 0,
                 'user-agent'  => 'Alesta-LinkChecker/1.0',
             ]);
 

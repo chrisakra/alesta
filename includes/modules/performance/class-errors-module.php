@@ -186,11 +186,15 @@ class Alesta_Errors_Module {
     // Helper : Verifier le statut HTTP d'une URL
     // =========================================================================
     private function check_url(string $url): array {
+        // Refuser les cibles internes (SSRF depuis le vhost) — ALESTA-10.
+        if ( class_exists('Alesta_Net') && ! Alesta_Net::is_safe_remote_url($url) ) {
+            return ['url' => $url, 'code' => 0, 'message' => 'URL non autorisee (cible interne)'];
+        }
         $response = wp_remote_head($url, [
             'timeout'     => 8,
-            'redirection' => 5,
+            'redirection' => 0,
             'user-agent'  => 'Alesta-Scanner/1.0',
-            'sslverify'   => false,
+            'sslverify'   => true,
         ]);
 
         if (is_wp_error($response)) {
