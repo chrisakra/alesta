@@ -27,8 +27,11 @@ class Alesta_Minify_Module {
         if ( ! empty($s['css_enabled']) ) {
             add_filter('style_loader_src',  [__CLASS__, 'maybe_minify_css_src'],  20, 2);
         }
-        if ( ! empty($s['js_enabled']) ) {
+        if ( ! empty($s['js_enabled']) && self::js_available() ) {
             add_filter('script_loader_src', [__CLASS__, 'maybe_minify_js_src'],   20, 2);
+        }
+        if ( ! self::js_available() ) {
+            self::apply_js_lock_once();
         }
         if ( ! empty($s['html_enabled']) ) {
             add_action('template_redirect', [__CLASS__, 'start_html_buffer'],     1);
@@ -62,7 +65,49 @@ class Alesta_Minify_Module {
             'preload_handles'        => '',       // virgule-séparés
             'preload_excludes'       => '',
         ];
-        return wp_parse_args( get_option(self::OPT, []), $defaults );
+        $s = wp_parse_args( get_option(self::OPT, []), $defaults );
+        if ( ! self::js_available() ) {
+            $s['js_enabled'] = false;
+        }
+        return $s;
+    }
+
+    /**
+     * Minification JavaScript : EN COURS DE DÉVELOPPEMENT. Indisponible tant
+     * qu'elle n'a pas été validée sur un large corpus de scripts réels.
+     * Activable uniquement pour les tests, via wp-config.php :
+     *   define( 'ALESTA_MINIFY_JS_BETA', true );
+     */
+    public static function js_available(): bool {
+        return defined('ALESTA_MINIFY_JS_BETA') && ALESTA_MINIFY_JS_BETA;
+    }
+
+    /**
+     * Appliqué une seule fois après la mise à jour : désactive un réglage
+     * « Minify JS » hérité (l'ancienne version cassait certains scripts) et
+     * supprime les fichiers JS minifiés du cache, pour qu'ils ne soient plus
+     * servis ni comptés. Le réglage ne se réactivera pas tout seul quand la
+     * fonctionnalité reviendra.
+     */
+    private static function apply_js_lock_once(): void {
+        $opt = get_option(self::OPT, []);
+        if ( ! is_array($opt) ) {
+            $opt = [];
+        }
+        if ( ! empty($opt['js_lock_applied']) ) {
+            return;
+        }
+
+        $files = glob(self::CACHE_DIR . '*.js');
+        if ( is_array($files) ) {
+            foreach ( $files as $file ) {
+                wp_delete_file($file);
+            }
+        }
+
+        $opt['js_enabled']      = false;
+        $opt['js_lock_applied'] = true;
+        update_option(self::OPT, $opt);
     }
 
     // =========================================================================
@@ -575,6 +620,9 @@ class Alesta_Minify_Module {
         $allowed = ['css_enabled', 'js_enabled', 'html_enabled', 'preload_enabled'];
 
         if ( ! in_array($type, $allowed, true) ) wp_send_json_error(['message' => 'Type invalide.']);
+        if ( 'js_enabled' === $type && ! self::js_available() ) {
+            wp_send_json_error(['message' => 'La minification JavaScript est en cours de développement et temporairement indisponible.']);
+        }
 
         $s        = self::settings();
         $s[$type] = $value;
@@ -594,6 +642,9 @@ class Alesta_Minify_Module {
                 $s['css_excludes'] = sanitize_textarea_field( wp_unslash($_POST['excludes'] ?? '') );
                 break;
             case 'js':
+                if ( ! self::js_available() ) {
+                    wp_send_json_error(['message' => 'La minification JavaScript est en cours de développement et temporairement indisponible.']);
+                }
                 $s['js_excludes'] = sanitize_textarea_field( wp_unslash($_POST['excludes'] ?? '') );
                 break;
             case 'html':
