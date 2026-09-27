@@ -259,7 +259,10 @@ class Alesta_Minify_Module {
         // Normaliser espaces blancs
         $css = preg_replace( '/\s+/', ' ', $css );
         // Supprimer espaces autour des caractères structuraux
-        $css = preg_replace( '/\s*([\{\}:;,>~\+])\s*/', '$1', $css );
+        // NB : « + » volontairement EXCLU — retirer ses espaces casserait
+        // calc(a + b) (les opérateurs + et - de calc exigent des espaces). Garder
+        // les espaces autour de « + » reste valide aussi pour le combinateur CSS.
+        $css = preg_replace( '/\s*([\{\}:;,>~])\s*/', '$1', $css );
         // Supprimer point-virgule avant }
         $css = str_replace( ';}', '}', $css );
         // Supprimer espace dans les parenthèses
@@ -340,11 +343,15 @@ class Alesta_Minify_Module {
         $preserved = [];
         $idx       = 0;
 
-        // Préserver : <script>, <style>, <pre>, <textarea>
+        // Préserver : <script>, <style>, <pre>, <textarea>.
+        // Le marqueur NE DOIT PAS être un commentaire HTML : sinon l'étape
+        // html_remove_comments ci-dessous le supprimerait, et le bloc préservé
+        // (CSS/JS inline, ex. le CSS dynamique du thème) disparaîtrait de la page.
+        // On utilise donc un jeton neutre, sans <, >, ni espaces.
         $html = preg_replace_callback(
             '/<(script|style|pre|textarea)(\s[^>]*)?>[\s\S]*?<\/\1>/i',
             function ( $m ) use ( &$preserved, &$idx ) {
-                $key             = '<!--ALESTAGARD' . $idx . '-->';
+                $key             = '@@ALESTA_MINIFY_GUARD_' . $idx . '@@';
                 $preserved[$key] = $m[0];
                 $idx++;
                 return $key;
