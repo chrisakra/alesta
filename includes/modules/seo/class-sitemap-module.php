@@ -268,7 +268,7 @@ class Alesta_Sitemap_Module {
             $thumb = $default_thumb;
             $oembed = wp_remote_get(
                 'https://vimeo.com/api/oembed.json?url=' . rawurlencode('https://vimeo.com/' . $vid_id) . '&width=640',
-                ['timeout' => 5, 'sslverify' => false]
+                ['timeout' => 5]
             );
             if (!is_wp_error($oembed)) {
                 $data  = json_decode(wp_remote_retrieve_body($oembed), true);
