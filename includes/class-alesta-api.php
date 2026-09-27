@@ -3,7 +3,8 @@
  * Alesta — Client API des fournisseurs IA (Anthropic Claude / OpenAI).
  *
  * Port Free de Alesta_AI_API (Pro). Même contrat public : le constructeur
- * lit la clé (Vault chiffré) et le modèle, ask() envoie un prompt et
+ * lit le modèle (la clé du Vault chiffré n'est lue qu'au moment d'un appel
+ * IA), ask() envoie un prompt et
  * retourne le texte, et les helpers statiques d'usage / budget alimentent
  * la page « Budget » du Free (Alesta_Admin_Budget).
  *
@@ -76,8 +77,8 @@ class Alesta_API {
 	/** Endpoint « models » d'OpenAI. */
 	const OPENAI_MODELS_ENDPOINT = 'https://api.openai.com/v1/models'; // phpcs:ignore PluginCheck.CodeAnalysis.AIProvider.DirectIntegration
 
-	/** @var string */
-	private $api_key;
+	/** @var string|null Clé API, null tant qu'elle n'a pas été chargée (cf. get_api_key()). */
+	private $api_key = null;
 
 	/** @var string */
 	private $model;
@@ -87,15 +88,28 @@ class Alesta_API {
 
 	/**
 	 * Tarifs en $ par million de tokens (input / output) — même table que la Pro.
+	 * Un modèle absent de la table est compté au tarif le plus élevé (cf. compute_cost()).
+	 * Correspondance partielle, première entrée trouvée : les identifiants les plus
+	 * précis (claude-opus-4-8…) doivent rester AVANT les génériques (claude-opus-4
+	 * couvre Opus 4 et 4.1, claude-sonnet-4 couvre Sonnet 4).
 	 *
 	 * @var array<string, array{input: float, output: float}>
 	 */
 	private static $default_pricing = array(
+		'claude-opus-5'              => array( 'input' => 5.00,  'output' => 25.00 ),
+		'claude-sonnet-5'            => array( 'input' => 2.00,  'output' => 10.00 ),
+		'claude-opus-4-8'            => array( 'input' => 5.00,  'output' => 25.00 ),
+		'claude-opus-4-7'            => array( 'input' => 5.00,  'output' => 25.00 ),
+		'claude-opus-4-6'            => array( 'input' => 5.00,  'output' => 25.00 ),
+		'claude-opus-4-5'            => array( 'input' => 5.00,  'output' => 25.00 ),
 		'claude-opus-4'              => array( 'input' => 15.00, 'output' => 75.00 ),
+		'claude-sonnet-4-6'          => array( 'input' => 3.00,  'output' => 15.00 ),
 		'claude-sonnet-4-5'          => array( 'input' => 3.00,  'output' => 15.00 ),
+		'claude-sonnet-4'            => array( 'input' => 3.00,  'output' => 15.00 ),
+		'claude-3-7-sonnet'          => array( 'input' => 3.00,  'output' => 15.00 ),
 		'claude-3-5-sonnet-20241022' => array( 'input' => 3.00,  'output' => 15.00 ),
 		'claude-3-5-haiku-20241022'  => array( 'input' => 0.80,  'output' => 4.00 ),
-		'claude-haiku-4-5'           => array( 'input' => 0.80,  'output' => 4.00 ),
+		'claude-haiku-4-5'           => array( 'input' => 1.00,  'output' => 5.00 ),
 		'claude-3-haiku-20240307'    => array( 'input' => 0.25,  'output' => 1.25 ),
 		'claude-3-opus-20240229'     => array( 'input' => 15.00, 'output' => 75.00 ),
 	);
@@ -116,14 +130,11 @@ class Alesta_API {
 			? self::normalize_provider( $provider )
 			: self::get_provider();
 
+		// La clé stockée n'est pas lue ici : certains modules instancient ce
+		// client à chaque chargement de page. Elle est déchiffrée à la première
+		// demande (get_api_key()), c'est-à-dire au moment d'un appel IA.
 		if ( is_string( $api_key ) && trim( $api_key ) !== '' ) {
 			$this->api_key = trim( $api_key );
-		} elseif ( class_exists( 'Alesta_Key_Vault' ) ) {
-			$this->api_key = (string) ( Alesta_Key_Vault::get( self::key_slot( $this->provider ) ) ?? '' );
-		} elseif ( self::PROVIDER_ANTHROPIC === $this->provider ) {
-			$this->api_key = (string) get_option( 'alesta_ai_api_key', '' );
-		} else {
-			$this->api_key = '';
 		}
 
 		if ( is_string( $model ) && trim( $model ) !== '' ) {
@@ -476,12 +487,34 @@ class Alesta_API {
 	}
 
 	/**
+	 * Clé API de cette instance : celle passée au constructeur, sinon celle
+	 * du coffre-fort pour le fournisseur, chargée à la première demande.
+	 *
+	 * @return string Chaîne vide si aucune clé n'est disponible.
+	 */
+	private function get_api_key(): string {
+		if ( null !== $this->api_key ) {
+			return $this->api_key;
+		}
+
+		if ( class_exists( 'Alesta_Key_Vault' ) ) {
+			$this->api_key = (string) ( Alesta_Key_Vault::get( self::key_slot( $this->provider ) ) ?? '' );
+		} elseif ( self::PROVIDER_ANTHROPIC === $this->provider ) {
+			$this->api_key = (string) get_option( 'alesta_ai_api_key', '' );
+		} else {
+			$this->api_key = '';
+		}
+
+		return $this->api_key;
+	}
+
+	/**
 	 * Indique si une clé API est disponible pour cette instance.
 	 *
 	 * @return bool
 	 */
 	public function has_key(): bool {
-		return $this->api_key !== '';
+		return $this->get_api_key() !== '';
 	}
 
 	/**
@@ -493,7 +526,7 @@ class Alesta_API {
 	 * @return string|WP_Error
 	 */
 	public function ask( string $prompt, int $max_tokens = 1024 ) {
-		if ( empty( $this->api_key ) ) {
+		if ( '' === $this->get_api_key() ) {
 			return self::missing_key_error();
 		}
 
@@ -542,7 +575,7 @@ class Alesta_API {
 			array(
 				'timeout' => 60,
 				'headers' => array(
-					'x-api-key'         => $this->api_key,
+					'x-api-key'         => $this->get_api_key(),
 					'anthropic-version' => self::ANTHROPIC_VERSION,
 					'content-type'      => 'application/json',
 				),
@@ -641,7 +674,7 @@ class Alesta_API {
 			array(
 				'timeout' => 60,
 				'headers' => array(
-					'Authorization' => 'Bearer ' . $this->api_key,
+					'Authorization' => 'Bearer ' . $this->get_api_key(),
 					'content-type'  => 'application/json',
 				),
 				'body'    => wp_json_encode( $payload ),
@@ -824,11 +857,23 @@ class Alesta_API {
 		if ( '' === $model ) {
 			return null;
 		}
-		foreach ( self::get_pricing() as $key => $p ) {
-			if ( ! is_array( $p ) || ! isset( $p['input'], $p['output'] ) ) {
+		$table = self::get_pricing();
+		// Correspondance exacte d'abord (évite qu'un identifiant court comme
+		// « claude-opus-4 » prenne le tarif d'une entrée plus précise).
+		if ( isset( $table[ $model ] ) && is_array( $table[ $model ] ) && isset( $table[ $model ]['input'], $table[ $model ]['output'] ) ) {
+			return array(
+				'input'  => (float) $table[ $model ]['input'],
+				'output' => (float) $table[ $model ]['output'],
+			);
+		}
+		// Correspondance partielle : l'identifiant du modèle contient la clé
+		// (ex. claude-sonnet-4-5-20250929). Pas l'inverse : « gpt-4o » ne doit
+		// pas prendre le tarif d'une clé « gpt-4o-mini » ajoutée par filtre.
+		foreach ( $table as $key => $p ) {
+			if ( '' === (string) $key || ! is_array( $p ) || ! isset( $p['input'], $p['output'] ) ) {
 				continue;
 			}
-			if ( strpos( $model, (string) $key ) !== false || strpos( (string) $key, $model ) !== false ) {
+			if ( strpos( $model, (string) $key ) !== false ) {
 				return array(
 					'input'  => (float) $p['input'],
 					'output' => (float) $p['output'],
@@ -839,7 +884,8 @@ class Alesta_API {
 	}
 
 	/**
-	 * Indique si le coût d'un modèle peut être estimé (tarif connu).
+	 * Indique si le modèle a un tarif connu (table interne ou filtre).
+	 * Sans tarif connu, le coût est une estimation haute (cf. compute_cost()).
 	 *
 	 * @param string $model Modèle.
 	 * @return bool
@@ -849,11 +895,45 @@ class Alesta_API {
 	}
 
 	/**
+	 * Tarif le plus élevé de la table (entrée et sortie prises séparément),
+	 * appliqué aux modèles sans tarif connu. Tient compte des tarifs ajoutés
+	 * par le filtre 'alesta_ai_model_pricing' ; si le filtre ne laisse aucune
+	 * entrée valide, on retombe sur la table interne.
+	 *
+	 * @return array{input: float, output: float}
+	 */
+	public static function get_fallback_pricing(): array {
+		foreach ( array( self::get_pricing(), self::$default_pricing ) as $table ) {
+			$max_in  = 0.0;
+			$max_out = 0.0;
+			foreach ( $table as $p ) {
+				if ( ! is_array( $p ) || ! isset( $p['input'], $p['output'] ) ) {
+					continue;
+				}
+				$max_in  = max( $max_in, (float) $p['input'] );
+				$max_out = max( $max_out, (float) $p['output'] );
+			}
+			if ( $max_in > 0 || $max_out > 0 ) {
+				return array(
+					'input'  => $max_in,
+					'output' => $max_out,
+				);
+			}
+		}
+		return array(
+			'input'  => 0.0,
+			'output' => 0.0,
+		);
+	}
+
+	/**
 	 * Calcule le coût en USD pour des tokens donnés.
 	 *
-	 * Modèle sans tarif connu (OpenAI, nouveau Claude) : le coût vaut 0 —
-	 * les tokens restent comptés, seule l'estimation monétaire est absente.
-	 * Le filtre 'alesta_ai_model_pricing' permet de fournir ses propres tarifs.
+	 * Modèle sans tarif connu (OpenAI, nouveau Claude) : il est compté au
+	 * tarif le PLUS ÉLEVÉ de la table (estimation haute, approche
+	 * conservatrice) pour que le plafond de budget mensuel se déclenche aussi
+	 * avec ces modèles. Le filtre 'alesta_ai_model_pricing' permet de fournir
+	 * leurs vrais tarifs.
 	 *
 	 * @param int    $input  Tokens entrants.
 	 * @param int    $output Tokens sortants.
@@ -863,7 +943,7 @@ class Alesta_API {
 	public static function compute_cost( int $input, int $output, string $model ): float {
 		$price = self::find_price( $model );
 		if ( null === $price ) {
-			return 0.0;
+			$price = self::get_fallback_pricing();
 		}
 		return round(
 			( $input / 1000000 ) * $price['input'] +
