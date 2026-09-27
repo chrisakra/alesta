@@ -161,6 +161,7 @@ The key is encrypted (AES-256-GCM) with a key derived from your site's `AUTH_KEY
 * Security: the broken-links scanner, the URL tester and the SEO audit link checker refuse internal/private addresses and verify TLS.
 * Security: the Debug Manager checks that wp-config.php remains valid PHP before saving it and keeps a restorable copy (wp-config-alesta-backup.php); on Apache it also blocks web access to debug.log (not on nginx, see the FAQ).
 * Security: TLS verification on the Vimeo oEmbed request of the video sitemap.
+* Fix: SEO Audit "Broken links" check never ran (invalid regular expression, PHP warning per page). It now works and is bounded per audit (60 links, 25 seconds) so large sites do not time out; links beyond the limit are reported as "not checked".
 * Fix: Minify HTML removed the inline style and script blocks when "Remove HTML comments" was on (broke themes such as Astra).
 * Fix: Minify CSS broke calc() (spaces around "+"). Minified CSS files are regenerated under new names after the update: clear your page cache / CDN so cached pages use them. "Vider le cache" removes the old files.
 * Changed: JavaScript minification is paused ("in development") while its engine is reworked. If it was enabled, it is switched off on update and its cached files are deleted. HTML and CSS minification are unaffected.

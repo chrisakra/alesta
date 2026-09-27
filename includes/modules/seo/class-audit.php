@@ -21,7 +21,13 @@ class Alesta_Audit {
     const MAX_TITLE_LENGTH   = 60;
     const MIN_META_LENGTH    = 120;
     const MAX_META_LENGTH    = 160;
-    const LINK_CHECK_TIMEOUT = 8;     // secondes par lien
+    const LINK_CHECK_TIMEOUT = 5;     // secondes par lien
+    const LINK_CHECK_MAX     = 60;    // liens vérifiés au plus par audit
+    const LINK_CHECK_BUDGET  = 25;    // secondes au total pour la vérification des liens
+
+    /** Budget de la vérification des liens pour l'audit en cours. */
+    private $link_checks_done   = 0;
+    private $link_check_started = 0.0;
 
     /**
      * Client Claude (lazy) ou WP_Error si indisponible.
@@ -226,10 +232,14 @@ class Alesta_Audit {
     // ─────────────────────────────────────────────────────────────────────────
 
     private function audit_links(WP_Post $post, array &$out): void {
-        preg_match_all('#<a[^>]+href=["\']+([^"\'^#][^"\']*?)["\']+[^>]*>#i', $post->post_content, $matches);
-        $links  = array_unique($matches[1] ?? []);
-        $broken = [];
-        $ok     = 0;
+        // Délimiteur « ~ » : l'ancien « # » était aussi présent dans la classe
+        // [^"'^#], ce qui coupait le motif (« Unknown modifier ] ») : la
+        // vérification des liens ne s'exécutait jamais.
+        preg_match_all('~<a[^>]+href=["\']+([^"\'^#][^"\']*?)["\']+[^>]*>~i', $post->post_content, $matches);
+        $links   = array_unique($matches[1] ?? []);
+        $broken  = [];
+        $ok      = 0;
+        $skipped = 0;
 
         foreach ($links as $url) {
             // Ignorer mailto, tel, ancres, javascript.
@@ -249,8 +259,21 @@ class Alesta_Audit {
                 continue;
             }
 
+            // Budget global : l'audit ne doit pas dépasser le délai de la requête
+            // AJAX sur un site riche en liens. Au-delà, les liens sont comptés
+            // comme « non vérifiés ».
+            if ( 0.0 === $this->link_check_started ) {
+                $this->link_check_started = microtime(true);
+            }
+            $elapsed = microtime(true) - $this->link_check_started;
+            if ( $this->link_checks_done >= self::LINK_CHECK_MAX || $elapsed >= self::LINK_CHECK_BUDGET ) {
+                $skipped++;
+                continue;
+            }
+            $this->link_checks_done++;
+
             $response = wp_remote_head($url, [
-                'timeout'     => self::LINK_CHECK_TIMEOUT,
+                'timeout'     => (int) max(1, min(self::LINK_CHECK_TIMEOUT, ceil(self::LINK_CHECK_BUDGET - $elapsed))),
                 'sslverify'   => true,
                 'redirection' => 0,
                 'user-agent'  => 'Alesta-LinkChecker/1.0',
@@ -276,6 +299,7 @@ class Alesta_Audit {
                 'type'        => $post->post_type,
                 'total_links' => count($links),
                 'ok_links'    => $ok,
+                'skipped'     => $skipped, // non vérifiés (budget de l'audit atteint)
                 'broken'      => $broken,
                 'status'      => empty($broken) ? 'ok' : (count($broken) > 2 ? 'error' : 'warning'),
             ];
