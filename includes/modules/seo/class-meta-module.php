@@ -107,9 +107,12 @@ class Alesta_Meta_Module {
             $post_types = ['page', 'post'];
         }
 
+        // Les contenus protégés par mot de passe sont exclus : leur texte ne
+        // doit jamais être envoyé à l'IA ni résumé dans le <head> public.
         $posts = get_posts([
             'post_type'      => $post_types,
             'post_status'    => 'publish',
+            'has_password'   => false,
             'posts_per_page' => -1,
             'orderby'        => 'date',
             'order'          => 'DESC',
@@ -231,6 +234,11 @@ class Alesta_Meta_Module {
         $post = get_post($post_id);
         if ( ! $post ) {
             return new WP_Error('not_found', __('Contenu introuvable.', 'alesta'));
+        }
+        // Contenu protégé par mot de passe : pas de génération (fuite du texte
+        // protégé dans la meta description / l'Open Graph publics).
+        if ( ! empty($post->post_password) ) {
+            return new WP_Error('password_protected', __('Ce contenu est protégé par mot de passe : la génération IA est désactivée pour ne pas exposer son texte.', 'alesta'));
         }
 
         $api = $this->api();
@@ -814,8 +822,46 @@ class Alesta_Meta_Module {
         return self::yoast_active() || self::rankmath_active() || defined('AIOSEO_VERSION');
     }
 
+    /**
+     * Autres extensions SEO qui écrivent déjà meta description, Open Graph et
+     * Twitter Cards : on n'émet pas notre bloc pour éviter les doublons.
+     */
+    private static function other_seo_head_active(): bool {
+        return defined('SEOPRESS_VERSION')
+            || defined('THE_SEO_FRAMEWORK_VERSION')
+            || defined('SLIM_SEO_VER')
+            || defined('SQ_VERSION')
+            || defined('SMARTCRAWL_VERSION');
+    }
+
+    /**
+     * Open Graph de Jetpack actif (modules Partage / Publicize, ou forcé via
+     * le filtre 'jetpack_enable_open_graph').
+     */
+    private static function jetpack_open_graph_active(): bool {
+        if ( function_exists('jetpack_og_tags') ) {
+            return true;
+        }
+        if ( ! class_exists('Jetpack') ) {
+            return false;
+        }
+        $enabled = false;
+        if ( is_callable(['Jetpack', 'is_module_active']) ) {
+            $enabled = Jetpack::is_module_active('publicize') || Jetpack::is_module_active('sharedaddy');
+        }
+        return (bool) apply_filters('jetpack_enable_open_graph', $enabled);
+    }
+
+    /**
+     * Sortie des balises og:* et twitter:* ; désactivable via le filtre
+     * 'alesta_output_social_meta' (bool).
+     */
+    private static function social_meta_enabled( int $post_id ): bool {
+        return (bool) apply_filters('alesta_output_social_meta', ! self::jetpack_open_graph_active(), $post_id);
+    }
+
     public function output_meta_tags(): void {
-        if ( ! is_singular() || self::third_party_seo_active() ) {
+        if ( ! is_singular() || self::third_party_seo_active() || self::other_seo_head_active() ) {
             return;
         }
 
@@ -823,7 +869,15 @@ class Alesta_Meta_Module {
         if ( ! $post_id ) {
             return;
         }
-        $meta = (string) get_post_meta($post_id, '_alesta_meta_description', true);
+        // Contenu protégé non déverrouillé : aucune balise dérivée du contenu.
+        if ( post_password_required($post_id) ) {
+            return;
+        }
+        $meta   = (string) get_post_meta($post_id, '_alesta_meta_description', true);
+        $social = self::social_meta_enabled((int) $post_id);
+        if ( ! $meta && ! $social ) {
+            return;
+        }
 
         // og:image — image personnalisée > image mise en avant.
         $og_img_id = (int) get_post_meta($post_id, '_alesta_og_image_id', true);
@@ -845,6 +899,10 @@ class Alesta_Meta_Module {
         echo "\n<!-- Alesta SEO -->\n";
         if ( $meta ) {
             echo '<meta name="description" content="' . esc_attr($meta) . '">' . "\n";
+        }
+        if ( ! $social ) {
+            echo "<!-- /Alesta SEO -->\n";
+            return;
         }
         echo '<meta property="og:title" content="' . esc_attr($og_title) . '">' . "\n";
         echo '<meta property="og:type" content="' . esc_attr( is_front_page() ? 'website' : 'article' ) . '">' . "\n";
@@ -872,7 +930,9 @@ class Alesta_Meta_Module {
         if ( self::third_party_seo_active() ) {
             return $title;
         }
-        if ( is_singular() ) {
+        // Contenu protégé non déverrouillé : titre natif (le titre SEO peut
+        // avoir été généré à partir du texte protégé).
+        if ( is_singular() && ! post_password_required(get_the_ID()) ) {
             $t = get_post_meta(get_the_ID(), '_alesta_seo_title', true);
             if ( $t ) {
                 return (string) $t; // Titre complet, sans que WP ajoute le nom du site.
