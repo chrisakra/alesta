@@ -27,8 +27,11 @@ class Alesta_Minify_Module {
         if ( ! empty($s['css_enabled']) ) {
             add_filter('style_loader_src',  [__CLASS__, 'maybe_minify_css_src'],  20, 2);
         }
-        if ( ! empty($s['js_enabled']) ) {
+        if ( ! empty($s['js_enabled']) && self::js_available() ) {
             add_filter('script_loader_src', [__CLASS__, 'maybe_minify_js_src'],   20, 2);
+        }
+        if ( ! self::js_available() ) {
+            self::apply_js_lock_once();
         }
         if ( ! empty($s['html_enabled']) ) {
             add_action('template_redirect', [__CLASS__, 'start_html_buffer'],     1);
@@ -62,7 +65,49 @@ class Alesta_Minify_Module {
             'preload_handles'        => '',       // virgule-séparés
             'preload_excludes'       => '',
         ];
-        return wp_parse_args( get_option(self::OPT, []), $defaults );
+        $s = wp_parse_args( get_option(self::OPT, []), $defaults );
+        if ( ! self::js_available() ) {
+            $s['js_enabled'] = false;
+        }
+        return $s;
+    }
+
+    /**
+     * Minification JavaScript : EN COURS DE DÉVELOPPEMENT. Indisponible tant
+     * qu'elle n'a pas été validée sur un large corpus de scripts réels.
+     * Activable uniquement pour les tests, via wp-config.php :
+     *   define( 'ALESTA_MINIFY_JS_BETA', true );
+     */
+    public static function js_available(): bool {
+        return defined('ALESTA_MINIFY_JS_BETA') && ALESTA_MINIFY_JS_BETA;
+    }
+
+    /**
+     * Appliqué une seule fois après la mise à jour : désactive un réglage
+     * « Minify JS » hérité (l'ancienne version cassait certains scripts) et
+     * supprime les fichiers JS minifiés du cache, pour qu'ils ne soient plus
+     * servis ni comptés. Le réglage ne se réactivera pas tout seul quand la
+     * fonctionnalité reviendra.
+     */
+    private static function apply_js_lock_once(): void {
+        $opt = get_option(self::OPT, []);
+        if ( ! is_array($opt) ) {
+            $opt = [];
+        }
+        if ( ! empty($opt['js_lock_applied']) ) {
+            return;
+        }
+
+        $files = glob(self::CACHE_DIR . '*.js');
+        if ( is_array($files) ) {
+            foreach ( $files as $file ) {
+                wp_delete_file($file);
+            }
+        }
+
+        $opt['js_enabled']      = false;
+        $opt['js_lock_applied'] = true;
+        update_option(self::OPT, $opt);
     }
 
     // =========================================================================
@@ -299,38 +344,115 @@ class Alesta_Minify_Module {
     // =========================================================================
 
     public static function minify_js( string $js ): string {
-        // Préserver les chaînes de caractères pour ne pas y toucher
-        $preserved = [];
-        $idx       = 0;
+        // Retrait des commentaires en UN SEUL passage, conscient du contexte
+        // (chaînes ' " `, littéraux regex). L'ancienne approche par regex
+        // confondait une apostrophe de commentaire français (d', l', n', qu')
+        // avec un début de chaîne, appariait avec une apostrophe de code plus
+        // loin, et supprimait de larges pans de code (JS invalide en sortie).
+        $js = self::strip_js_comments( $js );
 
-        $js = preg_replace_callback(
-            '/(\'(?:[^\'\\\\]|\\\\.)*\'|"(?:[^"\\\\]|\\\\.)*"|`(?:[^`\\\\]|\\\\.)*`)/s',
-            function ( $m ) use ( &$preserved, &$idx ) {
-                $key            = '__ALESTASTR' . $idx . '__';
-                $preserved[$key] = $m[0];
-                $idx++;
-                return $key;
-            },
-            $js
-        );
-
-        // Supprimer commentaires /* ... */
-        $js = preg_replace( '/\/\*[\s\S]*?\*\//', '', $js );
-        // Supprimer commentaires // (mais pas les URL http://)
-        $js = preg_replace( '/(?<![\'":])\/\/(?![\/:]).*$/m', '', $js );
-        // Réduire les espaces/tabulations en un seul espace
+        // Espaces : collapse horizontal, trim des bords de ligne, lignes vides.
+        // On CONSERVE les sauts de ligne simples pour préserver l'ASI.
         $js = preg_replace( '/[ \t]+/', ' ', $js );
-        // Supprimer espaces en début et fin de ligne
         $js = preg_replace( '/^[ \t]+|[ \t]+$/m', '', $js );
-        // Supprimer lignes vides
         $js = preg_replace( '/\n{2,}/', "\n", $js );
 
-        // Restaurer les chaînes
-        foreach ( $preserved as $key => $val ) {
-            $js = str_replace( $key, $val, $js );
+        return trim( $js );
+    }
+
+    /**
+     * Retire les commentaires JS (// et /* *​/) en respectant les chaînes,
+     * les gabarits (`) et les littéraux d'expression régulière. Scanner
+     * caractère par caractère : aucune donnée dans une chaîne/regex n'est
+     * altérée, et aucune apostrophe de commentaire n'est prise pour un
+     * délimiteur de chaîne.
+     */
+    private static function strip_js_comments( string $js ): string {
+        $len  = strlen( $js );
+        $out  = '';
+        $i    = 0;
+        $prev = '';   // dernier caractère significatif (hors espaces)
+        $word = '';   // identifiant courant en cours d'accumulation
+        $prevWord = ''; // dernier identifiant complet (pour return/typeof…)
+
+        while ( $i < $len ) {
+            $c  = $js[$i];
+            $c2 = ( $i + 1 < $len ) ? $js[$i + 1] : '';
+
+            // Commentaire ligne //
+            if ( $c === '/' && $c2 === '/' ) {
+                $i += 2;
+                while ( $i < $len && $js[$i] !== "\n" ) { $i++; }
+                continue;
+            }
+            // Commentaire bloc /* */
+            if ( $c === '/' && $c2 === '*' ) {
+                $i += 2;
+                while ( $i < $len && ! ( $js[$i] === '*' && ( $i + 1 < $len ) && $js[$i + 1] === '/' ) ) { $i++; }
+                $i += 2; // saute la fermeture
+                continue;
+            }
+            // Chaîne ' " `
+            if ( $c === '"' || $c === "'" || $c === '`' ) {
+                $q = $c; $out .= $c; $i++;
+                while ( $i < $len ) {
+                    $ch = $js[$i]; $out .= $ch;
+                    if ( $ch === '\\' && $i + 1 < $len ) { $out .= $js[$i + 1]; $i += 2; continue; }
+                    $i++;
+                    if ( $ch === $q ) { break; }
+                }
+                $prev = $q; $word = ''; $prevWord = '';
+                continue;
+            }
+            // Littéral regex /…/flags si le contexte l'autorise
+            if ( $c === '/' && self::js_regex_allowed( $prev, $prevWord ) ) {
+                $out .= $c; $i++;
+                $inClass = false;
+                while ( $i < $len ) {
+                    $ch = $js[$i];
+                    if ( $ch === "\n" ) { break; } // une regex ne traverse pas une ligne
+                    $out .= $ch;
+                    if ( $ch === '\\' && $i + 1 < $len ) { $out .= $js[$i + 1]; $i += 2; continue; }
+                    if ( $ch === '[' ) { $inClass = true; }
+                    elseif ( $ch === ']' ) { $inClass = false; }
+                    elseif ( $ch === '/' && ! $inClass ) { $i++; break; }
+                    $i++;
+                }
+                while ( $i < $len && ctype_alpha( $js[$i] ) ) { $out .= $js[$i]; $i++; } // flags
+                $prev = '/'; $word = ''; $prevWord = '';
+                continue;
+            }
+
+            // Caractère normal
+            $out .= $c;
+            if ( ctype_alnum( $c ) || $c === '_' || $c === '$' ) {
+                $word .= $c;
+            } else {
+                if ( $word !== '' ) { $prevWord = $word; }
+                $word = '';
+            }
+            if ( $c !== ' ' && $c !== "\t" && $c !== "\n" && $c !== "\r" ) { $prev = $c; }
+            $i++;
         }
 
-        return trim($js);
+        return $out;
+    }
+
+    /**
+     * Décide si un « / » démarre un littéral regex (vs une division) selon le
+     * dernier caractère/identifiant significatif. Heuristique standard.
+     */
+    private static function js_regex_allowed( string $prev, string $prevWord ): bool {
+        if ( $prev === '' ) { return true; }
+        // Après un opérateur ou une ponctuation d'ouverture → regex.
+        if ( strpos( "(,=:[!&|?{};<>+-*/%^~", $prev ) !== false ) { return true; }
+        // Après un mot-clé (return /x/, typeof /x/…) → regex.
+        if ( ctype_alnum( $prev ) || $prev === '_' || $prev === '$' ) {
+            $kw = array( 'return', 'typeof', 'instanceof', 'in', 'of', 'new', 'delete', 'void', 'do', 'else', 'yield', 'case', 'throw', 'await' );
+            return in_array( $prevWord, $kw, true );
+        }
+        // Après ) ] } . ou un littéral → division.
+        return false;
     }
 
     // =========================================================================
@@ -498,6 +620,9 @@ class Alesta_Minify_Module {
         $allowed = ['css_enabled', 'js_enabled', 'html_enabled', 'preload_enabled'];
 
         if ( ! in_array($type, $allowed, true) ) wp_send_json_error(['message' => 'Type invalide.']);
+        if ( 'js_enabled' === $type && ! self::js_available() ) {
+            wp_send_json_error(['message' => 'La minification JavaScript est en cours de développement et temporairement indisponible.']);
+        }
 
         $s        = self::settings();
         $s[$type] = $value;
@@ -517,6 +642,9 @@ class Alesta_Minify_Module {
                 $s['css_excludes'] = sanitize_textarea_field( wp_unslash($_POST['excludes'] ?? '') );
                 break;
             case 'js':
+                if ( ! self::js_available() ) {
+                    wp_send_json_error(['message' => 'La minification JavaScript est en cours de développement et temporairement indisponible.']);
+                }
                 $s['js_excludes'] = sanitize_textarea_field( wp_unslash($_POST['excludes'] ?? '') );
                 break;
             case 'html':

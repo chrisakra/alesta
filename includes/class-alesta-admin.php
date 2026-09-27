@@ -251,7 +251,7 @@ class Alesta_Admin {
 		add_submenu_page(
 			self::MENU_SLUG,
 			__( 'Minification', 'alesta' ),
-			'- Minification HTML/CSS/JS',
+			'- Minification HTML/CSS',
 			self::CAPABILITY,
 			'alesta-ai-minify',
 			function () {
@@ -771,7 +771,7 @@ class Alesta_Admin {
 					self::card_active(
 						"\xE2\x9C\x82", // ✂
 						__( 'Minification', 'alesta' ),
-						__( 'Minifie HTML, CSS et JS pour accélérer le site (avec bypass des page-builders).', 'alesta' ),
+						__( 'Minifie HTML et CSS pour accélérer le site (avec bypass des page-builders). Minification JS en cours de développement.', 'alesta' ),
 						'alesta-ai-minify',
 						__( 'Ouvrir', 'alesta' )
 					);
