@@ -333,12 +333,12 @@ class Alesta_Admin_Settings {
 
 			<div style="margin-bottom:16px;">
 				<label for="alesta-key-<?php echo esc_attr( $provider ); ?>" style="display:block;font-weight:500;margin-bottom:6px;color:#374151;"><?php echo esc_html( $label ); ?></label>
-				<div style="display:flex;gap:8px;">
+				<div style="display:flex;gap:8px;align-items:stretch;">
 					<input type="password" id="alesta-key-<?php echo esc_attr( $provider ); ?>" class="regular-text alesta-key-input" style="flex:1;"
 						value="" autocomplete="new-password" spellcheck="false"
 						placeholder="<?php echo esc_attr( $placeholder ); ?>">
-					<button type="button" class="button alesta-toggle-key" data-target="alesta-key-<?php echo esc_attr( $provider ); ?>" title="<?php esc_attr_e( 'Afficher / masquer', 'alesta' ); ?>">
-						<span class="dashicons dashicons-visibility" style="vertical-align:middle;"></span>
+					<button type="button" class="button alesta-toggle-key" data-target="alesta-key-<?php echo esc_attr( $provider ); ?>" title="<?php esc_attr_e( 'Afficher / masquer', 'alesta' ); ?>" style="display:flex;align-items:center;justify-content:center;padding:0 10px;">
+						<span class="dashicons dashicons-visibility" style="line-height:1;width:20px;height:20px;font-size:20px;"></span>
 					</button>
 				</div>
 				<p class="description" style="margin-top:6px;">
