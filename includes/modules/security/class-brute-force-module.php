@@ -26,9 +26,18 @@ defined('ABSPATH') || exit;
  * garde l'IP en clair pour permettre le déblocage manuel.
  *
  * Paramètres par défaut (style fail2ban standard) :
+ *   - Désactivé tant que l'administrateur ne l'a pas activé depuis sa page
+ *     (nouveau en 1.9.0 : pas d'activation d'office à la mise à jour)
  *   - Seuil : 5 échecs
  *   - Fenêtre : 5 minutes (300s)
  *   - Durée ban : 15 minutes (900s)
+ *
+ * Proxy / CDN non déclaré (ALESTA-06-R2) : tous les visiteurs partagent
+ * alors l'IP du proxy, et un ban bloquerait tout le monde, administrateur
+ * compris. Dans ce cas le verrouillage par IP est suspendu (échec ouvert)
+ * et la page admin explique comment déclarer le proxy
+ * (ALESTA_TRUSTED_PROXIES / ALESTA_TRUSTED_PROXY_HEADER dans wp-config.php).
+ * Même logique dans Alesta_AI_Brute_Force_Module (Pro).
  *
  * Lorsque l'addon Alesta AI Pro est actif, c'est SA classe
  * Alesta_AI_Brute_Force_Module qui prend le relais : le loader du Free ne doit
@@ -44,6 +53,9 @@ class Alesta_Brute_Force_Module {
     const PREFIX_BLOCK   = 'alesta_bf_block_';
     const NOTIFY_LOCK    = 'alesta_bf_notify_lock';
     const NONCE_UNBAN    = 'alesta_bf_unban';
+    // 'proxy' | 'direct' : dernier constat fait sur le trafic d'un administrateur
+    // connecté (option partagée avec la Pro).
+    const OPT_PROXY_STATE = 'alesta_bf_proxy_state';
 
     /**
      * Constructeur — hooks dans WordPress.
@@ -52,6 +64,9 @@ class Alesta_Brute_Force_Module {
         // AJAX admin pour unban manuel (enregistré même si la protection est
         // désactivée : on doit pouvoir débloquer une IP résiduelle).
         add_action('wp_ajax_alesta_bf_unban', [$this, 'ajax_unban']);
+        // Détection proxy / CDN sur les requêtes d'un administrateur connecté
+        // (prête avant même l'activation de la protection).
+        add_action('admin_init', [$this, 'observe_admin_request']);
 
         $s = self::settings();
         if ( empty($s['enabled']) ) return;
@@ -79,7 +94,9 @@ class Alesta_Brute_Force_Module {
 
     public static function settings(): array {
         $defaults = [
-            'enabled'        => true,
+            // Désactivé par défaut : l'administrateur active la protection
+            // depuis sa page, après avoir vérifié l'IP détectée (ALESTA-06-R2).
+            'enabled'        => false,
             'threshold'      => 5,
             'window_seconds' => 300,   // 5 min
             'ban_seconds'    => 900,   // 15 min
@@ -103,7 +120,11 @@ class Alesta_Brute_Force_Module {
         $whitelist = array_slice( array_filter( (array) $new['whitelist'], function($ip) {
             return is_string($ip) && filter_var( trim($ip), FILTER_VALIDATE_IP );
         } ), 0, 50 );
-        $new['whitelist'] = array_values( array_unique( array_map( 'trim', $whitelist ) ) );
+        $whitelist = array_values( array_unique( array_map( 'trim', $whitelist ) ) );
+        // IP privée / réservée ou IP du proxy non déclaré : jamais en liste
+        // blanche (la page admin refuse déjà avec un message explicatif).
+        $rejected = self::whitelist_rejections( $whitelist );
+        $new['whitelist'] = array_values( array_diff( $whitelist, array_keys( $rejected ) ) );
 
         // update_option() renvoie false si la valeur est inchangée : on
         // considère cela comme un succès.
@@ -120,7 +141,7 @@ class Alesta_Brute_Force_Module {
      * Bloque même si le username/password seraient corrects.
      */
     public function check_blocked_ip( $user, $username, $password ) {
-        $ip = self::client_ip();
+        $ip = self::lockout_ip();
         if ( ! $ip ) return $user;
         if ( self::is_whitelisted($ip) ) return $user;
         if ( ! self::is_blocked($ip) ) return $user;
@@ -137,7 +158,7 @@ class Alesta_Brute_Force_Module {
      * Hook wp_login_failed — incrémente le compteur et BAN si seuil dépassé.
      */
     public function on_login_failed( $username ): void {
-        $ip = self::client_ip();
+        $ip = self::lockout_ip();
         if ( ! $ip || self::is_whitelisted($ip) ) return;
 
         $s     = self::settings();
@@ -167,7 +188,7 @@ class Alesta_Brute_Force_Module {
      * Hard block sur la page wp-login.php elle-même (avant rendu du formulaire).
      */
     public function block_login_form_if_banned(): void {
-        $ip = self::client_ip();
+        $ip = self::lockout_ip();
         if ( ! $ip || self::is_whitelisted($ip) ) return;
         if ( ! self::is_blocked($ip) ) return;
 
@@ -185,7 +206,7 @@ class Alesta_Brute_Force_Module {
      * wp_die() en contexte XML-RPC renvoie un fault XML-RPC propre + HTTP 429.
      */
     public function block_xmlrpc_if_banned(): void {
-        $ip = self::client_ip();
+        $ip = self::lockout_ip();
         if ( ! $ip || self::is_whitelisted($ip) ) return;
         if ( ! self::is_blocked($ip) ) return;
 
@@ -359,9 +380,8 @@ class Alesta_Brute_Force_Module {
     }
 
     /**
-     * Récupère l'IP client réelle (gère X-Forwarded-For pour reverse-proxy /
-     * Cloudflare / load balancer). Prend la PREMIÈRE IP de la chaîne X-FF
-     * (= le client originel, pas le dernier proxy).
+     * Récupère l'IP client réelle : REMOTE_ADDR, ou l'IP transmise par un
+     * reverse-proxy / CDN déclaré de confiance (voir Alesta_Net).
      */
     public static function client_ip(): string {
         // IP non usurpable : REMOTE_ADDR par défaut, en-têtes de transfert
@@ -374,5 +394,200 @@ class Alesta_Brute_Force_Module {
         return isset( $_SERVER['REMOTE_ADDR'] )
             ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) )
             : '';
+    }
+
+    // =========================================================================
+    // PROXY / CDN NON DÉCLARÉ (ALESTA-06-R2)
+    // =========================================================================
+
+    /**
+     * IP soumise au verrouillage, ou '' quand le verrouillage par IP est
+     * suspendu (proxy non déclaré : échec ouvert, jamais tout le monde bloqué).
+     */
+    private static function lockout_ip(): string {
+        if ( self::behind_undeclared_proxy() ) return '';
+        return self::client_ip();
+    }
+
+    /**
+     * Vrai quand l'IP vue par WordPress est probablement celle d'un proxy /
+     * CDN non déclaré : un ban sur cette IP bloquerait tous les visiteurs.
+     *
+     *   - proxy déclaré (ALESTA_TRUSTED_PROXIES) : seule une requête arrivant
+     *     par ce proxy sans IP client exploitable, ou d'une IP interne hors
+     *     liste, reste ambiguë ;
+     *   - sinon, REMOTE_ADDR privée / réservée / loopback = intermédiaire ;
+     *   - sinon, on se fie au dernier constat fait sur le trafic d'un
+     *     administrateur connecté (non falsifiable par un anonyme) et, à
+     *     défaut de constat, aux en-têtes de la requête elle-même.
+     */
+    public static function behind_undeclared_proxy(): bool {
+        $remote = self::remote_addr();
+        if ( '' === $remote ) return false;
+
+        $trusted = self::trusted_proxies();
+        if ( ! empty( $trusted ) ) {
+            if ( class_exists( 'Alesta_Net' ) && Alesta_Net::ip_in_ranges( $remote, $trusted ) ) {
+                return self::same_ip( self::client_ip(), $remote );
+            }
+            return self::is_private_ip( $remote );
+        }
+
+        if ( self::is_private_ip( $remote ) ) return true;
+
+        $state = get_option( self::OPT_PROXY_STATE, '' );
+        if ( 'proxy' === $state )  return true;
+        if ( 'direct' === $state ) return false;
+        return self::request_via_proxy();
+    }
+
+    /**
+     * La requête courante passe-t-elle par un proxy dont l'IP n'a pas été
+     * résolue ? REMOTE_ADDR privée / réservée, ou en-tête de transfert
+     * annonçant une autre IP. Quand le serveur a déjà remplacé REMOTE_ADDR
+     * par l'IP réelle (mod_remoteip, nginx real_ip), celle-ci figure dans
+     * l'en-tête : rien à signaler.
+     */
+    public static function request_via_proxy(): bool {
+        $remote = self::remote_addr();
+        if ( '' === $remote ) return false;
+        if ( self::is_private_ip( $remote ) ) return true;
+        $forwarded = self::forwarded_ips();
+        if ( empty( $forwarded ) ) return false;
+        foreach ( $forwarded as $ip ) {
+            if ( self::same_ip( $ip, $remote ) ) return false;
+        }
+        return true;
+    }
+
+    /**
+     * admin_init — mémorise si le trafic d'un administrateur connecté passe
+     * par un proxy non résolu. Écrit uniquement en cas de changement.
+     */
+    public function observe_admin_request(): void {
+        if ( wp_doing_cron() || ! current_user_can('manage_options') ) return;
+        if ( '' === self::remote_addr() ) return;
+        $state = self::request_via_proxy() ? 'proxy' : 'direct';
+        if ( get_option( self::OPT_PROXY_STATE, '' ) !== $state ) {
+            update_option( self::OPT_PROXY_STATE, $state );
+        }
+    }
+
+    /**
+     * Proxies de confiance déclarés dans wp-config.php.
+     */
+    public static function trusted_proxies(): array {
+        if ( ! defined('ALESTA_TRUSTED_PROXIES') ) return [];
+        return array_values( array_filter( array_map( 'trim', explode( ',', (string) ALESTA_TRUSTED_PROXIES ) ) ) );
+    }
+
+    /**
+     * En-têtes de transfert présents dans la requête courante (noms $_SERVER).
+     */
+    public static function forward_headers_present(): array {
+        $found = [];
+        foreach ( self::forward_headers() as $h ) {
+            if ( ! empty( $_SERVER[ $h ] ) ) $found[] = $h;
+        }
+        return $found;
+    }
+
+    /**
+     * IP privée, réservée ou loopback (10/8, 172.16/12, 192.168/16, 127/8,
+     * 169.254/16, 100.64/10, ::1, fc00::/7, fe80::/10…) ?
+     */
+    public static function is_private_ip( string $ip ): bool {
+        $ip = trim( $ip );
+        if ( ! filter_var( $ip, FILTER_VALIDATE_IP ) ) return false;
+        // IPv4 encapsulée dans IPv6 (::ffff:10.0.0.1).
+        if ( 0 === stripos( $ip, '::ffff:' ) && filter_var( substr( $ip, 7 ), FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
+            $ip = substr( $ip, 7 );
+        }
+        if ( ! filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
+            return true;
+        }
+        // Plages que filter_var ne couvre pas selon la version de PHP.
+        return class_exists( 'Alesta_Net' ) && Alesta_Net::ip_in_ranges( $ip, [
+            '0.0.0.0/8', '100.64.0.0/10', '127.0.0.0/8', '169.254.0.0/16', '192.0.0.0/24',
+            '::/128', '::1/128', 'fc00::/7', 'fe80::/10', '2001:db8::/32',
+        ] );
+    }
+
+    /**
+     * IPs refusées en liste blanche, avec la raison : IP privée / réservée /
+     * loopback, ou IP du proxy non déclaré par lequel passe la requête
+     * courante (la mettre en liste blanche désactiverait la protection pour
+     * tout le monde).
+     *
+     * @return array<string,string> ip => message
+     */
+    public static function whitelist_rejections( array $ips ): array {
+        $proxy_ip = self::behind_undeclared_proxy() ? self::remote_addr() : '';
+        $out = [];
+        foreach ( $ips as $ip ) {
+            $ip = trim( (string) $ip );
+            if ( '' === $ip || isset( $out[ $ip ] ) ) continue;
+            if ( self::is_private_ip( $ip ) ) {
+                /* translators: %s : adresse IP */
+                $out[ $ip ] = sprintf( __( '%s est une IP privée, réservée ou locale : c\'est celle d\'un proxy ou du réseau interne, la mettre en liste blanche désactiverait la protection pour tous les visiteurs.', 'alesta' ), $ip );
+            } elseif ( '' !== $proxy_ip && self::same_ip( $ip, $proxy_ip ) ) {
+                /* translators: %s : adresse IP */
+                $out[ $ip ] = sprintf( __( '%s est l\'IP d\'un proxy / CDN non déclaré, partagée par tous les visiteurs : déclarez d\'abord le proxy dans wp-config.php.', 'alesta' ), $ip );
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * En-têtes de transfert posés par les reverse-proxies / CDN courants.
+     */
+    private static function forward_headers(): array {
+        return [
+            'HTTP_X_FORWARDED_FOR', 'HTTP_CF_CONNECTING_IP', 'HTTP_X_REAL_IP',
+            'HTTP_TRUE_CLIENT_IP', 'HTTP_X_CLIENT_IP', 'HTTP_X_CLUSTER_CLIENT_IP',
+            'HTTP_FASTLY_CLIENT_IP', 'HTTP_FORWARDED',
+        ];
+    }
+
+    /**
+     * IPs annoncées par les en-têtes de transfert (X-Forwarded-For en liste,
+     * Forwarded « for=… », ports et crochets IPv6 retirés).
+     */
+    private static function forwarded_ips(): array {
+        $ips = [];
+        foreach ( self::forward_headers() as $h ) {
+            if ( empty( $_SERVER[ $h ] ) || ! is_string( $_SERVER[ $h ] ) ) continue;
+            $raw = sanitize_text_field( wp_unslash( $_SERVER[ $h ] ) );
+            foreach ( preg_split( '/[,;]/', $raw ) as $tok ) {
+                $tok = trim( $tok );
+                if ( 0 === stripos( $tok, 'for=' ) ) $tok = substr( $tok, 4 );
+                $tok = trim( $tok, " \"'" );
+                if ( preg_match( '/^\[([^\]]+)\]/', $tok, $m ) ) {
+                    $tok = $m[1];
+                } elseif ( preg_match( '/^(\d{1,3}(?:\.\d{1,3}){3}):\d+$/', $tok, $m ) ) {
+                    $tok = $m[1];
+                }
+                if ( filter_var( $tok, FILTER_VALIDATE_IP ) ) $ips[] = $tok;
+            }
+        }
+        return array_values( array_unique( $ips ) );
+    }
+
+    /**
+     * REMOTE_ADDR validée ('' si absente ou invalide).
+     */
+    private static function remote_addr(): string {
+        $r = isset( $_SERVER['REMOTE_ADDR'] ) ? trim( sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) ) : '';
+        return filter_var( $r, FILTER_VALIDATE_IP ) ? $r : '';
+    }
+
+    /**
+     * Égalité de deux IPs, écritures IPv6 différentes comprises.
+     */
+    private static function same_ip( string $a, string $b ): bool {
+        if ( $a === $b ) return true;
+        $pa = @inet_pton( $a ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+        $pb = @inet_pton( $b ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+        return false !== $pa && false !== $pb && $pa === $pb;
     }
 }

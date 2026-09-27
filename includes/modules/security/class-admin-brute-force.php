@@ -46,7 +46,9 @@ class Alesta_Admin_Brute_Force {
             'ajax_url'    => admin_url('admin-ajax.php'),
             'nonce_save'  => wp_create_nonce( self::NONCE_SAVE ),
             'nonce_unban' => wp_create_nonce( Alesta_Brute_Force_Module::NONCE_UNBAN ),
-            'client_ip'   => Alesta_Brute_Force_Module::client_ip(),
+            // Vide (bouton « Ajouter mon IP » inopérant) si l'IP détectée est
+            // celle d'un proxy non déclaré ou une IP privée (ALESTA-06-R2).
+            'client_ip'   => self::addable_client_ip(),
             'i18n'        => [
                 'saving'        => __( 'Enregistrement…', 'alesta' ),
                 'saved'         => __( 'Paramètres enregistrés.', 'alesta' ),
@@ -83,6 +85,13 @@ class Alesta_Admin_Brute_Force {
         $whitelist_raw = isset( $_POST['whitelist'] ) ? sanitize_textarea_field( wp_unslash( $_POST['whitelist'] ) ) : '';
         $whitelist     = array_filter( array_map( 'trim', preg_split( '/[\r\n,]+/', $whitelist_raw ) ) );
 
+        // IP privée / réservée ou IP d'un proxy non déclaré : refus explicite
+        // plutôt qu'un retrait silencieux (ALESTA-06-R2).
+        $rejected = Alesta_Brute_Force_Module::whitelist_rejections( $whitelist );
+        if ( ! empty( $rejected ) ) {
+            wp_send_json_error( [ 'message' => implode( ' ', array_values( $rejected ) ) ] );
+        }
+
         $ok = Alesta_Brute_Force_Module::save_settings( [
             'enabled'        => $enabled,
             'notify_email'   => $notify_email,
@@ -96,6 +105,21 @@ class Alesta_Admin_Brute_Force {
             wp_send_json_success( [ 'message' => __( 'Paramètres enregistrés.', 'alesta' ) ] );
         }
         wp_send_json_error( [ 'message' => __( 'Échec de l\'enregistrement.', 'alesta' ) ] );
+    }
+
+    /**
+     * IP proposée par « Ajouter mon IP », ou '' si elle ne doit pas aller en
+     * liste blanche : IP d'un proxy non déclaré (partagée par tous les
+     * visiteurs) ou IP privée / réservée (ALESTA-06-R2).
+     */
+    private static function addable_client_ip(): string {
+        $ip = Alesta_Brute_Force_Module::client_ip();
+        if ( '' === $ip
+            || Alesta_Brute_Force_Module::behind_undeclared_proxy()
+            || Alesta_Brute_Force_Module::is_private_ip( $ip ) ) {
+            return '';
+        }
+        return $ip;
     }
 
     // =========================================================================
@@ -118,6 +142,9 @@ class Alesta_Admin_Brute_Force {
         $client_ip     = Alesta_Brute_Force_Module::client_ip();
         $is_enabled    = ! empty( $s['enabled'] );
         $nb_active     = count( $active_bans );
+        $behind_proxy  = Alesta_Brute_Force_Module::behind_undeclared_proxy();
+        $addable_ip    = self::addable_client_ip();
+        $fwd_headers   = Alesta_Brute_Force_Module::forward_headers_present();
         ?>
         <div class="wrap alesta-wrap" id="alesta-bf-wrap">
 
@@ -130,22 +157,83 @@ class Alesta_Admin_Brute_Force {
                         <p class="alesta-bf-subtitle"><?php esc_html_e( 'Blocage automatique des IPs après tentatives de connexion répétées (fail2ban-like)', 'alesta' ); ?></p>
                     </div>
                 </div>
-                <span class="alesta-bf-status <?php echo $is_enabled ? 'is-on' : 'is-off'; ?>">
-                    <?php echo $is_enabled ? esc_html__( 'Protection ACTIVE', 'alesta' ) : esc_html__( 'Protection INACTIVE', 'alesta' ); ?>
+                <span class="alesta-bf-status <?php echo ( $is_enabled && ! $behind_proxy ) ? 'is-on' : 'is-off'; ?>">
+                    <?php
+                    if ( ! $is_enabled ) {
+                        esc_html_e( 'Protection INACTIVE', 'alesta' );
+                    } elseif ( $behind_proxy ) {
+                        esc_html_e( 'Protection SUSPENDUE (proxy non déclaré)', 'alesta' );
+                    } else {
+                        esc_html_e( 'Protection ACTIVE', 'alesta' );
+                    }
+                    ?>
                 </span>
             </div>
 
+            <!-- ── Invitation à activer (désactivée par défaut) ── -->
+            <?php if ( ! $is_enabled ) : ?>
+            <div class="alesta-bf-notice" style="border-left:4px solid #2563eb;">
+                <strong><?php esc_html_e( 'La protection anti-force-brute n\'est pas encore activée.', 'alesta' ); ?></strong>
+                <?php esc_html_e( 'Vérifiez l\'IP détectée ci-dessous, cochez « Activer la protection » puis cliquez sur « Enregistrer » : les IPs qui accumulent les échecs de connexion seront alors bloquées automatiquement.', 'alesta' ); ?>
+                <a href="#bf-enabled"><?php esc_html_e( 'Activer maintenant', 'alesta' ); ?></a>
+            </div>
+            <?php endif; ?>
+
+            <!-- ── Proxy / CDN non déclaré (ALESTA-06-R2) ── -->
+            <?php if ( $behind_proxy ) : ?>
+            <div class="alesta-bf-notice" style="border-left:4px solid #dc2626;background:#fef2f2;color:#7f1d1d;">
+                <p><strong><?php esc_html_e( 'Proxy ou CDN non déclaré détecté : verrouillage par IP suspendu.', 'alesta' ); ?></strong></p>
+                <p>
+                    <?php
+                    printf(
+                        /* translators: %s : adresse IP vue par WordPress (en gras) */
+                        esc_html__( 'Votre site reçoit les connexions par un intermédiaire (Cloudflare, Varnish, répartiteur de charge…) et WordPress voit l\'adresse %s au lieu de celle de chaque visiteur. Bannir cette adresse bloquerait tout le monde, vous compris : tant que ce proxy n\'est pas déclaré, aucune IP n\'est verrouillée.', 'alesta' ),
+                        '<strong>' . esc_html( $client_ip ) . '</strong>'
+                    );
+                    ?>
+                    <?php if ( ! empty( $fwd_headers ) ) : ?>
+                        <?php esc_html_e( 'En-têtes de transfert reçus :', 'alesta' ); ?>
+                        <code><?php echo esc_html( implode( ', ', $fwd_headers ) ); ?></code>
+                    <?php endif; ?>
+                </p>
+                <p><?php esc_html_e( 'Déclarez le proxy dans wp-config.php (au-dessus de la ligne « That\'s all, stop editing! »). Exemple pour Cloudflare :', 'alesta' ); ?></p>
+                <pre style="white-space:pre-wrap;word-break:break-all;background:#fff;padding:8px;border:1px solid #fecaca;">define( 'ALESTA_TRUSTED_PROXIES', '173.245.48.0/20,103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,141.101.64.0/18,108.162.192.0/18,190.93.240.0/20,188.114.96.0/20,197.234.240.0/22,198.41.128.0/17,162.158.0.0/15,104.16.0.0/13,104.24.0.0/14,172.64.0.0/13,131.0.72.0/22' );
+define( 'ALESTA_TRUSTED_PROXY_HEADER', 'HTTP_CF_CONNECTING_IP' );</pre>
+                <p>
+                    <?php
+                    printf(
+                        /* translators: %1$s : URL des plages Cloudflare, %2$s : exemple de valeur pour un proxy local, %3$s : nom d'en-tête */
+                        esc_html__( 'Vérifiez les plages à jour (IPv4 et IPv6) sur %1$s. Pour un proxy installé sur le serveur (Varnish, nginx) : %2$s avec l\'en-tête %3$s.', 'alesta' ),
+                        '<code>https://www.cloudflare.com/ips/</code>',
+                        '<code>ALESTA_TRUSTED_PROXIES = \'127.0.0.1\'</code>',
+                        '<code>HTTP_X_FORWARDED_FOR</code>'
+                    );
+                    ?>
+                </p>
+            </div>
+            <?php endif; ?>
+
             <!-- ── Info IP courante ── -->
-            <?php if ( $client_ip ) : ?>
+            <?php if ( $addable_ip ) : ?>
             <div class="alesta-bf-notice">
                 <?php
                 printf(
                     /* translators: %s : adresse IP courante (en gras) */
                     esc_html__( 'Votre IP actuelle : %s — pensez à l\'ajouter à la whitelist ci-dessous pour ne jamais vous bloquer vous-même par erreur.', 'alesta' ),
-                    '<strong>' . esc_html( $client_ip ) . '</strong>'
+                    '<strong>' . esc_html( $addable_ip ) . '</strong>'
                 );
                 ?>
                 <button type="button" class="button button-small" id="bf-add-my-ip"><?php esc_html_e( 'Ajouter mon IP à la whitelist', 'alesta' ); ?></button>
+            </div>
+            <?php elseif ( $client_ip ) : ?>
+            <div class="alesta-bf-notice">
+                <?php
+                printf(
+                    /* translators: %s : adresse IP détectée (en gras) */
+                    esc_html__( 'IP détectée : %s — c\'est l\'adresse d\'un proxy non déclaré ou une adresse privée / locale, partagée par d\'autres visiteurs : elle ne peut pas être ajoutée à la whitelist (cela désactiverait la protection pour tout le monde).', 'alesta' ),
+                    '<strong>' . esc_html( $client_ip ) . '</strong>'
+                );
+                ?>
             </div>
             <?php endif; ?>
 
@@ -198,7 +286,7 @@ class Alesta_Admin_Brute_Force {
 
                 <div class="alesta-bf-field">
                     <label for="bf-whitelist"><?php esc_html_e( 'Whitelist d\'IPs (une par ligne)', 'alesta' ); ?></label>
-                    <textarea id="bf-whitelist" rows="4" placeholder="192.168.1.42&#10;203.0.113.5"><?php echo esc_textarea( $whitelist_str ); ?></textarea>
+                    <textarea id="bf-whitelist" rows="4" placeholder="203.0.113.5&#10;198.51.100.7"><?php echo esc_textarea( $whitelist_str ); ?></textarea>
                     <small><?php esc_html_e( 'Ces IPs ne seront JAMAIS bannies. Ajoutez la vôtre, votre VPN, vos collègues admin… (50 max.)', 'alesta' ); ?></small>
                 </div>
 
