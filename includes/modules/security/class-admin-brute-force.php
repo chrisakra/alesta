@@ -202,9 +202,8 @@ define( 'ALESTA_TRUSTED_PROXY_HEADER', 'HTTP_CF_CONNECTING_IP' );</pre>
                 <p>
                     <?php
                     printf(
-                        /* translators: %1$s : URL des plages Cloudflare, %2$s : exemple de valeur pour un proxy local, %3$s : nom d'en-tête */
-                        esc_html__( 'Vérifiez les plages à jour (IPv4 et IPv6) sur %1$s. Pour un proxy installé sur le serveur (Varnish, nginx) : %2$s avec l\'en-tête %3$s.', 'alesta' ),
-                        '<code>https://www.cloudflare.com/ips/</code>',
+                        /* translators: %1$s : exemple de valeur pour un proxy local, %2$s : nom d'en-tête */
+                        esc_html__( 'Vérifiez les plages à jour (IPv4 et IPv6) dans la liste officielle des plages IP publiée par Cloudflare (page « IP Ranges »). Pour un proxy installé sur le serveur (Varnish, nginx) : %1$s avec l\'en-tête %2$s.', 'alesta' ),
                         '<code>ALESTA_TRUSTED_PROXIES = \'127.0.0.1\'</code>',
                         '<code>HTTP_X_FORWARDED_FOR</code>'
                     );
