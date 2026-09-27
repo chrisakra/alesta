@@ -202,6 +202,7 @@ class Alesta_Audit {
                 'posts_per_page' => 1,
                 'post_type'      => ['page', 'post'],
                 'post_status'    => 'publish',
+                'has_password'   => false,
             ]);
             if ( ! empty($similar_posts) ) {
                 /* translators: %s: title of the similar post */
@@ -345,6 +346,11 @@ class Alesta_Audit {
         if ( ! $post ) {
             return new WP_Error('not_found', __('Contenu introuvable.', 'alesta'));
         }
+        // Contenu protégé par mot de passe : son texte n'est jamais envoyé à l'IA
+        // (même règle que la meta box et le module Meta).
+        if ( ! empty($post->post_password) ) {
+            return new WP_Error('password_protected', __('Ce contenu est protégé par mot de passe : la génération IA est désactivée pour ne pas exposer son texte.', 'alesta'));
+        }
         $api = $this->api();
         if ( is_wp_error($api) ) {
             return $api;
@@ -445,9 +451,12 @@ class Alesta_Audit {
         if ( empty($post_types) ) {
             return [];
         }
+        // Contenus protégés par mot de passe exclus : l'audit propose ensuite
+        // une génération IA ligne par ligne, qui enverrait leur texte.
         return get_posts([
             'post_type'      => $post_types,
             'post_status'    => 'publish',
+            'has_password'   => false,
             'posts_per_page' => -1,
             'orderby'        => 'date',
             'order'          => 'DESC',

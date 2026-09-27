@@ -491,7 +491,7 @@ class Alesta_Admin_Settings {
 							<?php esc_html_e( 'Chaque appel est comptabilisé (tokens, coût estimé). Définissez une limite mensuelle et une alerte email depuis la page Budget.', 'alesta' ); ?>
 						</p>
 						<p style="font-size:12px;color:#6b7280;margin:0 0 10px;">
-							<?php esc_html_e( 'Le coût n\'est estimé que pour les modèles dont le tarif est connu du plugin. Pour les autres, les tokens sont comptés mais le coût affiché reste à 0 (« non estimé »).', 'alesta' ); ?>
+							<?php esc_html_e( 'Le coût est calculé d\'après le tarif connu du plugin. Un modèle sans tarif connu (OpenAI, nouveaux modèles Claude) est compté au tarif le plus élevé (« estimation haute »), pour que la limite mensuelle reste efficace.', 'alesta' ); ?>
 						</p>
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=alesta-ai-budget' ) ); ?>" class="button"><?php esc_html_e( 'Ouvrir le Budget API', 'alesta' ); ?></a>
 					</div>
