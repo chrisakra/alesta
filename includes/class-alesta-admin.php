@@ -432,6 +432,8 @@ class Alesta_Admin {
 		self::register_pro_submenu( 'alesta-ai-pro-llms',         __( 'LLMs.txt pour IA', 'alesta' ),          __( 'Fichier de découverte pour ChatGPT, Claude, Gemini, Perplexity.', 'alesta' ),                                        "\xF0\x9F\xA4\x96", 'solo' );
 		self::register_pro_submenu( 'alesta-ai-pro-ai-metadata',  __( 'AI Metadata Generator', 'alesta' ),     __( 'Balises meta spécifiques aux crawlers IA.', 'alesta' ),                                                              "\xF0\x9F\xA7\xA0", 'solo' );
 		self::register_pro_submenu( 'alesta-ai-pro-duplicates',   __( 'Détecteur contenu dupliqué', 'alesta' ), __( 'Analyse et alertes sur le contenu similaire.', 'alesta' ),                                                          "\xF0\x9F\x93\x8B", 'solo' );
+		self::register_pro_submenu( 'alesta-ai-pro-geo',             __( 'Visibilité IA (GEO)', 'alesta' ),          __( 'Score de citabilité IA de vos pages (AI Overviews, ChatGPT, Perplexity) et recommandations.', 'alesta' ), "\xF0\x9F\xA4\x96", 'pro' );
+		self::register_pro_submenu( 'alesta-ai-pro-cannibalization', __( 'Détecteur de cannibalisation', 'alesta' ), __( 'Détecte les pages qui se concurrencent sur le même mot-clé.', 'alesta' ),                                  "\xF0\x9F\x94\x8D", 'solo' );
 
 		// 02 Contenu & Rédaction
 		self::register_pro_submenu( 'alesta-ai-pro-chatbot',      __( 'Chatbot IA', 'alesta' ),                __( 'Widget conversationnel connecté à Claude Haiku : personnalisable (ton, périmètre, mémoire).', 'alesta' ),           "\xF0\x9F\x92\xAC", 'pro' );
@@ -449,12 +451,16 @@ class Alesta_Admin {
 		self::register_pro_submenu( 'alesta-ai-pro-cwv',          __( 'Core Web Vitals', 'alesta' ),           __( 'Mesure LCP / INP / CLS en temps réel via l\'API Google PageSpeed Insights.', 'alesta' ),                             "\xF0\x9F\x93\x88", 'solo' );
 		self::register_pro_submenu( 'alesta-ai-pro-scripts',      __( 'Détecteur scripts bloquants', 'alesta' ), __( 'Identification et conseils defer/async par Claude.', 'alesta' ),                                                   "\xF0\x9F\x94\x80", 'solo' );
 		self::register_pro_submenu( 'alesta-ai-pro-redirects',    __( 'Redirections 404 auto', 'alesta' ),     __( 'Détection et suggestion IA des pages introuvables.', 'alesta' ),                                                     "\xF0\x9F\x94\x81", 'solo' );
+		self::register_pro_submenu( 'alesta-ai-pro-lazyload',     __( 'Lazy-load & dimensions', 'alesta' ),    __( 'Chargement différé des images + dimensions width/height anti-CLS.', 'alesta' ),                                      "\xF0\x9F\x96\xBC", 'solo' );
+		self::register_pro_submenu( 'alesta-ai-pro-preload',      __( 'Preload & Preconnect', 'alesta' ),      __( 'Précharge les ressources clés et accélère le LCP.', 'alesta' ),                                                      "\xE2\x9A\xA1", 'solo' );
+		self::register_pro_submenu( 'alesta-ai-pro-css-defer',    __( 'Optimisation CSS (defer)', 'alesta' ),  __( 'Charge le CSS non critique en asynchrone pour débloquer le rendu.', 'alesta' ),                                      "\xF0\x9F\x8E\xA8", 'pro' );
 
 		// 05 Sécurité & RGPD
 		self::register_pro_submenu( 'alesta-ai-pro-security',     __( 'Audit sécurité IA', 'alesta' ),         __( 'Scan permissions, fichiers sensibles, versions WP/PHP/plugins, recommandations Claude.', 'alesta' ),                 "\xF0\x9F\x9B\xA1", 'solo' );
 		self::register_pro_submenu( 'alesta-ai-pro-activity',     __( 'Journal d\'activité', 'alesta' ),       __( 'Log des actions admin (posts, login, plugins) avec alertes suspectes.', 'alesta' ),                                  "\xF0\x9F\x93\x93", 'solo' );
 		self::register_pro_submenu( 'alesta-ai-pro-updates',      __( 'Mises à jour planifiées', 'alesta' ),   __( 'Auto-update WP + plugins selon fenêtre horaire choisie.', 'alesta' ),                                                "\xF0\x9F\x94\x84", 'pro' );
 		self::register_pro_submenu( 'alesta-ai-pro-roles',        __( 'Rôles avancés', 'alesta' ),             __( 'Contrôle fin des permissions par rôle et par module.', 'alesta' ),                                                   "\xF0\x9F\x91\xA4", 'pro' );
+		self::register_pro_submenu( 'alesta-ai-pro-popups',       __( 'Pop-ups & Conversions', 'alesta' ),     __( 'Fenêtres de conversion ciblées : contenu, ciblage, déclencheurs, fréquence.', 'alesta' ),                          "\xF0\x9F\x93\xA2", 'pro' );
 
 		// 08 Rapports client
 		self::register_pro_submenu( 'alesta-ai-pro-pdf',          __( 'Rapport PDF SEO', 'alesta' ),           __( 'Génération A4 paysage : score global, meta manquants, breakdown par page — pour envoi client.', 'alesta' ),          "\xF0\x9F\x93\x84", 'pro' );
@@ -638,6 +644,22 @@ class Alesta_Admin {
 						'alesta-ai-pro-duplicates',
 						'solo'
 					);
+					self::card_pro(
+						"\xF0\x9F\xA4\x96", // 🤖
+						__( 'Visibilité IA (GEO)', 'alesta' ),
+						__( 'Score de citabilité IA de vos pages (AI Overviews, ChatGPT, Perplexity) et recommandations.', 'alesta' ),
+						'alesta-ai-pro-geo',
+						'pro',
+						true
+					);
+					self::card_pro(
+						"\xF0\x9F\x94\x8D", // 🔍
+						__( 'Détecteur de cannibalisation', 'alesta' ),
+						__( 'Détecte les pages qui se concurrencent sur le même mot-clé.', 'alesta' ),
+						'alesta-ai-pro-cannibalization',
+						'solo',
+						true
+					);
 					?>
 				</div>
 			</div>
@@ -796,6 +818,30 @@ class Alesta_Admin {
 						'alesta-ai-pro-redirects',
 						'solo'
 					);
+					self::card_pro(
+						"\xF0\x9F\x96\xBC", // 🖼
+						__( 'Lazy-load & dimensions', 'alesta' ),
+						__( 'Chargement différé des images + dimensions width/height anti-CLS.', 'alesta' ),
+						'alesta-ai-pro-lazyload',
+						'solo',
+						true
+					);
+					self::card_pro(
+						"\xE2\x9A\xA1", // ⚡
+						__( 'Preload & Preconnect', 'alesta' ),
+						__( 'Précharge les ressources clés et accélère le LCP.', 'alesta' ),
+						'alesta-ai-pro-preload',
+						'solo',
+						true
+					);
+					self::card_pro(
+						"\xF0\x9F\x8E\xA8", // 🎨
+						__( 'Optimisation CSS (defer)', 'alesta' ),
+						__( 'Charge le CSS non critique en asynchrone pour débloquer le rendu.', 'alesta' ),
+						'alesta-ai-pro-css-defer',
+						'pro',
+						true
+					);
 					?>
 				</div>
 			</div>
@@ -921,6 +967,14 @@ class Alesta_Admin {
 						'alesta-ai-budget',
 						__( 'Ouvrir', 'alesta' )
 					);
+					self::card_pro(
+						"\xF0\x9F\x93\xA2", // 📢
+						__( 'Pop-ups & Conversions', 'alesta' ),
+						__( 'Fenêtres de conversion ciblées : contenu, ciblage, déclencheurs, fréquence.', 'alesta' ),
+						'alesta-ai-pro-popups',
+						'pro',
+						true
+					);
 					?>
 				</div>
 			</div>
@@ -1007,7 +1061,16 @@ class Alesta_Admin {
 	 * $slug points to the teaser sub-menu registered by register_menu().
 	 * $tier is 'solo' (default) or 'pro' — controls badge + status pill.
 	 */
-	private static function card_pro( $icon, $name, $desc, $slug, $tier = 'solo' ) {
+	/**
+	 * Pastille « NEW » pour repérer les modules récemment ajoutés.
+	 */
+	private static function render_new_badge() {
+		?>
+		<span class="alesta-new-badge" style="display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;background:#ef4444;color:#fff;font-size:10px;font-weight:700;letter-spacing:.04em;line-height:1.5;vertical-align:middle;"><?php esc_html_e( 'NEW', 'alesta' ); ?></span>
+		<?php
+	}
+
+	private static function card_pro( $icon, $name, $desc, $slug, $tier = 'solo', $is_new = false ) {
 		// Si Alesta AI Pro (addon) est actif, on redirige vers la vraie page Pro
 		// (slug sans "-pro-" au milieu) et on rend la carte comme une carte
 		// active verte. Sinon, comportement teaser normal (page interne + CTA
@@ -1030,6 +1093,7 @@ class Alesta_Admin {
 					<div class="amc-name">
 						<?php echo esc_html( $name ); ?>
 						<span class="<?php echo $is_pro ? 'alesta-pro-badge alesta-pro-badge--pro' : 'alesta-pro-badge'; ?>"><?php echo esc_html( $is_pro ? 'Pro' : 'Solo' ); ?></span>
+						<?php if ( $is_new ) { self::render_new_badge(); } ?>
 					</div>
 					<div class="amc-desc"><?php echo esc_html( $desc ); ?></div>
 				</div>
@@ -1048,7 +1112,7 @@ class Alesta_Admin {
 				<span class="amc-status amc-status-ok"><?php echo esc_html( self::active_badge_label() ); ?></span>
 				<div class="amc-icon"><?php echo esc_html( $icon ); ?></div>
 				<div class="amc-info">
-					<div class="amc-name"><?php echo esc_html( $name ); ?></div>
+					<div class="amc-name"><?php echo esc_html( $name ); ?><?php if ( $is_new ) { self::render_new_badge(); } ?></div>
 					<div class="amc-desc"><?php echo esc_html( $desc ); ?></div>
 				</div>
 				<div class="amc-footer">
@@ -1073,6 +1137,7 @@ class Alesta_Admin {
 				<div class="amc-name">
 					<?php echo esc_html( $name ); ?>
 					<span class="<?php echo esc_attr( $badge_cls ); ?>"><?php echo esc_html( $badge_lbl ); ?></span>
+					<?php if ( $is_new ) { self::render_new_badge(); } ?>
 				</div>
 				<div class="amc-desc"><?php echo esc_html( $desc ); ?></div>
 			</div>

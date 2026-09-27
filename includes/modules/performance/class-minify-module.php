@@ -299,38 +299,115 @@ class Alesta_Minify_Module {
     // =========================================================================
 
     public static function minify_js( string $js ): string {
-        // Préserver les chaînes de caractères pour ne pas y toucher
-        $preserved = [];
-        $idx       = 0;
+        // Retrait des commentaires en UN SEUL passage, conscient du contexte
+        // (chaînes ' " `, littéraux regex). L'ancienne approche par regex
+        // confondait une apostrophe de commentaire français (d', l', n', qu')
+        // avec un début de chaîne, appariait avec une apostrophe de code plus
+        // loin, et supprimait de larges pans de code (JS invalide en sortie).
+        $js = self::strip_js_comments( $js );
 
-        $js = preg_replace_callback(
-            '/(\'(?:[^\'\\\\]|\\\\.)*\'|"(?:[^"\\\\]|\\\\.)*"|`(?:[^`\\\\]|\\\\.)*`)/s',
-            function ( $m ) use ( &$preserved, &$idx ) {
-                $key            = '__ALESTASTR' . $idx . '__';
-                $preserved[$key] = $m[0];
-                $idx++;
-                return $key;
-            },
-            $js
-        );
-
-        // Supprimer commentaires /* ... */
-        $js = preg_replace( '/\/\*[\s\S]*?\*\//', '', $js );
-        // Supprimer commentaires // (mais pas les URL http://)
-        $js = preg_replace( '/(?<![\'":])\/\/(?![\/:]).*$/m', '', $js );
-        // Réduire les espaces/tabulations en un seul espace
+        // Espaces : collapse horizontal, trim des bords de ligne, lignes vides.
+        // On CONSERVE les sauts de ligne simples pour préserver l'ASI.
         $js = preg_replace( '/[ \t]+/', ' ', $js );
-        // Supprimer espaces en début et fin de ligne
         $js = preg_replace( '/^[ \t]+|[ \t]+$/m', '', $js );
-        // Supprimer lignes vides
         $js = preg_replace( '/\n{2,}/', "\n", $js );
 
-        // Restaurer les chaînes
-        foreach ( $preserved as $key => $val ) {
-            $js = str_replace( $key, $val, $js );
+        return trim( $js );
+    }
+
+    /**
+     * Retire les commentaires JS (// et /* *​/) en respectant les chaînes,
+     * les gabarits (`) et les littéraux d'expression régulière. Scanner
+     * caractère par caractère : aucune donnée dans une chaîne/regex n'est
+     * altérée, et aucune apostrophe de commentaire n'est prise pour un
+     * délimiteur de chaîne.
+     */
+    private static function strip_js_comments( string $js ): string {
+        $len  = strlen( $js );
+        $out  = '';
+        $i    = 0;
+        $prev = '';   // dernier caractère significatif (hors espaces)
+        $word = '';   // identifiant courant en cours d'accumulation
+        $prevWord = ''; // dernier identifiant complet (pour return/typeof…)
+
+        while ( $i < $len ) {
+            $c  = $js[$i];
+            $c2 = ( $i + 1 < $len ) ? $js[$i + 1] : '';
+
+            // Commentaire ligne //
+            if ( $c === '/' && $c2 === '/' ) {
+                $i += 2;
+                while ( $i < $len && $js[$i] !== "\n" ) { $i++; }
+                continue;
+            }
+            // Commentaire bloc /* */
+            if ( $c === '/' && $c2 === '*' ) {
+                $i += 2;
+                while ( $i < $len && ! ( $js[$i] === '*' && ( $i + 1 < $len ) && $js[$i + 1] === '/' ) ) { $i++; }
+                $i += 2; // saute la fermeture
+                continue;
+            }
+            // Chaîne ' " `
+            if ( $c === '"' || $c === "'" || $c === '`' ) {
+                $q = $c; $out .= $c; $i++;
+                while ( $i < $len ) {
+                    $ch = $js[$i]; $out .= $ch;
+                    if ( $ch === '\\' && $i + 1 < $len ) { $out .= $js[$i + 1]; $i += 2; continue; }
+                    $i++;
+                    if ( $ch === $q ) { break; }
+                }
+                $prev = $q; $word = ''; $prevWord = '';
+                continue;
+            }
+            // Littéral regex /…/flags si le contexte l'autorise
+            if ( $c === '/' && self::js_regex_allowed( $prev, $prevWord ) ) {
+                $out .= $c; $i++;
+                $inClass = false;
+                while ( $i < $len ) {
+                    $ch = $js[$i];
+                    if ( $ch === "\n" ) { break; } // une regex ne traverse pas une ligne
+                    $out .= $ch;
+                    if ( $ch === '\\' && $i + 1 < $len ) { $out .= $js[$i + 1]; $i += 2; continue; }
+                    if ( $ch === '[' ) { $inClass = true; }
+                    elseif ( $ch === ']' ) { $inClass = false; }
+                    elseif ( $ch === '/' && ! $inClass ) { $i++; break; }
+                    $i++;
+                }
+                while ( $i < $len && ctype_alpha( $js[$i] ) ) { $out .= $js[$i]; $i++; } // flags
+                $prev = '/'; $word = ''; $prevWord = '';
+                continue;
+            }
+
+            // Caractère normal
+            $out .= $c;
+            if ( ctype_alnum( $c ) || $c === '_' || $c === '$' ) {
+                $word .= $c;
+            } else {
+                if ( $word !== '' ) { $prevWord = $word; }
+                $word = '';
+            }
+            if ( $c !== ' ' && $c !== "\t" && $c !== "\n" && $c !== "\r" ) { $prev = $c; }
+            $i++;
         }
 
-        return trim($js);
+        return $out;
+    }
+
+    /**
+     * Décide si un « / » démarre un littéral regex (vs une division) selon le
+     * dernier caractère/identifiant significatif. Heuristique standard.
+     */
+    private static function js_regex_allowed( string $prev, string $prevWord ): bool {
+        if ( $prev === '' ) { return true; }
+        // Après un opérateur ou une ponctuation d'ouverture → regex.
+        if ( strpos( "(,=:[!&|?{};<>+-*/%^~", $prev ) !== false ) { return true; }
+        // Après un mot-clé (return /x/, typeof /x/…) → regex.
+        if ( ctype_alnum( $prev ) || $prev === '_' || $prev === '$' ) {
+            $kw = array( 'return', 'typeof', 'instanceof', 'in', 'of', 'new', 'delete', 'void', 'do', 'else', 'yield', 'case', 'throw', 'await' );
+            return in_array( $prevWord, $kw, true );
+        }
+        // Après ) ] } . ou un littéral → division.
+        return false;
     }
 
     // =========================================================================
