@@ -1,6 +1,4 @@
 jQuery(function ($) {
-    console.log('[Alesta Errors] errors.js charge. AlestaErrors:', typeof AlestaErrors !== 'undefined' ? 'OK' : 'MANQUANT');
-    console.log('[Alesta Errors] Bouton scan:', $('#btn-scan').length);
 
     // =========================================================================
     // FILTRES
@@ -31,7 +29,6 @@ jQuery(function ($) {
     // =========================================================================
     // Confirmation inline au lieu de confirm() natif
     $('#btn-scan').on('click', function () {
-        console.log('[Alesta Errors] Bouton scan clique');
         var $btn = $(this);
 
         // Afficher confirmation inline
@@ -62,7 +59,6 @@ jQuery(function ($) {
             action: 'alesta_errors_scan',
             nonce:  AlestaErrors.nonce,
         }, function (r) {
-            console.log('[Alesta Errors] Reponse scan:', r);
             if (!r.success) {
                 $btn.prop('disabled', false).text('Lancer le scan');
                 alert(r.data && r.data.message ? r.data.message : 'Erreur');

@@ -543,7 +543,10 @@ class Alesta_Minify_Module {
     }
 
     private static function get_cache_path( string $local_path, string $ext ): string {
-        $hash = substr( md5($local_path), 0, 8 );
+        // Sel de version du moteur : les fichiers produits par l'ancien
+        // minifieur ne sont jamais invalidés (seul le mtime de la source est
+        // comparé). Incrémenter si minify_css/minify_js changent.
+        $hash = substr( md5( $local_path . '|engine-2' ), 0, 8 );
         $name = pathinfo($local_path, PATHINFO_FILENAME);
         // Nettoyer le nom (enlever ".min" si présent)
         $name = str_replace('.min', '', $name);

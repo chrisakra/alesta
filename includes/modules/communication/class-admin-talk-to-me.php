@@ -257,6 +257,22 @@ class Alesta_Admin_TalkToMe {
                         </div>
                     </div>
                 </div>
+
+                <div class="alesta-ttm-card">
+                    <h3><?php esc_html_e('Crédit', 'alesta'); ?></h3>
+                    <?php
+                    // Opt-in (règle 10 WordPress.org), décoché par défaut, sans
+                    // condition de plan. L'id #ttm-hide-branding est conservé car
+                    // talk-to-me-admin.js lit cette case et l'envoie sous la clé
+                    // historique hide_branding : ajax_save() l'interprète comme
+                    // « afficher le crédit ».
+                    ?>
+                    <label class="alesta-ttm-check">
+                        <input type="checkbox" id="ttm-hide-branding" <?php checked(!empty($s['show_branding'])); ?>>
+                        <?php esc_html_e('Afficher un lien « Propulsé par Alesta AI »', 'alesta'); ?>
+                    </label>
+                    <p class="description"><?php esc_html_e('Désactivé par défaut. Si vous le cochez, un petit lien vers alesta-ai.com apparaît sous les canaux du widget.', 'alesta'); ?></p>
+                </div>
             </div>
 
             <div class="alesta-ttm-actions">
@@ -355,10 +371,16 @@ class Alesta_Admin_TalkToMe {
         $clean['page_ids']        = array_values(array_filter(array_map('intval', (array) ($data['page_ids'] ?? []))));
         $clean['hours_enabled']   = ! empty($data['hours_enabled']);
         $clean['offline_message'] = sanitize_textarea_field((string) ($data['offline_message'] ?? ''));
-        // Version Free : hide_branding est TOUJOURS forcé à false pour conserver
-        // la mention "Propulsé par Alesta" (publicité passive). Le schéma est
-        // préservé pour permettre une future upgrade Pro sans migration.
-        $clean['hide_branding']   = false;
+        // Crédit « Propulsé par Alesta AI » : opt-in explicite, pour tous les
+        // plans (règle 10 WordPress.org). La clé show_branding est prioritaire ;
+        // à défaut, la clé historique hide_branding transmise par
+        // talk-to-me-admin.js porte l'état de la case « Afficher » (voir
+        // render_page). Absente ou vide : crédit masqué.
+        if ( array_key_exists('show_branding', $data) ) {
+            $clean['show_branding'] = ! empty($data['show_branding']);
+        } else {
+            $clean['show_branding'] = ! empty($data['hide_branding']);
+        }
 
         if ( isset($data['hours']) && is_array($data['hours']) ) {
             foreach ( $clean['hours'] as $day => $_default ) {
