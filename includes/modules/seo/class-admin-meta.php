@@ -115,7 +115,7 @@ class Alesta_Admin_Meta {
             <div class="notice notice-warning" style="margin:1rem 0 0;">
                 <p>
                     <strong><?php esc_html_e('Aucune clé API n\'est configurée pour le fournisseur IA sélectionné.', 'alesta'); ?></strong>
-                    <?php esc_html_e('L\'analyse du site fonctionne, mais la génération par l\'IA nécessite votre clé : rendez-vous dans Alesta AI &rarr; Configuration.', 'alesta'); ?>
+                    <?php esc_html_e('L\'analyse du site fonctionne, mais la génération par l\'IA nécessite votre clé : rendez-vous dans Alesta AI → Configuration.', 'alesta'); ?>
                 </p>
                 <p>
                     <a class="button button-primary" href="<?php echo esc_url( $settings_url ); ?>"><?php esc_html_e('Configurer la clé API', 'alesta'); ?></a>

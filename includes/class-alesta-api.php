@@ -220,11 +220,7 @@ class Alesta_API {
 	public static function missing_key_error(): WP_Error {
 		return new WP_Error(
 			'no_api_key',
-			sprintf(
-				/* translators: %s: URL of the Alesta AI Configuration page */
-				__( 'Aucune clé API n\'est configurée pour le fournisseur IA sélectionné. Saisissez-la dans Alesta AI &rarr; Configuration : %s', 'alesta' ),
-				self::settings_url()
-			),
+			__( 'Aucune clé API n\'est configurée pour le fournisseur IA sélectionné. Saisissez-la dans Alesta AI → Configuration.', 'alesta' ),
 			array( 'settings_url' => self::settings_url() )
 		);
 	}
@@ -237,11 +233,7 @@ class Alesta_API {
 	public static function missing_model_error(): WP_Error {
 		return new WP_Error(
 			'no_model',
-			sprintf(
-				/* translators: %s: URL of the Alesta AI Configuration page */
-				__( 'Aucun modèle n\'est sélectionné pour ce fournisseur IA. Choisissez-en un dans Alesta AI &rarr; Configuration : %s', 'alesta' ),
-				self::settings_url()
-			),
+			__( 'Aucun modèle n\'est sélectionné pour ce fournisseur IA. Choisissez-en un dans Alesta AI → Configuration.', 'alesta' ),
 			array( 'settings_url' => self::settings_url() )
 		);
 	}

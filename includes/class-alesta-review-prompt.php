@@ -338,7 +338,7 @@ class Alesta_Review_Prompt {
 		}
 		return sprintf(
 			/* translators: %s : lien vers la page d'avis WordPress.org. */
-			esc_html__( 'Alesta AI est développé en France et restera gratuit. %s', 'alesta' ),
+			esc_html__( 'Alesta AI est développé en France. %s', 'alesta' ),
 			sprintf(
 				'<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
 				esc_url( self::REVIEW_URL ),

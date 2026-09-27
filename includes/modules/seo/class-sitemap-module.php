@@ -451,7 +451,7 @@ class Alesta_Sitemap_Module {
 
         $lines   = [];
         $lines[] = '<?xml version="1.0" encoding="UTF-8"?>';
-        $lines[] = '<!-- Sitemap genere par Alesta v' . ALESTA_VERSION . ' (https://www.alesta-computer.com) -->';
+        $lines[] = '<!-- Sitemap généré par Alesta v' . ALESTA_VERSION . ' (https://www.alesta-computer.com) -->';
         $lines[] = '<!-- Mis a jour le : ' . current_time('Y-m-d H:i:s') . ' -->';
         $lines[] = '<urlset ' . $ns . '>';
 
@@ -620,7 +620,7 @@ class Alesta_Sitemap_Module {
         $counts = $this->count_urls($opts);
 
         wp_send_json_success([
-            'message'  => 'sitemap.xml genere avec succes (' . $counts['total'] . ' URLs).',
+            'message'  => 'sitemap.xml généré avec succès (' . $counts['total'] . ' URLs).',
             'size'     => filesize(self::sitemap_path()),
             'last_gen' => get_option(self::LAST_GEN_KEY),
             'counts'   => $counts,

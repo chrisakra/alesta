@@ -132,18 +132,18 @@ class Alesta_Admin_Sitemap {
                             </div>
                         </div>
 
-                        <!-- Bouton generer -->
+                        <!-- Bouton générer -->
                         <button id="btn-sitemap-generate" class="button button-primary" style="width:100%;padding:10px;font-size:14px;height:auto;">
-                            Generer le sitemap
+                            Générer le sitemap
                         </button>
                         <div id="sitemap-feedback" style="display:none;margin-top:12px;font-size:13px;padding:10px 14px;border-radius:6px;"></div>
                     </div>
 
-                    <!-- Priorites appliquees -->
+                    <!-- Priorités appliquées -->
                     <div style="background:#f0fdf4;border:1px solid #d1fae5;border-radius:8px;padding:14px 16px;font-size:12px;color:#065f46;">
-                        <strong>Priorites appliquees :</strong><br>
+                        <strong>Priorités appliquées :</strong><br>
                         Accueil : 1.0 &nbsp;·&nbsp; Pages : 0.8 &nbsp;·&nbsp; Produits : 0.7 &nbsp;·&nbsp; Articles : 0.6<br>
-                        Categories produits : 0.6 &nbsp;·&nbsp; Autres categories : 0.4 &nbsp;·&nbsp; Auteurs : 0.4
+                        Catégories produits : 0.6 &nbsp;·&nbsp; Autres catégories : 0.4 &nbsp;·&nbsp; Auteurs : 0.4
                     </div>
                 </div>
 
@@ -160,15 +160,15 @@ class Alesta_Admin_Sitemap {
                     </div>
 
                     <div id="sitemap-native-notice" style="display:none;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:14px 16px;font-size:13px;color:#1e40af;margin-bottom:16px;">
-                        <strong>Sitemap WordPress natif :</strong> WordPress 5.5+ genere deja un sitemap a
-                        <span id="sitemap-wp-native-url"></span>. Le fichier Alesta vous donne plus de controle (images, priorites, taxonomies personnalisees).
+                        <strong>Sitemap WordPress natif :</strong> WordPress 5.5+ génère déjà un sitemap à
+                        <span id="sitemap-wp-native-url"></span>. Le fichier Alesta vous donne plus de contrôle (images, priorités, taxonomies personnalisées).
                     </div>
 
                     <div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px;">
                         <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:8px;">EXTENSION IMAGE (Google)</div>
                         <p style="font-size:12px;color:#6b7280;margin:0;line-height:1.6;">
-                            Quand les images sont activees, le fichier XML inclut la balise <code>image:image</code> pour chaque page.
-                            Cela aide Google Images a decouvrir et indexer vos photos de produits.
+                            Quand les images sont activées, le fichier XML inclut la balise <code>image:image</code> pour chaque page.
+                            Cela aide Google Images à découvrir et indexer vos photos de produits.
                         </p>
                     </div>
                 </div>
@@ -177,7 +177,7 @@ class Alesta_Admin_Sitemap {
 
             <!-- Paramètres avancés -->
             <div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:20px;margin-top:20px;">
-                <h3 style="margin:0 0 16px;font-size:15px;color:#111827;">Parametres avances</h3>
+                <h3 style="margin:0 0 16px;font-size:15px;color:#111827;">Paramètres avancés</h3>
 
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
 
@@ -188,10 +188,10 @@ class Alesta_Admin_Sitemap {
                                 <input type="checkbox" id="opt-auto-regen" style="width:16px;height:16px;cursor:pointer;">
                             </div>
                             <div>
-                                <div style="font-size:13px;font-weight:600;color:#111827;margin-bottom:4px;">Mise a jour automatique</div>
+                                <div style="font-size:13px;font-weight:600;color:#111827;margin-bottom:4px;">Mise à jour automatique</div>
                                 <div style="font-size:12px;color:#6b7280;line-height:1.5;">
-                                    Le sitemap est régénérée automatiquement quand un article ou une page est publié, modifié ou supprimé.
-                                    <br><span style="color:#9ca3af;font-size:11px;">Delai de 5 minutes entre deux regenerations.</span>
+                                    Le sitemap est régénéré automatiquement quand un article ou une page est publié, modifié ou supprimé.
+                                    <br><span style="color:#9ca3af;font-size:11px;">Délai de 5 minutes entre deux régénérations.</span>
                                 </div>
                             </div>
                         </div>
@@ -207,7 +207,7 @@ class Alesta_Admin_Sitemap {
                                 <div style="font-size:13px;font-weight:600;color:#111827;margin-bottom:4px;">Désactiver le sitemap natif</div>
                                 <div style="font-size:12px;color:#6b7280;line-height:1.5;">
                                     Désactive le sitemap généré par WordPress (wp-sitemap.xml) et le sitemap de Yoast SEO s'il est actif.
-                                    <br><span id="native-yoast-badge" style="display:none;margin-top:4px;display:inline-block;font-size:11px;background:#eff6ff;color:#1e40af;padding:2px 8px;border-radius:20px;border:1px solid #bfdbfe;">Yoast SEO detecte</span>
+                                    <br><span id="native-yoast-badge" style="display:none;margin-top:4px;display:inline-block;font-size:11px;background:#eff6ff;color:#1e40af;padding:2px 8px;border-radius:20px;border:1px solid #bfdbfe;">Yoast SEO détecté</span>
                                 </div>
                             </div>
                         </div>
@@ -217,7 +217,7 @@ class Alesta_Admin_Sitemap {
 
                 <div style="margin-top:16px;display:flex;align-items:center;gap:12px;">
                     <button id="btn-sitemap-save-settings" class="button button-primary" style="font-size:13px;">
-                        Enregistrer les parametres
+                        Enregistrer les paramètres
                     </button>
                     <div id="settings-feedback" style="display:none;font-size:13px;"></div>
                 </div>

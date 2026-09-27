@@ -34,7 +34,7 @@ jQuery(function ($) {
         $('#sitemap-file-status').html(
             state.exists
                 ? '<span style="color:#065f46;">Fichier present (' + Math.round(state.size / 1024 * 10) / 10 + ' Ko)</span>'
-                : '<span style="color:#f59e0b;">Pas encore genere</span>'
+                : '<span style="color:#f59e0b;">Pas encore généré</span>'
         );
 
         $('#sitemap-gen-date').text(state.last_gen  || 'Jamais');
@@ -281,11 +281,11 @@ jQuery(function ($) {
             auto_regen:     $('#opt-auto-regen').is(':checked') ? '1' : '',
             disable_native: $('#opt-disable-native').is(':checked') ? '1' : '',
         }, function (r) {
-            $btn.prop('disabled', false).text('Enregistrer les parametres');
+            $btn.prop('disabled', false).text('Enregistrer les paramètres');
             if (r.success) {
                 $('#settings-feedback')
                     .css({'color': '#065f46', 'background': '#f0fdf4', 'border': '1px solid #d1fae5', 'padding': '6px 12px', 'border-radius': '6px'})
-                    .text('Parametres enregistres.')
+                    .text('Paramètres enregistrés.')
                     .show();
                 setTimeout(function () { $('#settings-feedback').fadeOut(400); }, 3000);
             } else {
@@ -295,7 +295,7 @@ jQuery(function ($) {
                     .show();
             }
         }).fail(function () {
-            $btn.prop('disabled', false).text('Enregistrer les parametres');
+            $btn.prop('disabled', false).text('Enregistrer les paramètres');
         });
     });
 
@@ -319,7 +319,7 @@ jQuery(function ($) {
             nonce:   AlestaSitemap.nonce,
             options: JSON.stringify(opts),
         }, function (r) {
-            $btn.prop('disabled', false).text('Generer le sitemap');
+            $btn.prop('disabled', false).text('Générer le sitemap');
             if (r.success) {
                 toast(r.data.message);
                 feedback('ok', r.data.message);
@@ -334,8 +334,8 @@ jQuery(function ($) {
                 feedback('error', r.data && r.data.message ? r.data.message : 'Erreur inconnue');
             }
         }).fail(function () {
-            $btn.prop('disabled', false).text('Generer le sitemap');
-            feedback('error', 'Erreur reseau.');
+            $btn.prop('disabled', false).text('Générer le sitemap');
+            feedback('error', 'Erreur réseau.');
         });
     });
 
