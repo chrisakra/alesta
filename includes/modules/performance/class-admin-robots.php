@@ -29,7 +29,7 @@ class Alesta_Admin_Robots {
                     <span class="dashicons dashicons-shield" style="font-size:28px;color:#a0aec0;"></span>
                     <div>
                         <h1 style="color:#fff;margin:0;font-size:18px;">Robots.txt</h1>
-                        <p style="color:#94a3b8;margin:0;font-size:13px;">Controle des robots d'indexation des moteurs de recherche</p>
+                        <p style="color:#94a3b8;margin:0;font-size:13px;">Contrôle des robots d’indexation des moteurs de recherche</p>
                     </div>
                 </div>
                 <div id="robots-status-bar" style="font-size:12px;color:#94a3b8;">Chargement...</div>
@@ -44,11 +44,11 @@ class Alesta_Admin_Robots {
                             <div id="robots-file-status" style="font-size:13px;font-weight:600;"></div>
                         </div>
                         <div>
-                            <div style="font-size:11px;color:#9ca3af;margin-bottom:2px;">ECRITURE</div>
+                            <div style="font-size:11px;color:#9ca3af;margin-bottom:2px;">ÉCRITURE</div>
                             <div id="robots-write-status" style="font-size:13px;font-weight:600;"></div>
                         </div>
                         <div>
-                            <div style="font-size:11px;color:#9ca3af;margin-bottom:2px;">DERNIERE SAUVEGARDE</div>
+                            <div style="font-size:11px;color:#9ca3af;margin-bottom:2px;">DERNIÈRE SAUVEGARDE</div>
                             <div id="robots-backup-date" style="font-size:13px;color:#374151;"></div>
                         </div>
                         <div>
@@ -59,15 +59,15 @@ class Alesta_Admin_Robots {
                     <div style="display:flex;gap:8px;">
                         <button id="btn-robots-backup" class="button" style="font-size:12px;">Sauvegarder</button>
                         <button id="btn-robots-restore" class="button" style="font-size:12px;color:#991b1b;border-color:#fca5a5;" disabled>Restaurer</button>
-                        <button id="btn-robots-ping" class="button" style="font-size:12px;">Verifier accessibilite</button>
+                        <button id="btn-robots-ping" class="button" style="font-size:12px;">Vérifier l’accessibilité</button>
                     </div>
                 </div>
             </div>
 
             <!-- Alerte WordPress virtuel -->
             <div id="robots-virtual-notice" style="display:none;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#1e40af;">
-                <strong>Note :</strong> Aucun fichier robots.txt physique n'existe. WordPress genere un robots.txt virtuel a la volee.
-                En enregistrant via ce module, un fichier physique sera cree et aura la priorite sur le virtuel.
+                <strong>Note :</strong> Aucun fichier robots.txt physique n’existe. WordPress génère un robots.txt virtuel à la volée.
+                En enregistrant via ce module, un fichier physique sera créé et aura la priorité sur le virtuel.
             </div>
 
             <!-- Resultat ping -->
@@ -79,12 +79,12 @@ class Alesta_Admin_Robots {
                 <!-- Colonne gauche : editeur -->
                 <div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:20px;">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-                        <h3 style="margin:0;font-size:15px;color:#111827;">Editeur robots.txt</h3>
-                        <button id="btn-robots-reset" class="button" style="font-size:12px;">Reinitialiser par defaut</button>
+                        <h3 style="margin:0;font-size:15px;color:#111827;">Éditeur robots.txt</h3>
+                        <button id="btn-robots-reset" class="button" style="font-size:12px;">Réinitialiser par défaut</button>
                     </div>
                     <p style="font-size:13px;color:#6b7280;margin:0 0 12px;line-height:1.6;">
                         Indiquez aux robots d'indexation quelles pages explorer ou ignorer.
-                        La directive <code>Disallow: /wp-admin/</code> est recommandee pour tous les sites.
+                        La directive <code>Disallow: /wp-admin/</code> est recommandée pour tous les sites.
                     </p>
                     <textarea id="robots-editor"
                         style="width:100%;height:320px;font-family:monospace;font-size:12px;line-height:1.6;padding:12px;border:1px solid #d1d5db;border-radius:6px;resize:vertical;box-sizing:border-box;"
@@ -98,7 +98,7 @@ class Alesta_Admin_Robots {
                 <!-- Colonne droite : contenu par defaut + aide -->
                 <div>
                     <div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:20px;margin-bottom:16px;">
-                        <h3 style="margin:0 0 10px;font-size:14px;color:#111827;">Contenu recommande</h3>
+                        <h3 style="margin:0 0 10px;font-size:14px;color:#111827;">Contenu recommandé</h3>
                         <pre id="robots-default-preview" style="background:#1e2a3a;color:#a8d8a8;padding:14px;border-radius:6px;font-size:11px;overflow:auto;max-height:200px;line-height:1.6;margin:0;white-space:pre-wrap;"></pre>
                         <button id="btn-use-default" class="button" style="margin-top:10px;font-size:12px;">Utiliser ce contenu</button>
                     </div>
@@ -107,7 +107,7 @@ class Alesta_Admin_Robots {
                         <ul style="margin:0;padding:0 0 0 16px;font-size:12px;color:#713f12;line-height:1.8;">
                             <li><code>User-agent: *</code> — Tous les robots</li>
                             <li><code>User-agent: Googlebot</code> — Google uniquement</li>
-                            <li><code>Disallow: /page/</code> — Bloquer un repertoire</li>
+                            <li><code>Disallow: /page/</code> — Bloquer un répertoire</li>
                             <li><code>Allow: /page/accueil</code> — Autoriser une URL</li>
                             <li><code>Sitemap: URL</code> — Indiquer le sitemap</li>
                         </ul>

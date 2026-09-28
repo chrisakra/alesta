@@ -29,11 +29,11 @@ jQuery(function ($) {
     // =========================================================================
     function renderState() {
         $('#sitemap-global-status').show();
-        $('#sitemap-status-bar').text('Sitemap charge').css('color', '#6ee7b7');
+        $('#sitemap-status-bar').text('Sitemap chargé').css('color', '#6ee7b7');
 
         $('#sitemap-file-status').html(
             state.exists
-                ? '<span style="color:#065f46;">Fichier present (' + Math.round(state.size / 1024 * 10) / 10 + ' Ko)</span>'
+                ? '<span style="color:#065f46;">Fichier présent (' + Math.round(state.size / 1024 * 10) / 10 + ' Ko)</span>'
                 : '<span style="color:#f59e0b;">Pas encore généré</span>'
         );
 
@@ -46,7 +46,7 @@ jQuery(function ($) {
             $('#btn-sitemap-delete').prop('disabled', false);
         }
         if (!state.can_write) {
-            $('#btn-sitemap-generate').prop('disabled', true).attr('title', 'Dossier racine non accessible en ecriture');
+            $('#btn-sitemap-generate').prop('disabled', true).attr('title', 'Dossier racine non accessible en écriture');
         }
         if (state.wp_native) {
             $('#sitemap-wp-native-url').html('<a href="' + escHtml(state.wp_native) + '" target="_blank" style="color:#1e40af;">' + escHtml(state.wp_native) + '</a>');
@@ -72,7 +72,7 @@ jQuery(function ($) {
                     + ' <span style="color:#9ca3af;font-size:12px;">(' + info.count + ')</span></span>'
                     + '</label>';
         });
-        $('#opt-post-types').html(ptHtml || '<span style="color:#9ca3af;font-size:12px;">Aucun contenu trouve</span>');
+        $('#opt-post-types').html(ptHtml || '<span style="color:#9ca3af;font-size:12px;">Aucun contenu trouvé</span>');
 
         // --- Images ---
         $('#opt-images').prop('checked', saved.include_images !== false);
@@ -201,7 +201,7 @@ jQuery(function ($) {
 
         // Taxonomies
         if (counts.terms > 0) {
-            html += countRow('Categories & Tags', counts.terms, '#5b21b6');
+            html += countRow('Catégories & Tags', counts.terms, '#5b21b6');
         }
 
         // Auteurs
@@ -225,7 +225,7 @@ jQuery(function ($) {
                   + '</div>';
         }
 
-        $('#sitemap-counts-list').html(html || '<span style="color:#9ca3af;">Aucun contenu selectionne</span>');
+        $('#sitemap-counts-list').html(html || '<span style="color:#9ca3af;">Aucun contenu sélectionné</span>');
     }
 
     function countRow(label, count, color) {
@@ -307,11 +307,11 @@ jQuery(function ($) {
     $('#btn-sitemap-generate').on('click', function () {
         var opts = collectOptions();
         if (!opts.post_types.length && !opts.include_taxonomies && !opts.include_authors) {
-            alert('Selectionnez au moins un type de contenu a inclure.');
+            alert('Sélectionnez au moins un type de contenu à inclure.');
             return;
         }
 
-        var $btn = $(this).prop('disabled', true).text('Generation en cours...');
+        var $btn = $(this).prop('disabled', true).text('Génération en cours...');
         $('#sitemap-feedback').hide();
 
         $.post(AlestaSitemap.ajax_url, {
@@ -357,7 +357,7 @@ jQuery(function ($) {
                 state.last_ping = r.data.last_ping;
                 $('#sitemap-ping-date').text(r.data.last_ping);
 
-                var html = '<div style="font-size:13px;font-weight:600;color:#111827;margin-bottom:10px;">Resultats :</div>';
+                var html = '<div style="font-size:13px;font-weight:600;color:#111827;margin-bottom:10px;">Résultats :</div>';
                 html += '<div style="display:flex;flex-direction:column;gap:8px;">';
                 $.each(r.data.results, function (i, item) {
                     var isOk   = item.status === 'ok';
@@ -376,7 +376,7 @@ jQuery(function ($) {
                     html += '</div>';
                 });
                 html += '</div>';
-                html += '<div style="margin-top:10px;font-size:12px;color:#9ca3af;">Les endpoints de ping automatique ont ete supprimes par Google (jan. 2024) et Bing. La soumission via les outils webmaster est desormais la methode recommandee.</div>';
+                html += '<div style="margin-top:10px;font-size:12px;color:#9ca3af;">Les endpoints de ping automatique ont été supprimés par Google (jan. 2024) et Bing. La soumission via les outils webmaster est désormais la méthode recommandée.</div>';
                 $res.html(html);
             } else {
                 $res.css({'background': '#fef2f2', 'border-color': '#fecaca'});

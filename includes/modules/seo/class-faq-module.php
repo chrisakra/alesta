@@ -102,7 +102,7 @@ class Alesta_FAQ_Module {
 
         $api = new Alesta_API();
         if (!method_exists($api, 'test_connection')) {
-            wp_send_json_success(['message' => __('Client API charge.', 'alesta')]);
+            wp_send_json_success(['message' => __('Client API chargé.', 'alesta')]);
         }
 
         $result = $api->test_connection();
