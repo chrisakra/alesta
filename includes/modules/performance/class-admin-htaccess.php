@@ -47,11 +47,11 @@ class Alesta_Admin_Htaccess {
                             <div id="htaccess-file-status" style="font-size:13px;font-weight:600;"></div>
                         </div>
                         <div>
-                            <div style="font-size:11px;color:#9ca3af;margin-bottom:2px;">ECRITURE</div>
+                            <div style="font-size:11px;color:#9ca3af;margin-bottom:2px;">ÉCRITURE</div>
                             <div id="htaccess-write-status" style="font-size:13px;font-weight:600;"></div>
                         </div>
                         <div>
-                            <div style="font-size:11px;color:#9ca3af;margin-bottom:2px;">DERNIERE SAUVEGARDE</div>
+                            <div style="font-size:11px;color:#9ca3af;margin-bottom:2px;">DERNIÈRE SAUVEGARDE</div>
                             <div id="htaccess-backup-date" style="font-size:13px;color:#374151;"></div>
                         </div>
                     </div>
@@ -92,7 +92,7 @@ class Alesta_Admin_Htaccess {
                             <h3 style="margin:0 0 8px;font-size:15px;color:#111827;">Cache navigateur</h3>
                             <p style="font-size:13px;color:#6b7280;margin:0 0 16px;line-height:1.6;">
                                 Indique aux navigateurs des visiteurs de conserver les fichiers statiques en cache.
-                                Les images, CSS et JS ne sont pas retelecharges a chaque visite - la page se charge instantanement pour les visiteurs qui reviennent.
+                                Les images, CSS et JS ne sont pas retéléchargés à chaque visite - la page se charge instantanément pour les visiteurs qui reviennent.
                             </p>
 
                             <!-- Statut -->
@@ -103,21 +103,21 @@ class Alesta_Admin_Htaccess {
 
                             <!-- Options durees -->
                             <div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:6px;padding:16px;margin-bottom:16px;">
-                                <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:12px;">DUREES DE CACHE</div>
+                                <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:12px;">DURÉES DE CACHE</div>
                                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                                     <div>
                                         <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px;">Images</label>
                                         <select id="cache-img-duration" style="width:100%;padding:6px 10px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;">
                                             <option value="1 month">1 mois</option>
                                             <option value="6 months">6 mois</option>
-                                            <option value="1 year" selected>1 an (recommande)</option>
+                                            <option value="1 year" selected>1 an (recommandé)</option>
                                         </select>
                                     </div>
                                     <div>
                                         <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px;">CSS / JavaScript</label>
                                         <select id="cache-css-duration" style="width:100%;padding:6px 10px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;">
                                             <option value="1 week">1 semaine</option>
-                                            <option value="1 month" selected>1 mois (recommande)</option>
+                                            <option value="1 month" selected>1 mois (recommandé)</option>
                                             <option value="6 months">6 mois</option>
                                         </select>
                                     </div>
@@ -125,7 +125,7 @@ class Alesta_Admin_Htaccess {
                                         <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px;">Polices</label>
                                         <select id="cache-font-duration" style="width:100%;padding:6px 10px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;">
                                             <option value="6 months">6 mois</option>
-                                            <option value="1 year" selected>1 an (recommande)</option>
+                                            <option value="1 year" selected>1 an (recommandé)</option>
                                         </select>
                                     </div>
                                 </div>
@@ -139,7 +139,7 @@ class Alesta_Admin_Htaccess {
 
                         <!-- Preview code -->
                         <div style="flex:1;min-width:280px;">
-                            <div style="font-size:11px;font-weight:600;color:#6b7280;margin-bottom:8px;">APERCU DU CODE .HTACCESS</div>
+                            <div style="font-size:11px;font-weight:600;color:#6b7280;margin-bottom:8px;">APERÇU DU CODE .HTACCESS</div>
                             <pre id="cache-preview" style="background:#1e2a3a;color:#a8d8a8;padding:16px;border-radius:6px;font-size:11px;overflow:auto;max-height:320px;line-height:1.5;margin:0;white-space:pre-wrap;"></pre>
                         </div>
                     </div>
@@ -152,7 +152,7 @@ class Alesta_Admin_Htaccess {
                             <h3 style="margin:0 0 8px;font-size:15px;color:#111827;">Compression GZIP</h3>
                             <p style="font-size:13px;color:#6b7280;margin:0 0 16px;line-height:1.6;">
                                 Compresse les fichiers HTML, CSS et JavaScript avant de les envoyer au navigateur.
-                                Reduit le poids des pages de 60 a 80% - impact direct sur le temps de chargement et le score Google PageSpeed.
+                                Réduit le poids des pages de 60 à 80 % - impact direct sur le temps de chargement et le score Google PageSpeed.
                             </p>
 
                             <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
@@ -171,7 +171,7 @@ class Alesta_Admin_Htaccess {
                         </div>
 
                         <div style="flex:1;min-width:280px;">
-                            <div style="font-size:11px;font-weight:600;color:#6b7280;margin-bottom:8px;">APERCU DU CODE .HTACCESS</div>
+                            <div style="font-size:11px;font-weight:600;color:#6b7280;margin-bottom:8px;">APERÇU DU CODE .HTACCESS</div>
                             <pre id="gzip-preview" style="background:#1e2a3a;color:#a8d8a8;padding:16px;border-radius:6px;font-size:11px;overflow:auto;max-height:320px;line-height:1.5;margin:0;white-space:pre-wrap;"></pre>
                         </div>
                     </div>
@@ -210,7 +210,7 @@ class Alesta_Admin_Htaccess {
                         </div>
 
                         <div style="flex:1;min-width:280px;">
-                            <div style="font-size:11px;font-weight:600;color:#6b7280;margin-bottom:8px;">APERCU DU CODE .HTACCESS</div>
+                            <div style="font-size:11px;font-weight:600;color:#6b7280;margin-bottom:8px;">APERÇU DU CODE .HTACCESS</div>
                             <pre id="https-preview" style="background:#1e2a3a;color:#a8d8a8;padding:16px;border-radius:6px;font-size:11px;overflow:auto;max-height:200px;line-height:1.5;margin:0;white-space:pre-wrap;"></pre>
                         </div>
                     </div>

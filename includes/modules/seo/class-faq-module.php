@@ -39,6 +39,8 @@ class Alesta_FAQ_Module {
         if (!is_singular()) return;
         $post_id = get_the_ID();
         if (!$post_id) return;
+        // Contenu protégé non déverrouillé : la FAQ résume le texte protégé.
+        if (post_password_required($post_id)) return;
 
         $data = get_post_meta($post_id, self::META_KEY, true);
         if (!is_array($data) || empty($data['active']) || empty($data['faqs']) || !is_array($data['faqs'])) return;
@@ -100,7 +102,7 @@ class Alesta_FAQ_Module {
 
         $api = new Alesta_API();
         if (!method_exists($api, 'test_connection')) {
-            wp_send_json_success(['message' => __('Client API charge.', 'alesta')]);
+            wp_send_json_success(['message' => __('Client API chargé.', 'alesta')]);
         }
 
         $result = $api->test_connection();
@@ -121,7 +123,11 @@ class Alesta_FAQ_Module {
             wp_send_json_error(['message' => __('Client API Alesta indisponible.', 'alesta')]);
         }
 
-        $post    = get_post($post_id);
+        $post = get_post($post_id);
+        // Contenu protégé par mot de passe : son texte n'est pas envoyé à l'IA.
+        if (!empty($post->post_password)) {
+            wp_send_json_error(['message' => __('Ce contenu est protégé par mot de passe : la génération IA est désactivée pour ne pas exposer son texte.', 'alesta')]);
+        }
         $content = wp_strip_all_tags($post->post_content);
         $content = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
         $excerpt = mb_substr(trim(preg_replace('/\s+/u', ' ', $content)), 0, 1500);

@@ -48,6 +48,7 @@ class Alesta_Admin_Minify {
         $dir_ok   = Alesta_Minify_Module::ensure_cache_dir();
         $css_on   = ! empty($s['css_enabled']);
         $js_on    = ! empty($s['js_enabled']);
+        $js_avail = Alesta_Minify_Module::js_available();
         $html_on  = ! empty($s['html_enabled']);
         $prel_on  = ! empty($s['preload_enabled']);
         ?>
@@ -59,7 +60,7 @@ class Alesta_Admin_Minify {
                     <span class="dashicons dashicons-editor-code" style="font-size:32px;color:#a0aec0;"></span>
                     <div>
                         <h1 class="mnf-title">Minification &amp; Preload</h1>
-                        <p class="mnf-subtitle">Réduit le poids des fichiers CSS, JS, HTML et prépare les CSS critiques via des hints <code>preload</code>.</p>
+                        <p class="mnf-subtitle">Réduit le poids des fichiers CSS et du HTML, et prépare les CSS critiques via des hints <code>preload</code>. La minification JS est en cours de développement.</p>
                     </div>
                 </div>
                 <div class="mnf-status-bar">
@@ -152,24 +153,40 @@ class Alesta_Admin_Minify {
             <div class="mnf-card">
                 <div class="mnf-card-body">
                     <div class="mnf-col-main">
-                        <h3 class="mnf-h3">⚡ Minification JavaScript</h3>
+                        <h3 class="mnf-h3">⚡ Minification JavaScript
+                            <?php if ( ! $js_avail ) : ?>
+                                <span style="display:inline-block;margin-left:8px;padding:2px 10px;border-radius:999px;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;font-size:11px;font-weight:700;vertical-align:middle;">🚧 En cours de développement</span>
+                            <?php else : ?>
+                                <span style="display:inline-block;margin-left:8px;padding:2px 10px;border-radius:999px;background:#ede9fe;color:#5b21b6;border:1px solid #c4b5fd;font-size:11px;font-weight:700;vertical-align:middle;">Bêta (test)</span>
+                            <?php endif; ?>
+                        </h3>
+                        <?php if ( ! $js_avail ) : ?>
+                        <p class="mnf-lead">
+                            Cette fonctionnalité est en cours de finalisation et <strong>temporairement indisponible</strong>,
+                            pour garantir qu'aucun script de votre site ne soit altéré. Elle sera réactivée dans une
+                            prochaine mise à jour, après validation complète. La minification CSS, HTML et le préchargement
+                            restent disponibles ci-dessous.
+                        </p>
+                        <?php else : ?>
                         <p class="mnf-lead">
                             Supprime les commentaires et réduit les espaces dans les fichiers JavaScript.
-                            Approche conservatrice : les chaînes de caractères et le code fonctionnel ne sont pas altérés.
+                            Version bêta réservée aux tests : vérifiez chaque page après activation.
                             jQuery, jQuery Migrate et les scripts WordPress core sont exclus automatiquement.
                         </p>
+                        <?php endif; ?>
 
                         <div class="mnf-toggle-row">
                             <span class="mnf-toggle-lbl">Activer la minification JS :</span>
                             <label class="mnf-toggle">
-                                <input type="checkbox" class="mnf-switch" data-type="js_enabled" <?php checked($js_on); ?>>
-                                <span class="mnf-slider <?php echo $js_on ? 'on' : ''; ?>">
+                                <input type="checkbox" class="mnf-switch" data-type="js_enabled" <?php checked($js_on); ?> <?php disabled( ! $js_avail ); ?>>
+                                <span class="mnf-slider <?php echo $js_on ? 'on' : ''; ?>" <?php echo $js_avail ? '' : 'style="opacity:.45;cursor:not-allowed;"'; ?>>
                                     <span class="mnf-knob"></span>
                                 </span>
                             </label>
-                            <span class="mnf-status-label" data-type="js_enabled"><?php echo $js_on ? 'Actif' : 'Inactif'; ?></span>
+                            <span class="mnf-status-label" data-type="js_enabled"><?php echo $js_avail ? ( $js_on ? 'Actif' : 'Inactif' ) : 'Bientôt disponible'; ?></span>
                         </div>
 
+                        <?php if ( $js_avail ) : ?>
                         <div class="mnf-tip">
                             ⚠ <strong>Conseil :</strong> testez sur un environnement de staging avant d'activer en production.
                             En cas de problème, videz le cache ou désactivez pour revenir au comportement normal.
@@ -189,6 +206,7 @@ class Alesta_Admin_Minify {
                             <span class="spinner" id="spinner-js"></span>
                             <span id="msg-js" class="mnf-msg"></span>
                         </div>
+                        <?php endif; ?>
                     </div>
 
                     <div class="mnf-col-side">

@@ -21,12 +21,12 @@ jQuery(function ($) {
 
     function renderState() {
         $('#robots-global-status').show();
-        $('#robots-status-bar').text('robots.txt charge').css('color', '#6ee7b7');
+        $('#robots-status-bar').text('robots.txt chargé').css('color', '#6ee7b7');
 
         // Fichier
         $('#robots-file-status').html(
             state.exists
-                ? '<span style="color:#065f46;">Fichier physique present</span>'
+                ? '<span style="color:#065f46;">Fichier physique présent</span>'
                 : '<span style="color:#f59e0b;">Aucun fichier (WordPress virtuel)</span>'
         );
 
@@ -61,7 +61,7 @@ jQuery(function ($) {
 
         // Desactiver editeur si pas d'ecriture
         if (!state.can_write) {
-            $('#robots-editor').prop('readonly', true).css('background', '#f9fafb').attr('title', 'Fichier non accessible en ecriture');
+            $('#robots-editor').prop('readonly', true).css('background', '#f9fafb').attr('title', 'Fichier non accessible en écriture');
             $('#btn-robots-save').prop('disabled', true);
             $('#btn-robots-reset').prop('disabled', true);
         }
@@ -86,13 +86,13 @@ jQuery(function ($) {
                 state.exists     = true;
                 state.is_virtual = false;
                 $('#robots-virtual-notice').hide();
-                $('#robots-file-status').html('<span style="color:#065f46;">Fichier physique present</span>');
+                $('#robots-file-status').html('<span style="color:#065f46;">Fichier physique présent</span>');
             } else {
                 feedback('error', r.data && r.data.message ? r.data.message : 'Erreur inconnue');
             }
         }).fail(function () {
             $btn.prop('disabled', false).text('Enregistrer robots.txt');
-            feedback('error', 'Erreur reseau.');
+            feedback('error', 'Erreur réseau.');
         });
     });
 
@@ -100,13 +100,13 @@ jQuery(function ($) {
     // REINITIALISER
     // =========================================================================
     $('#btn-robots-reset').on('click', function () {
-        if (!confirm('Reinitialiser le robots.txt avec le contenu par defaut ? Le contenu actuel sera sauvegarde.')) return;
+        if (!confirm('Réinitialiser le robots.txt avec le contenu par défaut ? Le contenu actuel sera sauvegardé.')) return;
         var $btn = $(this).prop('disabled', true).text('...');
         $.post(AlestaRobots.ajax_url, {
             action: 'alesta_robots_reset',
             nonce:  AlestaRobots.nonce,
         }, function (r) {
-            $btn.prop('disabled', false).text('Reinitialiser par defaut');
+            $btn.prop('disabled', false).text('Réinitialiser par défaut');
             if (r.success) {
                 $('#robots-editor').val(r.data.content);
                 toast(r.data.message);
@@ -165,7 +165,7 @@ jQuery(function ($) {
     $('#btn-robots-ping').on('click', function () {
         var $btn = $(this).prop('disabled', true).text('...');
         $.post(AlestaRobots.ajax_url, { action: 'alesta_robots_ping', nonce: AlestaRobots.nonce }, function (r) {
-            $btn.prop('disabled', false).text('Verifier accessibilite');
+            $btn.prop('disabled', false).text('Vérifier l’accessibilité');
             var $res = $('#robots-ping-result').show();
             if (r.success) {
                 var ok = r.data.ok;
@@ -182,7 +182,7 @@ jQuery(function ($) {
                 $res.html('<strong>Erreur :</strong> ' + escHtml(r.data && r.data.message ? r.data.message : 'Inconnue'));
             }
         }).fail(function () {
-            $btn.prop('disabled', false).text('Verifier accessibilite');
+            $btn.prop('disabled', false).text('Vérifier l’accessibilité');
         });
     });
 

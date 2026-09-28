@@ -27,7 +27,7 @@ jQuery(function ($) {
         // Fichier
         $('#htaccess-file-status').html(
             state.exists
-                ? '<span style="color:#065f46;">Trouve (' + Math.round(state.size / 1024 * 10) / 10 + ' Ko)</span>'
+                ? '<span style="color:#065f46;">Trouvé (' + Math.round(state.size / 1024 * 10) / 10 + ' Ko)</span>'
                 : '<span style="color:#991b1b;">Introuvable</span>'
         );
 
@@ -65,7 +65,7 @@ jQuery(function ($) {
 
         if (active) {
             $badge.text('Actif').css({ 'background': '#d1fae5', 'color': '#065f46' });
-            $apply.text('Mettre a jour').removeClass('button-primary');
+            $apply.text('Mettre à jour').removeClass('button-primary');
             $remove.show();
         } else {
             $badge.text('Inactif').css({ 'background': '#fee2e2', 'color': '#991b1b' });
@@ -74,7 +74,7 @@ jQuery(function ($) {
         }
 
         if (!state.can_write) {
-            $apply.prop('disabled', true).attr('title', '.htaccess non accessible en ecriture');
+            $apply.prop('disabled', true).attr('title', '.htaccess non accessible en écriture');
             $remove.prop('disabled', true);
         }
     }
@@ -102,7 +102,7 @@ jQuery(function ($) {
             if (r.success) {
                 $('#htaccess-backup-date').text(r.data.date);
                 $('#btn-restore').prop('disabled', false);
-                toast('Sauvegarde effectuee');
+                toast('Sauvegarde effectuée');
             } else {
                 alert(r.data && r.data.message ? r.data.message : 'Erreur');
             }
@@ -110,12 +110,12 @@ jQuery(function ($) {
     });
 
     $('#btn-restore').on('click', function () {
-        if (!confirm('Restaurer le .htaccess depuis la sauvegarde ? Les regles Alesta AI actuelles seront remplacees.')) return;
+        if (!confirm('Restaurer le .htaccess depuis la sauvegarde ? Les règles Alesta AI actuelles seront remplacées.')) return;
         var $btn = $(this).prop('disabled', true).text('...');
         $.post(AlestaHtaccess.ajax_url, { action: 'alesta_htaccess_restore', nonce: AlestaHtaccess.nonce }, function (r) {
             $btn.prop('disabled', false).text('Restaurer la sauvegarde');
             if (r.success) {
-                toast('Sauvegarde restauree avec succes');
+                toast('Sauvegarde restaurée avec succès');
                 loadState();
             } else {
                 alert(r.data && r.data.message ? r.data.message : 'Erreur');
@@ -140,19 +140,19 @@ jQuery(function ($) {
                 toast(r.data.message);
                 state.cache_active = true;
                 renderBadge('cache', true);
-                $btn.text('Mettre a jour');
+                $btn.text('Mettre à jour');
             } else {
                 alert(r.data && r.data.message ? r.data.message : 'Erreur');
                 $btn.text('Activer le cache navigateur');
             }
         }).fail(function () {
             $btn.prop('disabled', false).text('Activer le cache navigateur');
-            alert('Erreur reseau.');
+            alert('Erreur réseau.');
         });
     });
 
     $('#btn-remove-cache').on('click', function () {
-        if (!confirm('Desactiver le cache navigateur ?')) return;
+        if (!confirm('Désactiver le cache navigateur ?')) return;
         removeRule('Alesta AI - Cache navigateur', 'cache', $(this));
     });
 
@@ -170,19 +170,19 @@ jQuery(function ($) {
                 toast(r.data.message);
                 state.gzip_active = true;
                 renderBadge('gzip', true);
-                $btn.text('Mettre a jour');
+                $btn.text('Mettre à jour');
             } else {
                 alert(r.data && r.data.message ? r.data.message : 'Erreur');
                 $btn.text('Activer la compression GZIP');
             }
         }).fail(function () {
             $btn.prop('disabled', false).text('Activer la compression GZIP');
-            alert('Erreur reseau.');
+            alert('Erreur réseau.');
         });
     });
 
     $('#btn-remove-gzip').on('click', function () {
-        if (!confirm('Desactiver la compression GZIP ?')) return;
+        if (!confirm('Désactiver la compression GZIP ?')) return;
         removeRule('Alesta AI - Compression GZIP', 'gzip', $(this));
     });
 
@@ -200,24 +200,24 @@ jQuery(function ($) {
                 toast(r.data.message);
                 state.https_active = true;
                 renderBadge('https', true);
-                $btn.text('Mettre a jour');
+                $btn.text('Mettre à jour');
             } else {
                 alert(r.data && r.data.message ? r.data.message : 'Erreur');
                 $btn.text('Activer la redirection HTTPS');
             }
         }).fail(function () {
             $btn.prop('disabled', false).text('Activer la redirection HTTPS');
-            alert('Erreur reseau.');
+            alert('Erreur réseau.');
         });
     });
 
     $('#btn-remove-https').on('click', function () {
-        if (!confirm('Desactiver la redirection HTTPS ?')) return;
+        if (!confirm('Désactiver la redirection HTTPS ?')) return;
         removeRule('Alesta AI - HTTPS', 'https', $(this));
     });
 
     $('#btn-fix-https-url').on('click', function () {
-        if (!confirm('Mettre a jour les URLs WordPress de HTTP vers HTTPS ? Cette action modifie les reglages WordPress.')) return;
+        if (!confirm('Mettre à jour les URLs WordPress de HTTP vers HTTPS ? Cette action modifie les réglages WordPress.')) return;
         var $btn = $(this).prop('disabled', true).text('...');
         $.post(AlestaHtaccess.ajax_url, {
             action: 'alesta_htaccess_fix_https_url',
@@ -225,7 +225,7 @@ jQuery(function ($) {
         }, function (r) {
             $btn.prop('disabled', false).text('Corriger l\'URL WordPress en HTTPS');
             if (r.success) {
-                toast('URL WordPress mise a jour : ' + r.data.siteurl);
+                toast('URL WordPress mise à jour : ' + r.data.siteurl);
                 $('#https-url-alert').slideUp();
             } else {
                 alert(r.data && r.data.message ? r.data.message : 'Erreur');
@@ -334,12 +334,12 @@ jQuery(function ($) {
         }, function (r) {
             $btn.prop('disabled', false);
             if (r.success) {
-                toast('Regle supprimee du .htaccess');
+                toast('Règle supprimée du .htaccess');
                 state[type + '_active'] = false;
                 renderBadge(type, false);
             } else {
                 alert(r.data && r.data.message ? r.data.message : 'Erreur');
-                $btn.text('Desactiver');
+                $btn.text('Désactiver');
             }
         });
     }

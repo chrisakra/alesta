@@ -144,7 +144,7 @@ class Alesta_Errors_Module {
         $new_url = esc_url_raw( isset( $_POST['new_url'] ) ? wp_unslash( $_POST['new_url'] ) : '' );
 
         if (!$post_id || !$old_url || !$new_url) {
-            wp_send_json_error(['message' => 'Donnees manquantes']);
+            wp_send_json_error(['message' => 'Données manquantes']);
         }
 
         $post = get_post($post_id);
@@ -176,10 +176,10 @@ class Alesta_Errors_Module {
         }
 
         if (!$fixed) {
-            wp_send_json_error(['message' => 'URL non trouvee (ni dans WordPress ni dans Elementor)']);
+            wp_send_json_error(['message' => 'URL non trouvée (ni dans WordPress ni dans Elementor)']);
         }
 
-        wp_send_json_success(['message' => 'Lien corrige avec succes']);
+        wp_send_json_success(['message' => 'Lien corrigé avec succès']);
     }
 
     // =========================================================================
@@ -188,7 +188,7 @@ class Alesta_Errors_Module {
     private function check_url(string $url): array {
         // Refuser les cibles internes (SSRF depuis le vhost) — ALESTA-10.
         if ( class_exists('Alesta_Net') && ! Alesta_Net::is_safe_remote_url($url) ) {
-            return ['url' => $url, 'code' => 0, 'message' => 'URL non autorisee (cible interne)'];
+            return ['url' => $url, 'code' => 0, 'message' => 'URL non autorisée (cible interne)'];
         }
         $response = wp_remote_head($url, [
             'timeout'     => 8,

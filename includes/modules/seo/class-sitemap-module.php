@@ -452,7 +452,7 @@ class Alesta_Sitemap_Module {
         $lines   = [];
         $lines[] = '<?xml version="1.0" encoding="UTF-8"?>';
         $lines[] = '<!-- Sitemap généré par Alesta v' . ALESTA_VERSION . ' (https://www.alesta-computer.com) -->';
-        $lines[] = '<!-- Mis a jour le : ' . current_time('Y-m-d H:i:s') . ' -->';
+        $lines[] = '<!-- Mis à jour le : ' . current_time('Y-m-d H:i:s') . ' -->';
         $lines[] = '<urlset ' . $ns . '>';
 
         // Homepage
@@ -655,7 +655,7 @@ class Alesta_Sitemap_Module {
         if (!current_user_can('manage_options')) wp_send_json_error();
 
         if (!file_exists(self::sitemap_path())) {
-            wp_send_json_error(['message' => 'Le sitemap.xml n\'existe pas encore. Generez-le d\'abord.']);
+            wp_send_json_error(['message' => 'Le sitemap.xml n’existe pas encore. Générez-le d’abord.']);
         }
 
         $sitemap_url = home_url('/sitemap.xml');
@@ -663,11 +663,11 @@ class Alesta_Sitemap_Module {
 
         $resp = wp_remote_get($sitemap_url, ['timeout' => 10]);
         if (is_wp_error($resp)) {
-            $results[] = ['engine' => 'Verification acces public', 'status' => 'error', 'message' => $resp->get_error_message(), 'link' => ''];
+            $results[] = ['engine' => 'Vérification accès public', 'status' => 'error', 'message' => $resp->get_error_message(), 'link' => ''];
         } else {
             $code = wp_remote_retrieve_response_code($resp);
             $results[] = [
-                'engine'  => 'Acces public sitemap.xml',
+                'engine'  => 'Accès public sitemap.xml',
                 'status'  => ($code === 200) ? 'ok' : 'error',
                 'message' => 'HTTP ' . $code . ($code === 200 ? ' — fichier accessible' : ' — fichier inaccessible'),
                 'link'    => '',

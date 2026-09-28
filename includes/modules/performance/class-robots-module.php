@@ -109,7 +109,7 @@ class Alesta_Robots_Module {
             wp_send_json_error(['message' => 'Échec de l\'écriture du robots.txt.']);
         }
 
-        wp_send_json_success(['message' => 'robots.txt enregistre avec succes.']);
+        wp_send_json_success(['message' => 'robots.txt enregistré avec succès.']);
     }
 
     // =========================================================================
@@ -128,7 +128,7 @@ class Alesta_Robots_Module {
         file_put_contents(self::robots_path(), $content); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_put_contents_file_put_contents -- writability checked above via can_write()
 
         wp_send_json_success([
-            'message' => 'robots.txt reinitialise avec les valeurs par defaut.',
+            'message' => 'robots.txt réinitialisé avec les valeurs par défaut.',
             'content' => $content,
         ]);
     }
@@ -142,7 +142,7 @@ class Alesta_Robots_Module {
 
         $this->make_backup();
         wp_send_json_success([
-            'message' => 'Sauvegarde effectuee.',
+            'message' => 'Sauvegarde effectuée.',
             'date'    => get_option(self::BACKUP_DATE_KEY),
         ]);
     }
@@ -165,7 +165,7 @@ class Alesta_Robots_Module {
 
         file_put_contents(self::robots_path(), $backup); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_put_contents_file_put_contents -- writability checked above via can_write()
         wp_send_json_success([
-            'message' => 'Sauvegarde restauree avec succes.',
+            'message' => 'Sauvegarde restaurée avec succès.',
             'content' => $backup,
         ]);
     }

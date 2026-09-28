@@ -29,7 +29,7 @@ class Alesta_Admin_Sitemap {
                     <span class="dashicons dashicons-networking" style="font-size:28px;color:#a0aec0;"></span>
                     <div>
                         <h1 style="color:#fff;margin:0;font-size:18px;">Sitemap XML</h1>
-                        <p style="color:#94a3b8;margin:0;font-size:13px;">Generation et soumission du plan du site aux moteurs de recherche</p>
+                        <p style="color:#94a3b8;margin:0;font-size:13px;">Génération et soumission du plan du site aux moteurs de recherche</p>
                     </div>
                 </div>
                 <div id="sitemap-status-bar" style="font-size:12px;color:#94a3b8;">Chargement...</div>
@@ -44,7 +44,7 @@ class Alesta_Admin_Sitemap {
                             <div id="sitemap-file-status" style="font-size:13px;font-weight:600;"></div>
                         </div>
                         <div>
-                            <div style="font-size:11px;color:#9ca3af;margin-bottom:2px;">DERNIERE GENERATION</div>
+                            <div style="font-size:11px;color:#9ca3af;margin-bottom:2px;">DERNIÈRE GÉNÉRATION</div>
                             <div id="sitemap-gen-date" style="font-size:13px;color:#374151;"></div>
                         </div>
                         <div>
@@ -72,7 +72,7 @@ class Alesta_Admin_Sitemap {
                 <!-- Colonne gauche : options de generation -->
                 <div>
                     <div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:20px;margin-bottom:16px;">
-                        <h3 style="margin:0 0 16px;font-size:15px;color:#111827;">Options de generation</h3>
+                        <h3 style="margin:0 0 16px;font-size:15px;color:#111827;">Options de génération</h3>
 
                         <!-- Contenu : post types -->
                         <div style="margin-bottom:20px;">
@@ -101,21 +101,21 @@ class Alesta_Admin_Sitemap {
                                     <input type="checkbox" id="opt-videos" style="margin-top:2px;width:15px;height:15px;">
                                     <div>
                                         <div style="font-size:13px;font-weight:500;color:#374151;">Vidéos</div>
-                                        <div style="font-size:12px;color:#9ca3af;">YouTube, Vimeo, MP4 auto-hébergés — detectés automatiquement dans le contenu</div>
+                                        <div style="font-size:12px;color:#9ca3af;">YouTube, Vimeo, MP4 auto-hébergés — détectés automatiquement dans le contenu</div>
                                     </div>
                                 </label>
 
                                 <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
                                     <input type="checkbox" id="opt-taxonomies" style="margin-top:2px;width:15px;height:15px;">
                                     <div>
-                                        <div style="font-size:13px;font-weight:500;color:#374151;">Categories et tags</div>
-                                        <div style="font-size:12px;color:#9ca3af;">Pages d'archives par categorie, tag, categorie produit...</div>
+                                        <div style="font-size:13px;font-weight:500;color:#374151;">Catégories et tags</div>
+                                        <div style="font-size:12px;color:#9ca3af;">Pages d’archives par catégorie, tag, catégorie produit...</div>
                                     </div>
                                 </label>
 
                                 <!-- Sous-options taxonomies -->
                                 <div id="opt-taxonomies-list" style="display:none;margin-left:25px;padding:12px;background:#f8fafc;border-radius:6px;border:1px solid #e5e7eb;">
-                                    <div style="font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:8px;">TAXONOMIES A INCLURE</div>
+                                    <div style="font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:8px;">TAXONOMIES À INCLURE</div>
                                     <div id="opt-tax-checkboxes" style="display:flex;flex-direction:column;gap:6px;">
                                         <div style="color:#9ca3af;font-size:12px;">Chargement...</div>
                                     </div>

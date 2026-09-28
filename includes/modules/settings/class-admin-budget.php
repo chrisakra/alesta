@@ -273,7 +273,7 @@ class Alesta_Admin_Budget {
 
             <!-- ── Note d'estimation des coûts ── -->
             <p style="margin:0 0 16px;font-size:12px;color:#6b7280;">
-                <?php esc_html_e('Les tokens sont comptés pour tous les modèles. Le coût n\'est estimé que pour les modèles dont le tarif est connu du plugin : pour les autres (OpenAI, nouveaux modèles Claude) il reste à 0 — « non estimé ». Le filtre alesta_ai_model_pricing permet de fournir vos propres tarifs.', 'alesta'); ?>
+                <?php esc_html_e('Les tokens sont comptés pour tous les modèles. Le coût est calculé d\'après le tarif connu du plugin ; un modèle sans tarif connu (OpenAI, nouveaux modèles Claude) est compté au tarif le plus élevé de la table — « estimation haute » —, pour que la limite mensuelle reste efficace. Le filtre alesta_ai_model_pricing permet de fournir vos propres tarifs.', 'alesta'); ?>
             </p>
 
             <!-- ── Stats du mois ── -->

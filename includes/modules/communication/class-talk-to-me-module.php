@@ -71,7 +71,10 @@ class Alesta_TalkToMe_Module {
             'hours_enabled'   => false,
             'hours'           => $hours_default,
             'offline_message' => 'Nous sommes actuellement fermés. Laissez-nous un message, nous reviendrons vite vers vous.',
-            'hide_branding'   => false,    // toujours false en version Free (branding conservé)
+            // Crédit « Propulsé par Alesta AI » : opt-in explicite, désactivé
+            // par défaut (règle 10 WordPress.org). Remplace l'ancien
+            // hide_branding, qui était forcé à false.
+            'show_branding'   => false,
             'channels'        => $channels,
         ];
     }
@@ -83,6 +86,11 @@ class Alesta_TalkToMe_Module {
         $defaults = self::defaults();
         // Shallow merge puis deep-merge de `channels` et `hours`.
         $merged = array_merge($defaults, $saved);
+        // Migration : l'ancien hide_branding (forcé à false jusqu'en 1.8.x) ne
+        // vaut pas consentement. Sans show_branding enregistré, le crédit
+        // reste masqué jusqu'à ce que l'admin coche explicitement la case.
+        unset($merged['hide_branding']);
+        $merged['show_branding'] = ! empty($saved['show_branding']);
         $merged['channels'] = array_replace_recursive($defaults['channels'], $saved['channels'] ?? []);
         $merged['hours']    = array_replace_recursive($defaults['hours'],    $saved['hours']    ?? []);
         return $merged;
@@ -276,7 +284,7 @@ class Alesta_TalkToMe_Module {
                     <?php endforeach; ?>
                 </ul>
 
-                <?php if ( empty($s['hide_branding']) ) : ?>
+                <?php if ( ! empty($s['show_branding']) ) : ?>
                     <a class="alesta-ttm__branding"
                        href="https://www.alesta-ai.com" target="_blank" rel="noopener noreferrer">
                         <span class="alesta-ttm__branding-logo" aria-hidden="true">&#x03C6;</span>
@@ -319,7 +327,7 @@ class Alesta_TalkToMe_Module {
                 </ul>
             <?php endif; ?>
 
-            <?php if ( $mode === 'stack' && empty($s['hide_branding']) ) : ?>
+            <?php if ( $mode === 'stack' && ! empty($s['show_branding']) ) : ?>
                 <a class="alesta-ttm__branding alesta-ttm__branding--stack"
                    href="https://www.alesta-ai.com" target="_blank" rel="noopener noreferrer">
                     <span class="alesta-ttm__branding-logo" aria-hidden="true">&#x03C6;</span>

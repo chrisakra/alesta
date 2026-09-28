@@ -1,6 +1,4 @@
 jQuery(function ($) {
-    console.log('[Alesta Errors] errors.js charge. AlestaErrors:', typeof AlestaErrors !== 'undefined' ? 'OK' : 'MANQUANT');
-    console.log('[Alesta Errors] Bouton scan:', $('#btn-scan').length);
 
     // =========================================================================
     // FILTRES
@@ -31,7 +29,6 @@ jQuery(function ($) {
     // =========================================================================
     // Confirmation inline au lieu de confirm() natif
     $('#btn-scan').on('click', function () {
-        console.log('[Alesta Errors] Bouton scan clique');
         var $btn = $(this);
 
         // Afficher confirmation inline
@@ -55,14 +52,13 @@ jQuery(function ($) {
         var $btn = $('#btn-scan').prop('disabled', true).text('Scan en cours...');
         $('#scan-progress-bar').show();
         $('#scan-bar-fill').css('width', '0%');
-        $('#scan-bar-text').text('Recuperation des pages...');
+        $('#scan-bar-text').text('Récupération des pages...');
 
         // Etape 1 : recuperer la liste des posts
         $.post(AlestaErrors.ajax_url, {
             action: 'alesta_errors_scan',
             nonce:  AlestaErrors.nonce,
         }, function (r) {
-            console.log('[Alesta Errors] Reponse scan:', r);
             if (!r.success) {
                 $btn.prop('disabled', false).text('Lancer le scan');
                 alert(r.data && r.data.message ? r.data.message : 'Erreur');
@@ -75,19 +71,19 @@ jQuery(function ($) {
             var total = ids.length;
             var idx   = 0;
 
-            $('#scan-bar-text').text('0 / ' + total + ' pages scannees...');
+            $('#scan-bar-text').text('0 / ' + total + ' pages scannées...');
 
             // Etape 2 : scanner chaque post en sequence
             function scanNext() {
                 if (idx >= ids.length) {
                     $('#scan-bar-fill').css('width', '100%');
-                    $('#scan-bar-text').text('Scan termine ! Rechargement...');
+                    $('#scan-bar-text').text('Scan terminé ! Rechargement...');
                     setTimeout(function () { location.reload(); }, 1000);
                     return;
                 }
                 var pct = Math.round(idx / total * 100);
                 $('#scan-bar-fill').css('width', pct + '%');
-                $('#scan-bar-text').text((idx + 1) + ' / ' + total + ' pages scannees...');
+                $('#scan-bar-text').text((idx + 1) + ' / ' + total + ' pages scannées...');
 
                 $.ajax({
                     url:     AlestaErrors.ajax_url,
@@ -101,7 +97,7 @@ jQuery(function ($) {
 
         }).fail(function () {
             $btn.prop('disabled', false).text('Lancer le scan');
-            alert('Erreur reseau.');
+            alert('Erreur réseau.');
         });
     }); // fin scan-confirm-yes
 
@@ -118,7 +114,7 @@ jQuery(function ($) {
 
         var html = '';
         html += '<div style="margin-bottom:14px;">';
-        html += '<label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:4px;">URL CASSEE</label>';
+        html += '<label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:4px;">URL CASSÉE</label>';
         html += '<div style="font-size:12px;background:#fee2e2;padding:8px 12px;border-radius:4px;color:#991b1b;word-break:break-all;">' + esc(old_url) + '</div>';
         html += '</div>';
 
@@ -126,7 +122,7 @@ jQuery(function ($) {
         html += '<label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:4px;">NOUVELLE URL <span style="color:#991b1b;">*</span></label>';
         html += '<input type="text" id="err-new-url" placeholder="https://..." '
               + 'style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;box-sizing:border-box;">';
-        html += '<div style="font-size:11px;color:#9ca3af;margin-top:4px;">Entrez la nouvelle URL qui remplacera le lien casse dans le contenu de la page.</div>';
+        html += '<div style="font-size:11px;color:#9ca3af;margin-top:4px;">Entrez la nouvelle URL qui remplacera le lien cassé dans le contenu de la page.</div>';
         html += '</div>';
 
         html += '<div style="display:flex;gap:8px;">';
@@ -174,7 +170,7 @@ jQuery(function ($) {
                 }).fadeOut(300, function () { $(this).remove(); filterTable(); });
 
                 // Toast
-                var $t = $('<div style="position:fixed;bottom:24px;right:24px;background:#065f46;color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;z-index:99999;box-shadow:0 4px 12px rgba(0,0,0,.2);">Lien corrige avec succes</div>');
+                var $t = $('<div style="position:fixed;bottom:24px;right:24px;background:#065f46;color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;z-index:99999;box-shadow:0 4px 12px rgba(0,0,0,.2);">Lien corrigé avec succès</div>');
                 $('body').append($t);
                 setTimeout(function () { $t.fadeOut(400, function () { $t.remove(); }); }, 3000);
             } else {
@@ -184,7 +180,7 @@ jQuery(function ($) {
             }
         }).fail(function () {
             $btn.prop('disabled', false).text('Appliquer la correction');
-            alert('Erreur reseau.');
+            alert('Erreur réseau.');
         });
     });
 });

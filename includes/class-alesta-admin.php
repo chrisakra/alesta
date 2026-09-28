@@ -251,7 +251,7 @@ class Alesta_Admin {
 		add_submenu_page(
 			self::MENU_SLUG,
 			__( 'Minification', 'alesta' ),
-			'- Minification HTML/CSS/JS',
+			'- Minification HTML/CSS',
 			self::CAPABILITY,
 			'alesta-ai-minify',
 			function () {
@@ -554,7 +554,7 @@ class Alesta_Admin {
 					<span style="display:inline-flex;align-items:center;justify-content:center;width:50px;height:50px;background:rgba(255,255,255,.1);border-radius:12px;font-family:Georgia,serif;font-size:36px;line-height:1;color:#fff;">&#x03C6;</span>
 					<div>
 						<h1 style="color:#fff;margin:0;font-size:20px;font-weight:700;letter-spacing:-.3px;"><?php esc_html_e( 'Master AI Dashboard', 'alesta' ); ?></h1>
-						<p style="color:#94a3b8;margin:0;font-size:13px;"><?php esc_html_e( 'Cockpit central — santé, performance, sécurité et visibilité IA en un seul écran', 'alesta' ); ?></p>
+						<p style="color:#94a3b8;margin:0;font-size:13px;"><?php esc_html_e( 'Cockpit central — SEO, santé, performance et sécurité en un seul écran', 'alesta' ); ?></p>
 					</div>
 				</div>
 				<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
@@ -584,7 +584,7 @@ class Alesta_Admin {
 				<div class="alesta-section-heading">
 					<span class="alesta-section-num">01</span>
 					<span class="alesta-section-title"><?php esc_html_e( 'SEO &amp; Référencement', 'alesta' ); ?></span>
-					<span class="alesta-section-desc"><?php esc_html_e( 'Optimisation on-page, balises, sitemap, visibilité IA', 'alesta' ); ?></span>
+					<span class="alesta-section-desc"><?php esc_html_e( 'Title &amp; meta, audit SEO, sitemap XML et FAQ Schema', 'alesta' ); ?></span>
 				</div>
 				<div class="alesta-cards">
 					<?php
@@ -793,7 +793,7 @@ class Alesta_Admin {
 					self::card_active(
 						"\xE2\x9C\x82", // ✂
 						__( 'Minification', 'alesta' ),
-						__( 'Minifie HTML, CSS et JS pour accélérer le site (avec bypass des page-builders).', 'alesta' ),
+						__( 'Minifie HTML et CSS pour accélérer le site (avec bypass des page-builders). Minification JS en cours de développement.', 'alesta' ),
 						'alesta-ai-minify',
 						__( 'Ouvrir', 'alesta' )
 					);

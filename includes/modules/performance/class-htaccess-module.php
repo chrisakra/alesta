@@ -192,7 +192,7 @@ class Alesta_Htaccess_Module {
         $result = insert_with_markers(self::htaccess_path(), 'Alesta AI - Cache navigateur', $this->rules_cache($opts));
 
         if (!$result) wp_send_json_error(['message' => 'Échec de l\'écriture dans .htaccess']);
-        wp_send_json_success(['message' => 'Cache navigateur active avec succes']);
+        wp_send_json_success(['message' => 'Cache navigateur activé avec succès']);
     }
 
     // =========================================================================
@@ -210,7 +210,7 @@ class Alesta_Htaccess_Module {
         $result = insert_with_markers(self::htaccess_path(), 'Alesta AI - Compression GZIP', $this->rules_gzip());
 
         if (!$result) wp_send_json_error(['message' => 'Échec de l\'écriture dans .htaccess']);
-        wp_send_json_success(['message' => 'Compression GZIP activee avec succes']);
+        wp_send_json_success(['message' => 'Compression GZIP activée avec succès']);
     }
 
     // =========================================================================
@@ -228,7 +228,7 @@ class Alesta_Htaccess_Module {
         $result = insert_with_markers(self::htaccess_path(), 'Alesta AI - HTTPS', $this->rules_https());
 
         if (!$result) wp_send_json_error(['message' => 'Échec de l\'écriture dans .htaccess']);
-        wp_send_json_success(['message' => 'Redirection HTTPS activee avec succes']);
+        wp_send_json_success(['message' => 'Redirection HTTPS activée avec succès']);
     }
 
     // =========================================================================
@@ -245,7 +245,7 @@ class Alesta_Htaccess_Module {
             'Alesta AI - HTTPS',
         ];
         if (!in_array($marker, $allowed)) {
-            wp_send_json_error(['message' => 'Marqueur non autorise']);
+            wp_send_json_error(['message' => 'Marqueur non autorisé']);
         }
 
         if (!$this->can_write()) {
@@ -255,7 +255,7 @@ class Alesta_Htaccess_Module {
         $this->make_backup();
         // Passer un tableau vide supprime le bloc mais garde les balises vides
         insert_with_markers(self::htaccess_path(), $marker, []);
-        wp_send_json_success(['message' => 'Regle supprimee du .htaccess']);
+        wp_send_json_success(['message' => 'Règle supprimée du .htaccess']);
     }
 
     // =========================================================================
@@ -267,7 +267,7 @@ class Alesta_Htaccess_Module {
 
         $this->make_backup();
         wp_send_json_success([
-            'message' => 'Sauvegarde effectuee',
+            'message' => 'Sauvegarde effectuée',
             'date'    => get_option(self::BACKUP_DATE_KEY),
         ]);
     }
@@ -292,7 +292,7 @@ class Alesta_Htaccess_Module {
         // canonical root location. can_write() above already verified that
         // we have write access — no WP_Filesystem indirection needed.
         file_put_contents(self::htaccess_path(), $backup); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_put_contents_file_put_contents
-        wp_send_json_success(['message' => 'Sauvegarde restauree avec succes']);
+        wp_send_json_success(['message' => 'Sauvegarde restaurée avec succès']);
     }
 
     // =========================================================================
@@ -312,7 +312,7 @@ class Alesta_Htaccess_Module {
         update_option('home',    $new_home);
 
         wp_send_json_success([
-            'message'  => 'URL WordPress mise a jour en HTTPS',
+            'message'  => 'URL WordPress mise à jour en HTTPS',
             'siteurl'  => $new_site,
             'home'     => $new_home,
         ]);

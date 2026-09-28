@@ -41,7 +41,7 @@ class Alesta_Admin_Errors {
                     <span class="dashicons dashicons-warning" style="font-size:28px;color:#a0aec0;"></span>
                     <div>
                         <h1 style="color:#fff;margin:0;font-size:18px;">Erreurs 4xx / 5xx</h1>
-                        <p style="color:#94a3b8;margin:0;font-size:13px;">Detection des liens cassés et erreurs HTTP sur toutes vos pages</p>
+                        <p style="color:#94a3b8;margin:0;font-size:13px;">Détection des liens cassés et erreurs HTTP sur toutes vos pages</p>
                     </div>
                 </div>
                 <?php if ($scan_date): ?>
@@ -79,11 +79,11 @@ class Alesta_Admin_Errors {
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
                 <div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px;text-align:center;">
                     <div style="font-size:28px;font-weight:700;color:#1e3a5f;"><?php echo esc_html( $pages_scanned ); ?></div>
-                    <div style="font-size:12px;color:#6b7280;margin-top:4px;">Pages analysees</div>
+                    <div style="font-size:12px;color:#6b7280;margin-top:4px;">Pages analysées</div>
                 </div>
                 <div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px;text-align:center;">
                     <div style="font-size:28px;font-weight:700;color:#374151;"><?php echo esc_html( $total_chk ); ?></div>
-                    <div style="font-size:12px;color:#6b7280;margin-top:4px;">Liens verifies</div>
+                    <div style="font-size:12px;color:#6b7280;margin-top:4px;">Liens vérifiés</div>
                 </div>
                 <div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px;text-align:center;">
                     <div style="font-size:28px;font-weight:700;color:#065f46;"><?php echo esc_html( $total_ok ); ?></div>
@@ -100,7 +100,7 @@ class Alesta_Admin_Errors {
             <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:40px;text-align:center;">
                 <div style="font-size:40px;margin-bottom:12px;">&#10003;</div>
                 <h3 style="color:#065f46;margin:0 0 8px;">Aucune erreur détectée</h3>
-                <p style="color:#6b7280;font-size:13px;margin:0;">Tous les <?php echo esc_html( $total_chk ); ?> liens verifies retournent un code HTTP valide.</p>
+                <p style="color:#6b7280;font-size:13px;margin:0;">Tous les <?php echo esc_html( $total_chk ); ?> liens vérifiés retournent un code HTTP valide.</p>
             </div>
 
             <?php else: ?>
@@ -144,7 +144,7 @@ class Alesta_Admin_Errors {
                     <thead>
                         <tr style="background:#f8fafc;">
                             <th style="padding:10px 16px;text-align:left;font-size:12px;color:#6b7280;font-weight:600;border-bottom:1px solid #e5e7eb;width:80px;">CODE</th>
-                            <th style="padding:10px 16px;text-align:left;font-size:12px;color:#6b7280;font-weight:600;border-bottom:1px solid #e5e7eb;">URL CASSEE</th>
+                            <th style="padding:10px 16px;text-align:left;font-size:12px;color:#6b7280;font-weight:600;border-bottom:1px solid #e5e7eb;">URL CASSÉE</th>
                             <th style="padding:10px 16px;text-align:left;font-size:12px;color:#6b7280;font-weight:600;border-bottom:1px solid #e5e7eb;">PAGE SOURCE</th>
                             <th style="padding:10px 16px;text-align:center;font-size:12px;color:#6b7280;font-weight:600;border-bottom:1px solid #e5e7eb;width:140px;">ACTION</th>
                         </tr>
@@ -203,7 +203,7 @@ class Alesta_Admin_Errors {
                 <div style="background:#fff;border-radius:10px;max-width:560px;margin:0 auto;padding:24px;position:relative;">
                     <button id="err-modal-close" style="position:absolute;top:12px;right:12px;background:none;border:none;font-size:22px;cursor:pointer;color:#9ca3af;">&times;</button>
                     <h3 style="margin:0 0 4px;font-size:16px;color:#1e3a5f;">Corriger ce lien</h3>
-                    <p style="margin:0 0 16px;font-size:12px;color:#9ca3af;">Remplacer l'URL cassee par une nouvelle URL valide dans le contenu de la page.</p>
+                    <p style="margin:0 0 16px;font-size:12px;color:#9ca3af;">Remplacer l’URL cassée par une nouvelle URL valide dans le contenu de la page.</p>
                     <div id="err-modal-body"></div>
                 </div>
             </div>

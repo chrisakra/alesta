@@ -21,7 +21,13 @@ class Alesta_Audit {
     const MAX_TITLE_LENGTH   = 60;
     const MIN_META_LENGTH    = 120;
     const MAX_META_LENGTH    = 160;
-    const LINK_CHECK_TIMEOUT = 8;     // secondes par lien
+    const LINK_CHECK_TIMEOUT = 5;     // secondes par lien
+    const LINK_CHECK_MAX     = 60;    // liens vérifiés au plus par audit
+    const LINK_CHECK_BUDGET  = 25;    // secondes au total pour la vérification des liens
+
+    /** Budget de la vérification des liens pour l'audit en cours. */
+    private $link_checks_done   = 0;
+    private $link_check_started = 0.0;
 
     /**
      * Client Claude (lazy) ou WP_Error si indisponible.
@@ -202,6 +208,7 @@ class Alesta_Audit {
                 'posts_per_page' => 1,
                 'post_type'      => ['page', 'post'],
                 'post_status'    => 'publish',
+                'has_password'   => false,
             ]);
             if ( ! empty($similar_posts) ) {
                 /* translators: %s: title of the similar post */
@@ -225,10 +232,14 @@ class Alesta_Audit {
     // ─────────────────────────────────────────────────────────────────────────
 
     private function audit_links(WP_Post $post, array &$out): void {
-        preg_match_all('#<a[^>]+href=["\']+([^"\'^#][^"\']*?)["\']+[^>]*>#i', $post->post_content, $matches);
-        $links  = array_unique($matches[1] ?? []);
-        $broken = [];
-        $ok     = 0;
+        // Délimiteur « ~ » : l'ancien « # » était aussi présent dans la classe
+        // [^"'^#], ce qui coupait le motif (« Unknown modifier ] ») : la
+        // vérification des liens ne s'exécutait jamais.
+        preg_match_all('~<a[^>]+href=["\']+([^"\'^#][^"\']*?)["\']+[^>]*>~i', $post->post_content, $matches);
+        $links   = array_unique($matches[1] ?? []);
+        $broken  = [];
+        $ok      = 0;
+        $skipped = 0;
 
         foreach ($links as $url) {
             // Ignorer mailto, tel, ancres, javascript.
@@ -248,8 +259,21 @@ class Alesta_Audit {
                 continue;
             }
 
+            // Budget global : l'audit ne doit pas dépasser le délai de la requête
+            // AJAX sur un site riche en liens. Au-delà, les liens sont comptés
+            // comme « non vérifiés ».
+            if ( 0.0 === $this->link_check_started ) {
+                $this->link_check_started = microtime(true);
+            }
+            $elapsed = microtime(true) - $this->link_check_started;
+            if ( $this->link_checks_done >= self::LINK_CHECK_MAX || $elapsed >= self::LINK_CHECK_BUDGET ) {
+                $skipped++;
+                continue;
+            }
+            $this->link_checks_done++;
+
             $response = wp_remote_head($url, [
-                'timeout'     => self::LINK_CHECK_TIMEOUT,
+                'timeout'     => (int) max(1, min(self::LINK_CHECK_TIMEOUT, ceil(self::LINK_CHECK_BUDGET - $elapsed))),
                 'sslverify'   => true,
                 'redirection' => 0,
                 'user-agent'  => 'Alesta-LinkChecker/1.0',
@@ -275,6 +299,7 @@ class Alesta_Audit {
                 'type'        => $post->post_type,
                 'total_links' => count($links),
                 'ok_links'    => $ok,
+                'skipped'     => $skipped, // non vérifiés (budget de l'audit atteint)
                 'broken'      => $broken,
                 'status'      => empty($broken) ? 'ok' : (count($broken) > 2 ? 'error' : 'warning'),
             ];
@@ -344,6 +369,11 @@ class Alesta_Audit {
         $post = get_post($post_id);
         if ( ! $post ) {
             return new WP_Error('not_found', __('Contenu introuvable.', 'alesta'));
+        }
+        // Contenu protégé par mot de passe : son texte n'est jamais envoyé à l'IA
+        // (même règle que la meta box et le module Meta).
+        if ( ! empty($post->post_password) ) {
+            return new WP_Error('password_protected', __('Ce contenu est protégé par mot de passe : la génération IA est désactivée pour ne pas exposer son texte.', 'alesta'));
         }
         $api = $this->api();
         if ( is_wp_error($api) ) {
@@ -445,9 +475,12 @@ class Alesta_Audit {
         if ( empty($post_types) ) {
             return [];
         }
+        // Contenus protégés par mot de passe exclus : l'audit propose ensuite
+        // une génération IA ligne par ligne, qui enverrait leur texte.
         return get_posts([
             'post_type'      => $post_types,
             'post_status'    => 'publish',
+            'has_password'   => false,
             'posts_per_page' => -1,
             'orderby'        => 'date',
             'order'          => 'DESC',

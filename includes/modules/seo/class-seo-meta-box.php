@@ -15,6 +15,9 @@ class Alesta_SEO_Meta_Box {
     const NONCE_SAVE = 'alesta_seo_mb_save';
     const NONCE_AJAX = 'alesta_seo_mb';
 
+    /** Préfixe du transient de limitation des appels IA (suivi de l'ID utilisateur). */
+    const RATE_KEY = 'alesta_meta_ai_rl_';
+
     /** @var bool Hooks enregistrés une seule fois. */
     private static $hooked = false;
 
@@ -53,6 +56,61 @@ class Alesta_SEO_Meta_Box {
         return array_values($public);
     }
 
+    /**
+     * Droit d'utiliser le bouton « Générer avec Claude » : chaque appel est
+     * facturé sur la clé API du propriétaire du site. Par défaut réservé aux
+     * éditeurs et plus (edit_others_posts), réglable via le filtre
+     * 'alesta_meta_ai_capability'. Le droit d'éditer l'article reste exigé.
+     */
+    private function user_can_use_ai( int $post_id = 0 ): bool {
+        $cap = (string) apply_filters('alesta_meta_ai_capability', 'edit_others_posts', $post_id);
+        if ( $cap === '' || ! current_user_can($cap) ) {
+            return false;
+        }
+        if ( $post_id && ! current_user_can('edit_post', $post_id) ) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Limite par utilisateur : N appels IA par heure (30 par défaut, filtre
+     * 'alesta_meta_ai_rate_limit' ; 0 ou moins = pas de limite).
+     * Compte l'appel s'il est autorisé ; renvoie un WP_Error sinon.
+     *
+     * @return true|WP_Error
+     */
+    private function consume_rate_limit( int $user_id ) {
+        $limit = (int) apply_filters('alesta_meta_ai_rate_limit', 30, $user_id);
+        if ( $limit <= 0 ) {
+            return true;
+        }
+
+        $key   = self::RATE_KEY . $user_id;
+        $now   = time();
+        $state = get_transient($key);
+        if ( ! is_array($state) || ! isset($state['count'], $state['start']) || ( $now - (int) $state['start'] ) >= HOUR_IN_SECONDS ) {
+            $state = ['count' => 0, 'start' => $now];
+        }
+
+        if ( (int) $state['count'] >= $limit ) {
+            $minutes = (int) max(1, ceil(( HOUR_IN_SECONDS - ( $now - (int) $state['start'] ) ) / MINUTE_IN_SECONDS));
+            return new WP_Error(
+                'rate_limited',
+                sprintf(
+                    /* translators: 1: maximum number of AI generations per hour, 2: minutes to wait */
+                    __('Limite atteinte : %1$d générations IA par heure. Réessayez dans %2$d minute(s).', 'alesta'),
+                    $limit,
+                    $minutes
+                )
+            );
+        }
+
+        $state['count'] = (int) $state['count'] + 1;
+        set_transient($key, $state, max(1, HOUR_IN_SECONDS - ( $now - (int) $state['start'] )));
+        return true;
+    }
+
     // =========================================================================
     // ASSETS
     // =========================================================================
@@ -73,10 +131,12 @@ class Alesta_SEO_Meta_Box {
             Alesta_API::enqueue_key_notice();
         }
         wp_enqueue_script('alesta-seo-mb', $url . 'assets/seo-meta-box.js', ['jquery'], ALESTA_VERSION, true);
+        // Le jeton de l'appel IA n'est remis qu'aux utilisateurs autorisés.
+        $post_id = (int) get_the_ID();
         wp_localize_script('alesta-seo-mb', 'AlestaSeoMB', [
             'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce'    => wp_create_nonce(self::NONCE_AJAX),
-            'post_id'  => get_the_ID(),
+            'nonce'    => $this->user_can_use_ai($post_id) ? wp_create_nonce(self::NONCE_AJAX) : '',
+            'post_id'  => $post_id,
             'home_url' => home_url('/'),
             'i18n'     => [
                 'no_title'     => __('Titre SEO non défini', 'alesta'),
@@ -182,7 +242,8 @@ class Alesta_SEO_Meta_Box {
                            class="aseo-input" />
                 </div>
 
-                <!-- Bouton IA -->
+                <?php if ( $this->user_can_use_ai($post->ID) ) : ?>
+                <!-- Bouton IA (réservé aux utilisateurs autorisés) -->
                 <div class="aseo-field aseo-ai-row">
                     <button type="button" id="aseo-btn-ai" class="button">
                         &#129302; <?php esc_html_e('Générer avec Claude', 'alesta'); ?>
@@ -190,6 +251,7 @@ class Alesta_SEO_Meta_Box {
                     <span class="spinner" id="aseo-ai-spinner" style="float:none;margin:0 0 0 8px;"></span>
                     <span id="aseo-ai-msg" class="aseo-ai-msg"></span>
                 </div>
+                <?php endif; ?>
 
             </div>
 
@@ -430,11 +492,15 @@ class Alesta_SEO_Meta_Box {
         if ( ! $post_id ) {
             wp_send_json_error(['message' => __('ID de post manquant.', 'alesta')]);
         }
-        if ( ! current_user_can('edit_post', $post_id) ) {
+        if ( ! current_user_can('edit_post', $post_id) || ! $this->user_can_use_ai($post_id) ) {
             wp_send_json_error(['message' => __('Accès refusé.', 'alesta')]);
         }
         if ( ! class_exists('Alesta_Meta_Module') ) {
             wp_send_json_error(['message' => __('Module Title & Meta indisponible.', 'alesta')]);
+        }
+        $allowed = $this->consume_rate_limit(get_current_user_id());
+        if ( is_wp_error($allowed) ) {
+            wp_send_json_error(Alesta_API::error_payload($allowed));
         }
 
         $module = new Alesta_Meta_Module();
